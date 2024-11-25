@@ -151,3 +151,9 @@
 ## 💤 画面遷移図
 Figma : https://www.figma.com/design/1zGdpuopbbSte31wXdMJu3/SleepLogger?node-id=0-1&t=XWvlXKwPKl1XLOAh-1
 [![Image from Gyazo](https://i.gyazo.com/68fe77d09b038d54f3df718b82e87dcf.png)](https://gyazo.com/68fe77d09b038d54f3df718b82e87dcf)
+
+<br>
+
+## 💤 ER図
+[dbdiagram](https://dbdiagram.io/d/SleepLogger-673f3ba9e9daa85aca423e68)
+[![Image from Gyazo](https://i.gyazo.com/5d7ede7e877203834a6e5aa0f6300905.png)](https://gyazo.com/5d7ede7e877203834a6e5aa0f6300905)
