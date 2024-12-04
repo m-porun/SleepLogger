@@ -1,0 +1,49 @@
+services:
+  # PostgreSQLの公式Dockerイメージを使用
+  db:
+    image: postgres
+    restart: always
+    environment:
+      TZ: Asia/Tokyo
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    # データベースのデータを永続化
+    volumes:
+      - postgresql_data:/var/lib/postgresql
+    ports:
+      - 5433:5432
+    # pg_isreadyコマンドを使ってSleepLogger_developmentデータベースのコンテナが正常に動くかチェック
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d SleepLogger_development -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+  # コンテナのビルド
+    build:
+      context: .
+      # Dockerfile.dev　に基づくよう指定
+      dockerfile: Dockerfile.dev
+    command: bash -c "bundle install && bundle exec rails db:prepare && rm -f tmp/pids/server.pid && ./bin/dev"
+    tty: true
+    stdin_open: true
+    # ローカルのコードをコンテナ内に反映
+    volumes:
+      - .:/SleepLogger
+      - bundle_data:/usr/local/bundle:cached
+      - node_modules:/SleepLogger/node_modules
+    environment:
+      TZ: Asia/Tokyo
+    ports:
+      - "3000:3000"
+    # PostgreSQLが無事動くことを確認してから起動する
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  # 永続化するためのボリューム
+  bundle_data:
+  postgresql_data:
+  node_modules:
