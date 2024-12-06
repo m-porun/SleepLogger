@@ -10,13 +10,56 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_12_06_044039) do
+ActiveRecord::Schema[7.2].define(version: 2024_12_06_130929) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
-  create_table "tasks", force: :cascade do |t|
-    t.string "name"
+  create_table "awakenings", force: :cascade do |t|
+    t.bigint "sleep_log_id"
+    t.integer "awakenings_count"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["sleep_log_id"], name: "index_awakenings_on_sleep_log_id"
   end
+
+  create_table "comments", force: :cascade do |t|
+    t.bigint "sleep_log_id"
+    t.text "comment"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["sleep_log_id"], name: "index_comments_on_sleep_log_id"
+  end
+
+  create_table "napping_times", force: :cascade do |t|
+    t.bigint "sleep_log_id"
+    t.integer "napping_time"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["sleep_log_id"], name: "index_napping_times_on_sleep_log_id"
+  end
+
+  create_table "sleep_logs", force: :cascade do |t|
+    t.datetime "go_to_bed_at"
+    t.datetime "fell_asleep_at"
+    t.datetime "woke_up_at"
+    t.datetime "leave_bed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id"
+    t.index ["user_id"], name: "index_sleep_logs_on_user_id"
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "email"
+    t.string "encrypted_password", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_users_on_email", unique: true
+  end
+
+  add_foreign_key "awakenings", "sleep_logs"
+  add_foreign_key "comments", "sleep_logs"
+  add_foreign_key "napping_times", "sleep_logs"
+  add_foreign_key "sleep_logs", "users"
 end
