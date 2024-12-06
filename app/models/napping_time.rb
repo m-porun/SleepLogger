@@ -1,5 +1,5 @@
 class NappingTime < ApplicationRecord
-  validates :napping_time numericality: { only_integer: true }
+  validates :napping_time, numericality: { only_integer: true }
 
   belongs_to :sleep_log
 end
