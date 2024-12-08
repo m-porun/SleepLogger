@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_12_06_130929) do
+ActiveRecord::Schema[7.2].define(version: 2024_12_06_150536) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -39,13 +39,13 @@ ActiveRecord::Schema[7.2].define(version: 2024_12_06_130929) do
   end
 
   create_table "sleep_logs", force: :cascade do |t|
+    t.bigint "user_id"
     t.datetime "go_to_bed_at"
     t.datetime "fell_asleep_at"
     t.datetime "woke_up_at"
     t.datetime "leave_bed_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "user_id"
     t.index ["user_id"], name: "index_sleep_logs_on_user_id"
   end
 
