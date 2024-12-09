@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <!-- ビューごとで動的にタイトルをつける -->
     <title><%= content_for(:title) || "Sleep Logger" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <%= csrf_meta_tags %>
-    <%= csp_meta_tag %>
+    <%= csrf_meta_tags %> <!-- CSRG攻撃を防ぐためのトークン -->
+    <%= csp_meta_tag %> <!-- CSPを設定するタグ -->
 
     <%= yield :head %>
 
@@ -13,6 +14,7 @@
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
+    <!-- Turbo使用時、アセットが更新されたときに再ロードする -->
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
   </head>
