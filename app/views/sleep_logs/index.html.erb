@@ -1,0 +1,13 @@
+<div class="w-4/5 relative flex justify-center"> <!-- 横幅の80%で中央配置、親要素あり -->
+  <div class="relative top-24 flex items-start justify-center"> <!-- 子要素、上から94px、縦軸は上揃え、横軸は中央揃え -->
+    <!-- 年月選択 -->
+    <%= form_with(url: sleep_logs_path, method: :get, local: true) do |f| %>
+      <div class="form-group">
+        <%= f.month_field :year_month, class: 'form-control bg-primary text-center' %> <!-- f.month_fieldで日付なしの選択ができる -->
+      </div>
+    <% end %>
+
+    <!-- 睡眠日誌の内容 -->
+    <p class="size-52 font-bold text-center">睡眠日誌</p>
+  </div>
+</div>
