@@ -1,0 +1,13 @@
+<!-- PDFに出力ボタン -->
+<button class="btn bg-primary text-neutral" onclick="pdf_export.showModal()">PDFに出力</button>
+<dialog id="pdf_export" class="modal">
+  <div class="modal-box">
+    <h3 class="font-bold">本リリースでがんばります</h3>
+    <p class="py-4">ESCキーか閉じるボタンを押してね</p>
+    <div class="modal-action">
+      <form method="dialog">
+        <button class="btn">閉じる</button>
+      </form>
+    </div>
+  </div>
+</dialog>

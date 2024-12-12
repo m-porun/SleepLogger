@@ -23,6 +23,9 @@
     <!-- Turbo使用時、アセットが更新されたときに再ロードする -->
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
+
+    <!-- Turbo Frameでモーダルの設定 -->
+    <%= turbo_frame_tag "modal" %>
   </head>
 
   <body class="w-full base-100 text-neutral">
