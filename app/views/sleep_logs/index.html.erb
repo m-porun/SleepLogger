@@ -1,5 +1,5 @@
-<div class="w-4/5 relative flex justify-center"> <!-- 横幅の80%で中央配置、親要素あり -->
-  <div class="relative top-24 flex items-start justify-center"> <!-- 子要素、上から94px、縦軸は上揃え、横軸は中央揃え -->
+<div class="relative w-4/5 place-self-center"> <!-- 横幅の80%で中央配置、親要素あり -->
+  <div class="relative top-24 flex justify-center "> <!-- 子要素、上から94px、横軸は中央揃え -->
     <!-- 年月選択 -->
     <%= form_with(url: sleep_logs_path, method: :get, local: true) do |f| %>
       <div class="form-group">
@@ -7,7 +7,14 @@
       </div>
     <% end %>
 
-    <!-- 睡眠日誌の内容 -->
     <p class="size-52 font-bold text-center">睡眠日誌</p>
+
+      <!-- PDFに出力ボタン -->
+      <%= render 'pdf_export' %>
+
+      <!-- 記録を保存ボタン -->
+      <%= render 'save_logs' %>
+
+
   </div>
 </div>
