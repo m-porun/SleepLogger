@@ -1,0 +1,32 @@
+<table class="border-collapse border border-neutral bg-primary"> <!-- 要カスタマイズ -->
+  <thead>
+    <tr>
+      <th class="border border-neutral">日</th>
+      <th class="border border-neutral">曜日</th>
+      <th class="border border-neutral">就床時刻</th>
+      <th class="border border-neutral">就寝時刻</th>
+      <th class="border border-neutral">覚醒時刻</th>
+      <th class="border border-neutral">起床時刻</th>
+      <th class="border border-neutral">睡眠時間</th>
+      <th class="border border-neutral">中途覚醒(回)</th>
+      <th class="border border-neutral">昼寝時間(分)</th>
+      <th class="border border-neutral">備考</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% (@start_date..@end_date).each do |date| %> <!-- 月初から月末までの日付を繰り返し処理する -->
+      <tr>
+        <td><%= date.day %></td> <!-- 日付 -->
+        <td><%= %w[日 月 火 水 木 金 土][date.wday] %></td> <!-- 曜日を日本語で表示 -->
+        <td>--:--</td> <!-- 就床時刻 -->
+        <td>--:--</td> <!-- 就寝時刻 -->
+        <td>--:--</td> <!-- 覚醒時刻 -->
+        <td>--:--</td> <!-- 起床時刻  -->
+        <td>00h00m</td> <!-- 睡眠時間 -->
+        <td>0</td> <!-- 中途覚醒(回) -->
+        <td>0</td> <!-- 昼寝時間(分) -->
+        <td>@@@</td> <!-- 備考 -->
+      </tr>
+    <% end %>
+  </tbody>
+</table>
