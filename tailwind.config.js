@@ -10,15 +10,15 @@ module.exports = {
     themes: [
       {
         mytheme: {
-          "primary": "#f5f5f5",
-          "secondary": "#c3c3c3",
-          "accent": "#5862ab",
-          "neutral": "#3d3a39",
-          "base-100": "#e3e0dc",
-          "info": "#5862ab",
-          "success": "#5862ab",
-          "warning": "#8d7683",
-          "error": "#8d7683",
+          "primary": "#f5f5f5", // 白色
+          "secondary": "#c3c3c3", // グレー
+          "accent": "#5862ab", // 青
+          "neutral": "#3d3a39", // 黒
+          "base-100": "#e3e0dc", // 薄グレー
+          "info": "#5862ab", // 青
+          "success": "#5862ab", // 青
+          "warning": "#8d7683", // 赤
+          "error": "#8d7683", /// 赤
           },
         },
       ],
