@@ -4,7 +4,7 @@ class SleepLogsController < ApplicationController
   def index
     # 年月を選択した場合、その月の日付・曜日を取得 / 今月の日付を取得
     if params[:year_month].present?
-      year, month = params[:year_month].split('-').map(&:to_i) # year-month(YYYY-MM)を分割し、整数に変換
+      year, month = params[:year_month].split("-").map(&:to_i) # year-month(YYYY-MM)を分割し、整数に変換
       @selected_date = Date.new(year, month, 1) # 選択された年月
     else
       @selected_date = Date.today # パラメーターがからの場合は現在の年月を入れる
@@ -15,7 +15,7 @@ class SleepLogsController < ApplicationController
 
     respond_to do |format| # Turbo Streamのリクエストに対応する
       format.html # いつもの表示
-      format.turbo_stream { render turbo_stream: turbo_stream.replace('sleep-logs-table', partial: 'logs_table') }
+      format.turbo_stream { render turbo_stream: turbo_stream.replace("sleep-logs-table", partial: "logs_table") }
     end
   end
 
