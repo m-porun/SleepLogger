@@ -1,0 +1,26 @@
+<div class="relative w-4/5 place-self-center"> <!-- 横幅の80%で中央配置、親要素あり -->
+  <div class="relative top-24 flex justify-center"> <!-- 子要素、上から94px、横軸は中央揃え -->
+    <!-- 年月選択 -->
+    <%= form_with(url: sleep_logs_path, method: :get, data: { turbo: true }) do |f| %>
+      <div class="form-group">
+        <%= f.month_field :year_month,
+                          class: 'form-control bg-primary text-center',
+                          value: @selected_date.strftime('%Y-%m'),
+                          onchange: 'this.form.submit();' %>
+      </div>
+    <% end %>
+
+    <p class="size-52 font-bold text-center">睡眠日誌</p>
+
+    <!-- PDFに出力ボタン -->
+    <%= render 'pdf_export' %>
+
+    <!-- 記録を保存ボタン -->
+    <%= render 'save_logs' %>
+  </div>
+
+  <!-- 睡眠記録テーブル -->
+  <div id="sleep-logs-table"> <!-- テーブルごとに一意の識別子を用意することで、指定の部分のみを更新できるようにしている  -->
+    <%= render 'logs_table' %>
+  </div>
+</div>
