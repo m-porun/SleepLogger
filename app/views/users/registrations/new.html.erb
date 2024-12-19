@@ -3,7 +3,7 @@
     <h2 class="mt-10 text-center text-2xl/9 font-bold text-neutral">新規登録</h2>
   </div>
 
-  <%= form_with model: @user, url: user_registration_path do |f| %> <!-- Userモデルに送る -->
+  <%= form_with model: @user, url: user_registration_path, data: { turbo: false } do |f| %> <!-- Userモデルに送る -->
     <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
       <%= render "users/shared/error_messages", resource: resource %> <!-- エラー発生時の部分テンプレート -->
 
