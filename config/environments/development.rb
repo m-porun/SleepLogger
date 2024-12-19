@@ -80,5 +80,5 @@ Rails.application.configure do
   # config.generators.apply_rubocop_autocorrect_after_generate!
 
   # 具体的なIPアドレスを指定しないために記述
-  config.web_console.allowed_ips = '0.0.0.0/0'
+  config.web_console.allowed_ips = "0.0.0.0/0"
 end
