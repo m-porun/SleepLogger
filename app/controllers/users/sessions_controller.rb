@@ -3,19 +3,20 @@
 class Users::SessionsController < Devise::SessionsController
   # before_action :configure_sign_in_params, only: [:create]
 
+  ##### コメントアウト中！　ログイン・ログアウトできなかったら戻してね
   # GET /resource/sign_in
   # def new
-  #   super
+  #   root_path
   # end
 
-  # POST /resource/sign_in
+  # # POST /resource/sign_in
   # def create
-  #   super
+  #   root_path
   # end
 
-  # DELETE /resource/sign_out
+  # # DELETE /resource/sign_out
   # def destroy
-  #   super
+  #   root_path
   # end
 
   # protected

@@ -55,8 +55,8 @@ class Users::RegistrationsController < Devise::RegistrationsController
   #   super(resource)
   # end
 
-  # The path used after sign up for inactive accounts.
+  # 一旦コメントアウト中！新規登録できなかったら戻してね
   # def after_inactive_sign_up_path_for(resource)
-  #   super(resource)
+  #   root_path(resource)
   # end
 end
