@@ -12,7 +12,15 @@ Rails.application.routes.draw do
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
 
   # Defines the root path route ("/") トップページ
-  root "sleep_logs#index"
+  root to: "sleep_logs#index"
   # リソースルート
   resources :sleep_logs
+
+  # ログイン機能
+  devise_for :users
+
+  devise_scope :user do
+    get "/users/sign_out" => "devise/sessions#destroy"
+    post "/users/sign_in" => "devise/sessions#create"
+  end
 end

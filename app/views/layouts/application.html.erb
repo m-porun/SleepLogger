@@ -10,7 +10,7 @@
 
     <%= yield :head %>
 
-    <!-- ファビコンなど -->
+<!-- ファビコンなど -->
     <link rel="manifest" href="/manifest.json">
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
@@ -33,7 +33,12 @@
   </head>
 
   <body class="w-full base-100 text-neutral">
-    <%= render 'shared/header' %>
+    <%= render 'shared/flash' %>
+    <% if user_signed_in? %>
+      <%= render 'shared/header' %>
+    <% else %>
+      <%= render 'shared/before_login_header' %>
+    <% end %>
     <%= yield %>
     <%= render 'shared/footer' %>
   </body>
