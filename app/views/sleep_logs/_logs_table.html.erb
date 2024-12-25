@@ -1,40 +1,40 @@
-<table class="text-center text-sm text-neutral"> <!-- 要カスタマイズ -->
-  <thead>
-    <tr class="p-4">
-      <th class="border border-secondary bg-primary">日</th>
-      <th class="border border-secondary bg-primary">曜日</th>
-      <th class="border border-secondary bg-primary">就床時刻</th>
-      <th class="border border-secondary bg-primary">就寝時刻</th>
-      <th class="border border-secondary bg-primary">覚醒時刻</th>
-      <th class="border border-secondary bg-primary">起床時刻</th>
-      <th class="border border-secondary bg-primary">睡眠時間</th>
-      <th class="border border-secondary bg-primary">中途覚醒(回)</th>
-      <th class="border border-secondary bg-primary">昼寝時間(分)</th>
-      <th class="border border-secondary bg-primary">備考</th>
-      <th class="border border-secondary bg-primary">編集</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% (@start_date..@end_date).each do |date| %> <!-- 月初から月末までの日付を繰り返し処理する -->
+<tbody>
+  <% (@start_date..@end_date).each do |date| %> <!-- 月初から月末までの日付を繰り返し処理する -->
+    <% sleep_log = @sleep_logs.find { |log| log.date == date } %>
       <tr class="border border-secondary bg-primary">
-        <td class="p-2 border border-secondary bg-primary"><%= date.day %></td> <!-- 日付 -->
-        <td class="p-2 border border-secondary bg-primary"><%= %w[日 月 火 水 木 金 土][date.wday] %></td> <!-- 曜日を日本語で表示 -->
-        <td class="p-2 border border-secondary bg-primary">--:--</td> <!-- 就床時刻 -->
-        <td class="p-2 border border-secondary bg-primary">--:--</td> <!-- 就寝時刻 -->
-        <td class="p-2 border border-secondary bg-primary">--:--</td> <!-- 覚醒時刻 -->
-        <td class="p-2 border border-secondary bg-primary">--:--</td> <!-- 起床時刻  -->
-        <td class="p-2 border border-secondary bg-primary">00h00m</td> <!-- 睡眠時間 -->
-        <td class="p-2 border border-secondary bg-primary">0</td> <!-- 中途覚醒(回) -->
-        <td class="p-2 border border-secondary bg-primary">0</td> <!-- 昼寝時間(分) -->
-        <td class="p-1 border border-secondary bg-primary">
-          <textarea rows="3" cols="42" placeholder="42文字まで" class="h-15 w-48 field-sizing-content bg-transparent border border-neutral-300 rounded"></textarea>
-        </td> <!-- 備考 -->
+        <td class="p-2 border border-secondary bg-primary"><%= date.day %></td>
+        <td class="p-2 border border-secondary bg-primary"><%= %w[日 月 火 水 木 金 土][date.wday] %></td>
+        <td class="p-2 border border-secondary bg-primary"><%= sleep_log&.go_to_bed_at&.strftime('%H:%M') || '--:--' %></td>
+        <td class="p-2 border border-secondary bg-primary"><%= sleep_log&.fell_asleep_at&.strftime('%H:%M') || '--:--' %></td>
+        <td class="p-2 border border-secondary bg-primary"><%= sleep_log&.woke_up_at&.strftime('%H:%M') || '--:--' %></td>
+        <td class="p-2 border border-secondary bg-primary"><%= sleep_log&.leave_bed_at&.strftime('%H:%M') || '--:--' %></td>
         <td class="p-2 border border-secondary bg-primary">
-          <span class="material-symbols-outlined">
-            edit_square
+          <% if sleep_log&.fell_asleep_at && sleep_log&.woke_up_at %>
+            <% fell_asleep = sleep_log.fell_asleep_at
+              woke_up = sleep_log.woke_up_at %>
+            <!-- もしwoke_up_atがfell_asleep_atより早ければ、1日加算して計算する -->
+            <% if woke_up < fell_asleep %>
+              <% woke_up += 1.day %>  <!-- 1日分足す -->
+            <% end %>
+            <% sleep_duration = woke_up - fell_asleep %>  <!-- 差を計算 -->
+            <%= Time.at(sleep_duration).strftime('%H時間%M分') %>  <!-- 時間の差を表示 -->
+          <% else %>
+            --:--
+          <% end %>
+        </td>
+        <td class="p-2 border border-secondary bg-primary"><%= sleep_log&.awakening&.awakenings_count || 0 %></td>
+        <td class="p-2 border border-secondary bg-primary"><%= sleep_log&.napping_time&.napping_time || 0 %></td>
+        <td class="p-1 border border-secondary bg-primary"><%= sleep_log&.comment&.comment || '' %></td>
+
+        <td class="p-2 border border-secondary bg-primary">
+          <span class="material-symbols-outlined inline-flex"> <!-- 祈りのinline-flex. クリック範囲広がれ -->
+            <!-- ボタンを押すとモーダル現る -->
+            <%= link_to 'edit_square', edit_sleep_log_path(sleep_log, date: date), data: { turbo_frame: 'sleep_log_modal'} %>
           </span>
         </td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+
+
+      </td>
+    </tr>
+  <% end %>
+</tbody>
