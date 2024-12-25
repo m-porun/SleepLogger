@@ -1,5 +1,3 @@
-<turbo-stream target="sleep-logs-table"> # 更新するターゲットのidを指定
-  <template>
-    <%= render 'logs_table' %> # 更新後のテーブルを再レンダリング
-  </template>
-</turbo-stream>
+<%= turbo_stream.replace "sleep-log-#{@sleep_log.id}" do %> # 更新するターゲットのidを指定
+    <%= render 'sleep_logs/_log_row' %> # 更新後のテーブルを再レンダリング
+<% end %>
