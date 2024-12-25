@@ -1,5 +1,5 @@
 class Awakening < ApplicationRecord
   validates :awakenings_count, numericality: { only_integer: true }
 
-  belongs_to :sleep_log
+  belongs_to :sleep_log, dependent: :destroy
 end
