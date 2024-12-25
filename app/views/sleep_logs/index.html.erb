@@ -1,5 +1,6 @@
-<div class="relative w-4/5 place-self-center pb-32"> <!-- 横幅の80%で中央配置、親要素あり -->
+<div class="relative w-4/5 place-self-center"> <!-- 横幅の80%で中央配置、親要素あり -->
   <div class="relative top-24 flex justify-center"> <!-- 子要素、上から94px、横軸は中央揃え -->
+    <%= render 'shared/flash' %>
     <!-- 年月選択 -->
     <%= form_with(url: sleep_logs_path, method: :get, data: { turbo: true }) do |f| %>
       <div class="form-group">
@@ -16,12 +17,14 @@
     <%= render 'pdf_export' %>
 
     <!-- 記録を保存ボタン -->
-    <%= button_to "記録を保存", '#', method: :post, class: "btn ml-5 bg-white text-neutral" %>
+    <%= form_with(url: sleep_logs_path, method: :patch) do |f| %>
+      <%= f.submit "記録を保存", class: "btn ml-5 bg-white text-neutral" %>
+    <% end %>
   </div>
 
   <!-- 睡眠記録テーブル -->
   <div id="sleep-logs-table"> <!-- テーブルごとに一意の識別子を用意することで、指定の部分のみを更新できるようにしている  -->
-    <table class="text-center text-sm text-neutral"> <!-- 要カスタマイズ -->
+    <table class="relative mt-10 mb-24 text-center text-sm text-neutral"> <!-- 要カスタマイズ -->
       <thead>
         <tr class="p-4">
           <th class="border border-secondary bg-primary">日</th>
@@ -34,7 +37,6 @@
           <th class="border border-secondary bg-primary">中途覚醒(回)</th>
           <th class="border border-secondary bg-primary">昼寝時間(分)</th>
           <th class="border border-secondary bg-primary">備考</th>
-          <th class="border border-secondary bg-primary">編集</th>
         </tr>
       </thead>
       <%= render 'logs_table' %>

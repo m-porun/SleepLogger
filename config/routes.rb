@@ -14,7 +14,7 @@ Rails.application.routes.draw do
   # Defines the root path route ("/") トップページ
   root to: "sleep_logs#index"
   # リソースルート
-  resources :sleep_logs
+  resources :sleep_logs, only: [:index, :show, :edit, :update, :create, :destroy]
 
   # ログイン機能
   devise_for :users

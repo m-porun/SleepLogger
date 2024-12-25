@@ -1,4 +1,6 @@
-<!-- _form_html.erbで編集した記録をレコードに反映させる -->
+<%
+=begin%>
+ <!-- _form_html.erbで編集した記録をレコードに反映させる -->
 <%= turbo_frame_tag sleep_log do %>
     <tr class="border border-secondary bg-primary">
       <td class="p-2 border border-secondary bg-primary"><%= sleep_log.date.day %></td>
@@ -26,4 +28,6 @@
     <%= link_to "編集", edit_sleep_log_path(sleep_log), class: "cursor-pointer" %>
   </td>
 </tr>
-
+ 
+<%
+=end%>

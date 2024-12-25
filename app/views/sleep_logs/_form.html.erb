@@ -1,5 +1,7 @@
 <!-- 編集モーダルフォーム -->
-<%= turbo_frame_tag "sleep_log_modal" do %>
+<%
+=begin%>
+ <%= turbo_frame_tag "sleep_log_modal" do %>
   <!-- targetでモーダル外と判別する -->
   <!-- モーダル外をクリックすると、closeBackgroundアクションが呼び出され自動的に閉じる -->
   <div class="fixed inset-0 flex items-center justify-center z-50 bg-gray-50 bg-gray-500 bg-opacity-50"
@@ -45,7 +47,9 @@
       <% end %>>
     </div>
   </div>
-<% end %>
+<% end %> 
+<%
+=end%>
 
 
 
