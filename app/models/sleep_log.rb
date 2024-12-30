@@ -1,10 +1,12 @@
 class SleepLog < ApplicationRecord
   belongs_to :user
-  has_one :awakening
-  has_one :napping_time
-  has_one :comment
+  has_one :awakening, dependent: :destroy
+  has_one :napping_time, dependent: :destroy
+  has_one :comment, dependent: :destroy
+  accepts_nested_attributes_for :awakening, :napping_time, :comment
 
-  accepts_nested_attributes_for :awakening
-  accepts_nested_attributes_for :comment
-  accepts_nested_attributes_for :napping_time
+  validates :user_id, presence: true
+  validates :date, uniqueness: { scope: :user_id, message: "はすでに登録されています" } # TODO: schemaファイルにも一意登録すべきでは
 end
+
+# TODO: 時間の前後する場合の対策を考える
