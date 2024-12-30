@@ -1,65 +1,53 @@
-<%= form_with(model: @sleep_logs, url: sleep_logs_path, method: :patch, data: { turbo: true }) do |f| %>
-  <tbody>
-    <% (@start_date..@end_date).each do |date| %> <!-- 月初から月末までの日付を繰り返し処理する -->
-      <% sleep_log = @sleep_logs.find { |log| log.date == date } || current_user.sleep_logs.create(date: date) %> <!-- その日付に合致する日付のログがあればその記録を使うし、なければその日付の記録を新たに作る -->
-        <tr class="border border-secondary bg-primary">
-          <td class="p-2 border border-secondary bg-primary"><%= date.day %></td>
-          <td class="p-2 border border-secondary bg-primary"><%= %w[日 月 火 水 木 金 土][date.wday] %></td>
-          <td class="p-2 border border-secondary bg-primary">
-            <%= f.time_field "sleep_logs[#{sleep_log.id}][go_to_bed_at]",
-                value: sleep_log.go_to_bed_at&.strftime('%H:%M') %>
-          </td>
+<tbody>
+  <% (@start_date..@end_date).each do |date| %> <!-- 月初から月末までの日付を繰り返し処理する -->
+    <% sleep_log = @sleep_logs.find { |log| log.date == date } || current_user.sleep_logs.find_or_initialize_by(date: date) %> <!-- その日付に合致する日付のログがあればその記録を使うし、なければその日付の入れ物を新たに作る（保存なし） -->
+    <tr class="border border-secondary bg-primary">
+      <td class="p-2 border border-secondary bg-primary"><%= date.day %></td>
+      <td class="p-2 border border-secondary bg-primary"><%= %w[日 月 火 水 木 金 土][date.wday] %></td>
+      <td class="p-2 border border-secondary bg-primary">
+        <%= sleep_log.go_to_bed_at&.strftime('%H:%M') || "--:--" %>
+      </td>
 
-          <td class="p-2 border border-secondary bg-primary">
-            <%= f.time_field "sleep_logs[#{sleep_log.id}][fell_asleep_at]",
-                value: sleep_log.fell_asleep_at&.strftime('%H:%M') %>
-          </td>
+      <td class="p-2 border border-secondary bg-primary">
+        <%= sleep_log.fell_asleep_at&.strftime('%H:%M') || "--:--" %>
+      </td>
 
-          <td class="p-2 border border-secondary bg-primary">
-            <%= f.time_field "sleep_logs[#{sleep_log.id}][woke_up_at]",
-                value: sleep_log.woke_up_at&.strftime('%H:%M') %>
-          </td>
+      <td class="p-2 border border-secondary bg-primary">
+        <%= sleep_log.woke_up_at&.strftime('%H:%M') || "--:--" %>
+      </td>
 
-          <td class="p-2 border border-secondary bg-primary">
-            <%= f.time_field "sleep_logs[#{sleep_log.id}][leave_bed_at]",
-                value: sleep_log.leave_bed_at&.strftime('%H:%M') %>
-          </td>
+      <td class="p-2 border border-secondary bg-primary">
+        <%= sleep_log.leave_bed_at&.strftime('%H:%M') || "--:--" %>
+      </td>
 
-          <td class="p-2 border border-secondary bg-primary">
-            <% if sleep_log.fell_asleep_at && sleep_log.woke_up_at %> <!-- 就寝時刻と覚醒時刻の両方が記載されている場合 -->
-              <%= calculate_sleep_duration(sleep_log.fell_asleep_at, sleep_log.woke_up_at) %> <!-- 就寝時刻〜覚醒時刻の睡眠時間を計算する -->
-            <% else %>
-              --:--
-            <% end %>
-          </td>
+      <td class="p-2 border border-secondary bg-primary">
+        <%= calculate_sleep_duration(sleep_log.fell_asleep_at, sleep_log.woke_up_at) || "--:--" %> <!-- 就寝時刻〜覚醒時刻の睡眠時間を計算する -->
+      </td>
 
-          <td class="p-2 border border-secondary bg-primary">
-          <%= f.fields_for :awakening do |awakening_form| %>
-            <%= f.number_field "sleep_logs[#{sleep_log.id}][awakenings_count]", # 子クラスのカラム
-                value: sleep_log.awakening&.awakenings_count || 0 %>
-          <% end %>
-          </td>
+      <td class="p-2 border border-secondary bg-primary">
+        <%= sleep_log.awakening&.awakenings_count || 0 %>
+      </td>
 
-          <td class="p-2 border border-secondary bg-primary">
-            <%= f.fields_for :napping_time do |comment_form| %>
-              <%= f.number_field "sleep_logs[#{sleep_log.id}][napping_time]", # 子クラスのカラム
-                  value: sleep_log.napping_time&.napping_time || 0 %>
-            <% end %>
-          </td>
+      <td class="p-2 border border-secondary bg-primary">
+          <%= sleep_log.napping_time&.napping_time || 0 %>
+      </td>
 
-          <td class="p-1 border border-secondary bg-primary">
-            <%= f.fields_for :comment do |napping_time_form| %>
-              <%= f.text_field "sleep_logs[#{sleep_log.id}][comment]",
-                  value: sleep_log.comment&.comment || '' %>
-            <% end %>
-          </td>
+      <td class="p-1 border border-secondary bg-primary">
+        <%= sleep_log.comment&.comment || '' %>
+      </td>
 
-          <td>
-            <%= form_with(url: sleep_logs_path, method: :patch) do |f| %>
-              <%= f.submit "記録を保存", class: "btn ml-5 bg-white text-neutral" %>
-            <% end %>
-          </td>
-      </tr>
-    <% end %>
-  </tbody>
-<% end %>
+
+      <td class="p-2 border border-secondary bg-primary">
+        <% if sleep_log.persisted? %>
+          <span class="material-symbols-outlined inline-flex">
+            <%= link_to 'edit_square', edit_sleep_log_path(sleep_log) %>
+          </span>
+        <% else %>
+          <span class="material-symbols-outlined inline-flex">
+            <%= link_to 'edit_square', new_sleep_log_path(date: date.to_s) %> <!-- 日付を数値に一旦変換 -->
+          </span>
+        <% end %>
+      </td>
+    </tr>
+  <% end %>
+</tbody>
