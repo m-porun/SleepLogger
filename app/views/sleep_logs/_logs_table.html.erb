@@ -1,9 +1,8 @@
 <tbody>
-  <% (@start_date..@end_date).each do |date| %> <!-- 月初から月末までの日付を繰り返し処理する -->
-    <% sleep_log = @sleep_logs.find { |log| log.date == date } || current_user.sleep_logs.find_or_initialize_by(date: date) %> <!-- その日付に合致する日付のログがあればその記録を使うし、なければその日付の入れ物を新たに作る（保存なし） -->
+  <% @sleep_logs.each do |sleep_log| %> <!-- 月初から月末までの日付を繰り返し表示する -->
     <tr class="border border-secondary bg-primary">
-      <td class="p-2 border border-secondary bg-primary"><%= date.day %></td>
-      <td class="p-2 border border-secondary bg-primary"><%= %w[日 月 火 水 木 金 土][date.wday] %></td>
+      <td class="p-2 border border-secondary bg-primary"><%= sleep_log.date.day %></td>
+      <td class="p-2 border border-secondary bg-primary"><%= %w[日 月 火 水 木 金 土][sleep_log.date.wday] %></td>
       <td class="p-2 border border-secondary bg-primary">
         <%= sleep_log.go_to_bed_at&.strftime('%H:%M') || "--:--" %>
       </td>
@@ -44,7 +43,7 @@
           </span>
         <% else %>
           <span class="material-symbols-outlined inline-flex">
-            <%= link_to 'edit_square', new_sleep_log_path(date: date.to_s) %> <!-- 日付を数値に一旦変換 -->
+            <%= link_to 'edit_square', new_sleep_log_path(date: sleep_log.date.to_s) %> <!-- 日付を数値に一旦変換 -->
           </span>
         <% end %>
       </td>

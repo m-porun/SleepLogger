@@ -6,7 +6,14 @@ class SleepLogsController < ApplicationController
     @selected_date = params[:year_month] ? Date.parse(params[:year_month] + "-01") : Date.today # 年月選択時に１日をつける。なければ本日の日付 parseは日付を文字列から日付に変えるメソッド
     @start_date = @selected_date.beginning_of_month # 1日or本日の日付の月初を設定
     @end_date = @selected_date.end_of_month # 1日or本日の月末を設定
-    @sleep_logs = current_user.sleep_logs.where(date: @start_date..@end_date).includes(:awakening, :napping_time, :comment) # 子クラスを含むsleep_logモデルを月初〜月末分取得する
+    sleep_logs = current_user.sleep_logs.where(date: @start_date..@end_date).includes(:awakening, :napping_time, :comment) # 子クラスを含むsleep_logモデルを月初〜月末分取得する
+
+    all_dates = (@start_date..@end_date).to_a # 月初から月末までの範囲オブジェクトを配列にする
+
+    # データが存在しない日は日付で埋める
+    @sleep_logs = all_dates.map do |date|
+      sleep_logs.find { |sleep_log| sleep_log.date == date } || current_user.sleep_logs.build(date: date)
+    end
 
     respond_to do |format| # Turbo Streamのリクエストに対応する
       format.html # いつもの表示
