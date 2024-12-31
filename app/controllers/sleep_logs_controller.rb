@@ -37,22 +37,18 @@ class SleepLogsController < ApplicationController
       @sleep_log[column] = convert_to_datetime(time_str) if time_str.present? # String型のHH:MMが渡されたら、DateTimeに変換する
     end
 
-  Rails.logger.debug @sleep_log.errors.full_messages.inspect # エラー内容をログに出力
-  Rails.logger.debug params[:sleep_log].inspect # 送信されたパラメータを確認
-
     if @sleep_log.save
       redirect_to sleep_logs_path, notice: "睡眠記録を保存しました"
     else
-      Rails.logger.debug @sleep_log.errors.full_messages.inspect # エラー内容をログに出力
       render :new
     end
   end
 
-  def edit # FIXME: 代入しよう
+  def edit
     @sleep_log = current_user.sleep_logs.find(params[:id])
-    @sleep_log.build_awakening if @sleep_log.awakening.nil?
-    @sleep_log.build_napping_time if @sleep_log.napping_time.nil?
-    @sleep_log.build_comment if @sleep_log.comment.nil?
+    @sleep_log.build_awakening unless @sleep_log.awakening.present? # 存在してなければbuild
+    @sleep_log.build_napping_time unless @sleep_log.napping_time.present?
+    @sleep_log.build_comment unless @sleep_log.comment.present?
   end
 
   def update
