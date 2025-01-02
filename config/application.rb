@@ -28,7 +28,6 @@ module SleepLogger
     config.time_zone = 'Asia/Tokyo'
 
     # DBへの保存時にUTCで保存し、表示時にはローカルタイムに変換
-    config.active_record.default_timezone = :utc  # UTCで保存
-    config.active_record.time_zone_aware_attributes = true
+    config.active_record.default_timezone = :local # UTCではなく、ローカルのタイムゾーンで保存
   end
 end
