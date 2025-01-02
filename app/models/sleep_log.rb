@@ -8,5 +8,3 @@ class SleepLog < ApplicationRecord
   validates :user_id, presence: true
   validates :date, uniqueness: { scope: :user_id, message: "はすでに登録されています" } # TODO: schemaファイルにも一意登録すべきでは
 end
-
-# TODO: 時間の前後する場合の対策を考える

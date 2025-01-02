@@ -32,10 +32,16 @@ class SleepLogsController < ApplicationController
   def create
     @sleep_log = SleepLog.new(sleep_log_params) # 保存用
 
+    processed_params = sleep_log_params.dup # 入力した内容を複製して編集
     %i[go_to_bed_at fell_asleep_at woke_up_at leave_bed_at].each do |column|
       time_str = params[:sleep_log][column]
-      @sleep_log[column] = convert_to_datetime(time_str) if time_str.present? # String型のHH:MMが渡されたら、DateTimeに変換する
+      if time_str.present?
+        datetime_value = convert_to_datetime(time_str, processed_params[:date])
+        processed_params[column] = datetime_value # String型のHH:MMが渡されたら、DateTimeに変換する
+      end
     end
+
+    @sleep_log.assign_attributes(processed_params) # 複製して編集した方を保存
 
     if @sleep_log.save
       redirect_to sleep_logs_path, notice: "睡眠記録を保存しました"
@@ -46,6 +52,7 @@ class SleepLogsController < ApplicationController
 
   def edit
     @sleep_log = current_user.sleep_logs.find(params[:id])
+    @sleep_log.date ||= params[:date]
     @sleep_log.build_awakening unless @sleep_log.awakening.present? # 存在してなければbuild
     @sleep_log.build_napping_time unless @sleep_log.napping_time.present?
     @sleep_log.build_comment unless @sleep_log.comment.present?
@@ -54,7 +61,16 @@ class SleepLogsController < ApplicationController
   def update
     @sleep_log = current_user.sleep_logs.find(params[:id])
 
-    if @sleep_log.update(sleep_log_params)
+    # String型のHH:MMが渡されたら、DateTimeに変換する
+    processed_params = sleep_log_params.dup # 入力した内容を複製して編集
+    %i[go_to_bed_at fell_asleep_at woke_up_at leave_bed_at].each do |column|
+      time_str = params[:sleep_log][column]
+      if time_str.present?
+        datetime_value = convert_to_datetime(time_str, processed_params[:date]) # Time型のカラムと複製したDateカラムを送る
+        processed_params[column] = datetime_value
+      end
+    end
+    if @sleep_log.update(processed_params) # 複製して編集した方を保存
       redirect_to sleep_logs_path, notice: "睡眠記録を更新しました"
     else
       render :edit
@@ -72,21 +88,19 @@ class SleepLogsController < ApplicationController
   def sleep_log_params
     params.require(:sleep_log).permit(
       :date,
+      :go_to_bed_at,
       :fell_asleep_at,
       :woke_up_at,
-      :go_to_bed_at,
       :leave_bed_at,
-      awakening_attributes: [ :id, :awakenings_count ],
-      napping_time_attributes: [ :napping_time ],
-      comment_attributes: [ :comment ]
+      awakening_attributes: [ :id, :awakenings_count ], # Unpermitted parameter: :id対策
+      napping_time_attributes: [ :id, :napping_time ],
+      comment_attributes: [ :id, :comment ]
     ).merge(user_id: current_user.id) # 誰の記録かも追加するストロングパラメーター
   end
 
   # 入力されたTime型をDateTime型にする
-  def convert_to_datetime(time_str)
+  def convert_to_datetime(time_str, date_str) # 複製したdateカラム
     return nil if time_str.blank? # もし時間入力がなければnilで登録
-      DateTime.parse("#{params[:sleep_log][:date]} #{time_str}") # "YYYY-MM-DD + time_str: HH:MM" として保存
-    rescue ArgumentError
-      nil
+    time_str = "#{date_str} #{time_str}".in_time_zone # "YYYY-MM-DD + time_str: HH:MM" をローカル時間で保存
   end
 end
