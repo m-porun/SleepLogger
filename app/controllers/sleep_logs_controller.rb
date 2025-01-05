@@ -53,6 +53,7 @@ class SleepLogsController < ApplicationController
       year_month = @sleep_log.date.strftime("%Y-%m") # 登録されたsleep_log.dateをYYYY-MM形式に変換
       redirect_to sleep_logs_path(year_month: year_month), notice: "睡眠記録を保存しました"
     else
+      flash.now[:alert] = 'エラーが発生しました。入力内容を確認してください。'
       render :new
     end
   end
@@ -83,6 +84,7 @@ class SleepLogsController < ApplicationController
       year_month = @sleep_log.date.strftime("%Y-%m")
       redirect_to sleep_logs_path(year_month: year_month), notice: "睡眠記録を更新しました"
     else
+      flash.now[:alert] = 'エラーが発生しました。入力内容を確認してください。'
       render :edit
     end
   end
@@ -124,7 +126,7 @@ class SleepLogsController < ApplicationController
   # 覚醒時刻が就床時刻・入眠時刻よりも後にならないよう修正
   def adjust_datetime_order(sleep_log, processed_params)
     %i[go_to_bed_at fell_asleep_at].each do |fix_date|
-      next if processed_params[fix_date].nil? || processed_params[:woke_up_at].nil? # 未入力か、日時の順序が正しい場合は次の処理へ
+      next if processed_params[fix_date].blank? || processed_params[:woke_up_at].blank? # 未入力か、日時の順序が正しい場合は次の処理へ
       if processed_params[fix_date] > processed_params[:woke_up_at]
         processed_params[fix_date] -= 1.day # 前夜就寝とする
       end
