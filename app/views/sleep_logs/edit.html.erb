@@ -1,6 +1,6 @@
 # 編集画面
 <div class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
-  <%= form_with(model: @sleep_log, local: true) do |f| %> <!-- FIXME: turbo入力 -->
+  <%= form_with(model: @sleep_log, local: true, data: { turbo: false }) do |f| %> <!-- TODO: turbo入力 -->
     <div>
       <%= f.label :date, '起きた日付' %>
       <%= f.date_field :date, value: @sleep_log.date, readonly: true %>

@@ -66,6 +66,6 @@ Rails.application.configure do
   config.action_controller.raise_on_missing_callback_actions = true
 
   # 日本時間をテスト環境にも適用
-  config.time_zone = 'Asia/Tokyo'
+  config.time_zone = "Asia/Tokyo"
   config.active_record.default_timezone = :utc
 end
