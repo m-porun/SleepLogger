@@ -37,15 +37,15 @@
 
 
       <td class="p-2 border border-secondary bg-primary">
-        <% if sleep_log.persisted? %>
-          <span class="material-symbols-outlined inline-flex">
-            <%= link_to 'edit_square', edit_sleep_log_path(sleep_log) %>
-          </span>
-        <% else %>
-          <span class="material-symbols-outlined inline-flex">
-            <%= link_to 'edit_square', new_sleep_log_path(date: sleep_log.date.to_s) %> <!-- 日付を数値に一旦変換 -->
-          </span>
-        <% end %>
+          <% if sleep_log.persisted? %>
+            <span class="material-symbols-outlined inline-flex">
+              <%= link_to 'edit_square', edit_sleep_log_path(sleep_log) %>
+            </span>
+          <% else %>
+            <span class="material-symbols-outlined inline-flex">
+              <%= link_to 'edit_square', new_sleep_log_path(date: sleep_log.date.to_s) %>
+            </span>
+          <% end %>
       </td>
     </tr>
   <% end %>

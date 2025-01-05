@@ -50,7 +50,8 @@ class SleepLogsController < ApplicationController
     @sleep_log.assign_attributes(processed_params)
 
     if @sleep_log.save
-      redirect_to sleep_logs_path, notice: "睡眠記録を保存しました"
+      year_month = @sleep_log.date.strftime("%Y-%m") # 登録されたsleep_log.dateをYYYY-MM形式に変換
+      redirect_to sleep_logs_path(year_month: year_month), notice: "睡眠記録を保存しました"
     else
       render :new
     end
@@ -79,7 +80,8 @@ class SleepLogsController < ApplicationController
     adjust_datetime_order(@sleep_log, processed_params) # DateTime型にした修正版睡眠記録を引数に
 
     if @sleep_log.update(processed_params) # 複製して編集した方を保存
-      redirect_to sleep_logs_path, notice: "睡眠記録を更新しました"
+      year_month = @sleep_log.date.strftime("%Y-%m")
+      redirect_to sleep_logs_path(year_month: year_month), notice: "睡眠記録を更新しました"
     else
       render :edit
     end
@@ -106,6 +108,7 @@ class SleepLogsController < ApplicationController
     ).merge(user_id: current_user.id) # 誰の記録かも追加するストロングパラメーター
   end
 
+  # 子モデルの作成
   def initialize_associations(sleep_log)
     @sleep_log.build_awakening unless @sleep_log.awakening.present? # 存在してなければbuild
     @sleep_log.build_napping_time unless @sleep_log.napping_time.present?

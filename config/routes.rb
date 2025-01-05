@@ -12,7 +12,7 @@ Rails.application.routes.draw do
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
 
   # リソースルート
-  resources :sleep_logs, only: [:index, :new, :edit, :update, :create, :destroy]
+  resources :sleep_logs, only: [ :index, :new, :edit, :update, :create, :destroy ]
 
   # ログイン機能
   devise_for :users
@@ -21,6 +21,6 @@ Rails.application.routes.draw do
     get "/users/sign_out" => "devise/sessions#destroy"
     post "/users/sign_in" => "devise/sessions#create"
     # Defines the root path route ("/") トップページ
-    root to: 'devise/sessions#new'
+    root to: "devise/sessions#new"
   end
 end
