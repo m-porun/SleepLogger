@@ -53,7 +53,7 @@ class SleepLogsController < ApplicationController
       year_month = @sleep_log.date.strftime("%Y-%m") # 登録されたsleep_log.dateをYYYY-MM形式に変換
       redirect_to sleep_logs_path(year_month: year_month), notice: "睡眠記録を保存しました"
     else
-      flash.now[:alert] = 'エラーが発生しました。入力内容を確認してください。'
+      flash.now[:alert] = "エラーが発生しました。入力内容を確認してください。"
       render :new
     end
   end
@@ -84,7 +84,7 @@ class SleepLogsController < ApplicationController
       year_month = @sleep_log.date.strftime("%Y-%m")
       redirect_to sleep_logs_path(year_month: year_month), notice: "睡眠記録を更新しました"
     else
-      flash.now[:alert] = 'エラーが発生しました。入力内容を確認してください。'
+      flash.now[:alert] = "エラーが発生しました。入力内容を確認してください。"
       render :edit
     end
   end
