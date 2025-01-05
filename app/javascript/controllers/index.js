@@ -3,9 +3,9 @@
 // ./bin/rails generate stimulus controllerName
 
 // from~Toggle)まで追加。TailwindCSSコンポーネントをインポート
-import { application } from "@hotwired/stimulus" // from "./application"
+import { Application } from "@hotwired/stimulus"
 
-application.start();
+const application = Application.start();
 
 // TailwindCSS Components https://github.com/excid3/tailwindcss-stimulus-components#basic-usage TODO: 不要なものがあれば消すこと
 import { Modal } from "tailwindcss-stimulus-components"
