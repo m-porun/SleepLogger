@@ -33,12 +33,12 @@
   </head>
 
   <body class="w-full base-100 text-neutral">
-    <%= render 'shared/flash' %>
     <% if user_signed_in? %>
       <%= render 'shared/header' %>
     <% else %>
       <%= render 'shared/before_login_header' %>
     <% end %>
+    <%= render 'shared/flash' %>
     <%= yield %>
     <%= render 'shared/footer' %>
   </body>

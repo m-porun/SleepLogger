@@ -23,5 +23,11 @@ module SleepLogger
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+
+    # 日本標準時に設定
+    config.time_zone = "Asia/Tokyo"
+
+    # DBへの保存時にUTCで保存し、表示時にはローカルタイムに変換
+    config.active_record.default_timezone = :local # UTCではなく、ローカルのタイムゾーンで保存
   end
 end

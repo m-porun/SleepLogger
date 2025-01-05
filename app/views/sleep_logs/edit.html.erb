@@ -1,0 +1,54 @@
+<!-- 編集画面 -->
+<div class="flex justify-center items-center z-50 mt-8">
+  <%= form_with(model: @sleep_log, local: true, data: { turbo: false }) do |f| %> <!-- TODO: turbo入力 -->
+    <div>
+      <%= f.label :date, '起きた日付' %>
+      <%= f.date_field :date, value: @sleep_log.date, readonly: true %>
+    </div>
+    <div>
+      <%= f.label :go_to_bed_at, "昨夜布団に入った時刻" %>
+      <%= f.time_field :go_to_bed_at %>
+    </div>
+
+    <div>
+      <%= f.label :fell_asleep_at, "昨夜寝た時刻" %>
+      <%= f.time_field :fell_asleep_at %>
+    </div>
+
+    <div>
+      <%= f.label :woke_up_at, "今朝目覚めた時刻" %>
+      <%= f.time_field :woke_up_at  %>
+    </div>
+
+    <div>
+      <%= f.label :leave_bed_at, "今朝布団から出た時刻" %>
+      <%= f.time_field :leave_bed_at  %>
+    </div>
+
+    <div>
+      <%= f.fields_for :awakening do |awakening_form| %>
+        <%= awakening_form.label :awakenings_count, "中途覚醒（回数）" %>
+        <%= awakening_form.number_field :awakenings_count, value: awakening_form.object.awakenings_count || 0, min: 0 %> <!-- デフォルトで0が入力されている -->
+      <% end %>
+    </div>
+
+    <div>
+      <%= f.fields_for :napping_time do |napping_time_form| %>
+        <%= napping_time_form.label :napping_time, "昼寝時間（分）" %>
+        <%= napping_time_form.number_field :napping_time, value: napping_time_form.object.napping_time || 0, min: 0 %>
+      <% end %>
+    </div>
+
+    <div>
+      <%= f.fields_for :comment do |comment_form| %>
+        <%= comment_form.label :comment, "備考(42文字まで)" %>
+        <%= comment_form.text_area :comment, max: 42 %>
+      <% end %>
+    </div>
+
+    <div class="form-group">
+      <%= f.submit "修正", class: "bg-blue-500 text-white py-2 px-4 rounded w-full" %>
+    </div>
+
+  <% end %>
+</div>
