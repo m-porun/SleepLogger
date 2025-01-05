@@ -11,10 +11,8 @@ Rails.application.routes.draw do
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
 
-  # Defines the root path route ("/") トップページ
-  root to: "sleep_logs#index"
   # リソースルート
-  resources :sleep_logs
+  resources :sleep_logs, only: [ :index, :new, :edit, :update, :create, :destroy ]
 
   # ログイン機能
   devise_for :users
@@ -22,5 +20,7 @@ Rails.application.routes.draw do
   devise_scope :user do
     get "/users/sign_out" => "devise/sessions#destroy"
     post "/users/sign_in" => "devise/sessions#create"
+    # Defines the root path route ("/") トップページ
+    root to: "devise/sessions#new"
   end
 end
