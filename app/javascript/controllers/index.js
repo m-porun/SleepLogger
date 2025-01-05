@@ -5,7 +5,7 @@
 // from~Toggle)まで追加。TailwindCSSコンポーネントをインポート
 import { application } from "@hotwired/stimulus" // from "./application"
 
-const application = Application.start();
+const application = application.start();
 
 // TailwindCSS Components https://github.com/excid3/tailwindcss-stimulus-components#basic-usage TODO: 不要なものがあれば消すこと
 import { Modal } from "tailwindcss-stimulus-components"
