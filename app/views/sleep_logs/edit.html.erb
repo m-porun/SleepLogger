@@ -1,5 +1,5 @@
-# 編集画面
-<div class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
+<!-- 編集画面 -->
+<div class="flex justify-center items-center z-50 mt-8">
   <%= form_with(model: @sleep_log, local: true, data: { turbo: false }) do |f| %> <!-- TODO: turbo入力 -->
     <div>
       <%= f.label :date, '起きた日付' %>
@@ -41,7 +41,7 @@
 
     <div>
       <%= f.fields_for :comment do |comment_form| %>
-        <%= comment_form.label :comment, "備考" %>
+        <%= comment_form.label :comment, "備考(42文字まで)" %>
         <%= comment_form.text_area :comment, max: 42 %>
       <% end %>
     </div>
