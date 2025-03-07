@@ -43,7 +43,7 @@
             </span>
           <% else %>
             <span class="material-symbols-outlined inline-flex">
-              <%= link_to 'edit_square', new_sleep_log_path(date: sleep_log.date.to_s) %>
+              <%= link_to 'edit_square', new_sleep_log_path(date: sleep_log.date.to_s) %> <!-- link_toで送るパラメータはString型にしなければならない。Railsで自動変換するが念の為 -->
             </span>
           <% end %>
       </td>

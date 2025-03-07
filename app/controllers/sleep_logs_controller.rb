@@ -26,16 +26,21 @@ class SleepLogsController < ApplicationController
   end
 
   def new
-    @sleep_log = SleepLog.new # ただの入力表示用
-    @sleep_log.date = params[:date]
-    initialize_associations(@sleep_log) # 子モデルの作成
+    # フォームオブジェクトを呼び出す
+    @date = params[:date]
+    @user = current_user.id
+    @sleep_log_form = SleepLogForm.new(sleep_date: @date, user_id: @user)
   end
 
   def create
-    @sleep_log = SleepLog.new(sleep_log_params) # 保存用。文字列型として渡される
+    @date = params[:date]
+    @user = current_user.id
+    @sleep_log_form = SleepLogForm.new(sleep_log_form_params, sleep_date: @date, user_id: @user) # 保存用。文字列型として渡される FIXME: initializeですでに日付とuser入れてるのでは
+    puts "createアクションでinitializeした後"
+    puts @sleep_log_form.inspect
 
     # Time型カラムをDateTime型カラムに変更する
-    processed_params = sleep_log_params.dup # 入力した内容を複製して編集
+    processed_params = sleep_log_form_params.dup # 入力した内容を複製して編集
 
     %i[go_to_bed_at fell_asleep_at woke_up_at leave_bed_at].each do |column|
       if processed_params[column].present?
@@ -44,14 +49,14 @@ class SleepLogsController < ApplicationController
     end
 
     # 覚醒時刻が就床時刻と就寝時刻よりも前の時間にならないよう2者を修正
-    adjust_datetime_order(@sleep_log, processed_params) # DateTime型にした修正版睡眠記録を引数に
+    adjust_datetime_order(@sleep_log_form, processed_params) # DateTime型にした修正版睡眠記録を引数に
 
     # 加工したパラメーターをモデルに割り当てる
-    @sleep_log.assign_attributes(processed_params)
+    @sleep_log_form.assign_attributes(processed_params)
 
-    if @sleep_log.save
-      year_month = @sleep_log.date.strftime("%Y-%m") # 登録されたsleep_log.dateをYYYY-MM形式に変換
-      redirect_to sleep_logs_path(year_month: year_month), notice: "睡眠記録を保存しました"
+    if @sleep_log_form.save
+      year_month = @sleep_log_form.date.strftime("%Y-%m") # 登録されたsleep_log.dateをYYYY-MM形式に変換
+      redirect_to sleep_logs_path(year_month: year_month), notice: "睡眠記録を保存しました" # 登録した年月のページにリダイレクト
     else
       flash.now[:alert] = "エラーが発生しました。入力内容を確認してください。"
       render :new
@@ -60,6 +65,7 @@ class SleepLogsController < ApplicationController
 
   def edit
     @sleep_log = current_user.sleep_logs.find(params[:id])
+    @date = params[:date]
     @sleep_log.date ||= params[:date]
     initialize_associations(@sleep_log) # 子モデルを探す／作成
   end
@@ -68,7 +74,7 @@ class SleepLogsController < ApplicationController
     @sleep_log = current_user.sleep_logs.find(params[:id])
 
     # String型のHH:MMが渡されたら、DateTimeに変換する
-    processed_params = sleep_log_params.dup # 入力した内容を複製して編集
+    processed_params = sleep_log_form_params.dup # 入力した内容を複製して編集
 
     %i[go_to_bed_at fell_asleep_at woke_up_at leave_bed_at].each do |column|
       time_str = params[:sleep_log][column]
@@ -97,24 +103,17 @@ class SleepLogsController < ApplicationController
 
   private
 
-  def sleep_log_params
-    params.require(:sleep_log).permit(
+  def sleep_log_form_params
+    params.require(:sleep_log_form).permit(
       :date,
       :go_to_bed_at,
       :fell_asleep_at,
       :woke_up_at,
       :leave_bed_at,
-      awakening_attributes: [ :id, :awakenings_count ], # Unpermitted parameter: :id対策
-      napping_time_attributes: [ :id, :napping_time ],
-      comment_attributes: [ :id, :comment ]
+      :awakenings_count,
+      :napping_time,
+      :comment
     ).merge(user_id: current_user.id) # 誰の記録かも追加するストロングパラメーター
-  end
-
-  # 子モデルの作成
-  def initialize_associations(sleep_log)
-    @sleep_log.build_awakening unless @sleep_log.awakening.present? # 存在してなければbuild
-    @sleep_log.build_napping_time unless @sleep_log.napping_time.present?
-    @sleep_log.build_comment unless @sleep_log.comment.present?
   end
 
   # 入力されたTime型をDateTime型にする
@@ -124,7 +123,7 @@ class SleepLogsController < ApplicationController
   end
 
   # 覚醒時刻が就床時刻・入眠時刻よりも後にならないよう修正
-  def adjust_datetime_order(sleep_log, processed_params)
+  def adjust_datetime_order(sleep_log_form, processed_params)
     %i[go_to_bed_at fell_asleep_at].each do |fix_date|
       next if processed_params[fix_date].blank? || processed_params[:woke_up_at].blank? # 未入力か、日時の順序が正しい場合は次の処理へ
       if processed_params[fix_date] > processed_params[:woke_up_at]
