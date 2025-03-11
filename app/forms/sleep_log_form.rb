@@ -5,7 +5,7 @@ class SleepLogForm
 
   # パラメータの読み書きを許可する。指定の属性に変換してくれる。デフォルト値も設定可能。各モデルで扱いたいカラム名をインスタンス変数名としている。
   attribute :user_id, :integer
-  attribute :date, :date # 気持ちを込めたDate属性
+  attribute :sleep_date, :date # 気持ちを込めたDate属性
   attribute :go_to_bed_at, :datetime
   attribute :fell_asleep_at, :datetime
   attribute :woke_up_at, :datetime
@@ -21,18 +21,18 @@ class SleepLogForm
   # 委譲する -> 表示するだけなので必要ない
   # delegate :persisted?, to: :sleep_log # SleepLogのpersistedというメソッドが使える
 
-  # 初期化
-  def initialize(date:, user:, sleep_log: nil) # sleep_logモデルは一旦nilにして、findさせたものを入れるか作る
+  # 初期化 initializeをオーバーライドできない fetch_valueとは:Rubyのメソッド→initializeオーバーライドしてはいかん右fetchにattributes
+  def set_up(sleep_date:, user:, sleep_log: nil) # sleep_logモデルは一旦nilにして、findさせたものを入れるか作る
     pp "initializeメソッド始動"
     @user = user # user_idをSleepLogモデルに関連づける
-    @date = date # フォームオブジェクトに渡されたdateの値を保持する
-    @sleep_log = sleep_log || user.sleep_logs.find_or_initialize_by(date: @date, user_id: @user) # その日付のレコードが見つからなければ新規作成して日付をぶちこむ
+    @sleep_date = sleep_date # フォームオブジェクトに渡されたdateの値を保持する
+    @sleep_log = sleep_log || user.sleep_logs.find_or_initialize_by(sleep_date: @sleep_date, user_id: @user) # その日付のレコードが見つからなければ新規作成して日付をぶちこむ
     pp "SleepLogモデルを作ったか探して@sleep_logにぶちこんだ"
     # 親モデルと子モデルが同時に存在する場合は子モデルの値を入れる、そうでなければ子モデルを作成
     @awakenings = sleep_log && sleep_log.awakenings.any? ? sleep_log.awakenings : [Awakening.new]
     @napping_times = sleep_log && sleep_log.napping_times.any? ? sleep_log.napping_times : [NappingTime.new]
     @comments = sleep_log && sleep_log.comments.any? ? sleep_log.comments : [Comment.new]
-    # @sleep_log_form.date = date # 送られてきた日付を入れる
+    # @sleep_log_form.sleep_date = sleep_date # 送られてきた日付を入れる
     # @sleep_log_form.user_id = user_id # saveの段階で入れられないか？
     puts @sleep_log.inspect
 
@@ -69,7 +69,7 @@ class SleepLogForm
     # {
     #   # 親モデルのデフォルト属性
     #   user_id: @sleep_log_form.user_id,
-    #   date: @sleep_log_form.date,
+    #   sleep_date: @sleep_log_form.sleep_date,
     #   go_to_bed_at: @sleep_log_form.go_to_bed_at,
     #   fell_asleep_at: @sleep_log_form.fell_asleep_at,
     #   woke_up_at: @sleep_log_form.woke_up_at,
