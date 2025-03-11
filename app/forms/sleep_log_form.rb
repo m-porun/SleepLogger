@@ -3,7 +3,7 @@ class SleepLogForm
   include ActiveModel::Model # 通常のモデルと同じくバリデーションを使えるように
   include ActiveModel::Attributes # attr_accessorと同じように属性が使える
 
-  # パラメータの読み書きを許可する。指定の属性に変換してくれる。デフォルト値も設定可能
+  # パラメータの読み書きを許可する。指定の属性に変換してくれる。デフォルト値も設定可能。各モデルで扱いたいカラム名をインスタンス変数名としている。
   attribute :user_id, :integer
   attribute :date, :date # 気持ちを込めたDate属性
   attribute :go_to_bed_at, :datetime
@@ -16,29 +16,33 @@ class SleepLogForm
   attribute :napping_time, :integer, default: 0
   attribute :comment, :string
 
+  # save時にUserモデルのuser_idを保存させたい
+  attr_accessor :user_id
   # 委譲する -> 表示するだけなので必要ない
   # delegate :persisted?, to: :sleep_log # SleepLogのpersistedというメソッドが使える
-  # viewでこういう書き方すべき？<%= form_with(model: @resource, url: @resource.persisted? ? resource_path(@resource) : resources_path, method: @resource.persisted? ? :patch : :post, local: true) do |form| %>
 
   # 初期化
-  def initialize(attributes = nil, sleep_date:, user_id:) # newアクションに入っている2つの引数
-    pp "initializeの中身"
-    @sleep_log_form = SleepLog.new # レコードが見つからなければnew
-    puts "SleepLogモデルを作りました"
-    puts @sleep_log_form.inspect
-    date = sleep_date
-    @sleep_log_form.date = sleep_date # 送られてきた日付を入れる
-    @sleep_log_form.user_id = user_id
-    puts "SleepLog.newできたか確認"
-    puts @sleep_log_form.inspect
+  def initialize(date:, user:, sleep_log: nil) # sleep_logモデルは一旦nilにして、findさせたものを入れるか作る
+    pp "initializeメソッド始動"
+    @user = user # user_idをSleepLogモデルに関連づける
+    @date = date # フォームオブジェクトに渡されたdateの値を保持する
+    @sleep_log = sleep_log || user.sleep_logs.find_or_initialize_by(date: @date, user_id: @user) # その日付のレコードが見つからなければ新規作成して日付をぶちこむ
+    pp "SleepLogモデルを作ったか探して@sleep_logにぶちこんだ"
+    # 親モデルと子モデルが同時に存在する場合は子モデルの値を入れる、そうでなければ子モデルを作成
+    @awakenings = sleep_log && sleep_log.awakenings.any? ? sleep_log.awakenings : [Awakening.new]
+    @napping_times = sleep_log && sleep_log.napping_times.any? ? sleep_log.napping_times : [NappingTime.new]
+    @comments = sleep_log && sleep_log.comments.any? ? sleep_log.comments : [Comment.new]
+    # @sleep_log_form.date = date # 送られてきた日付を入れる
+    # @sleep_log_form.user_id = user_id # saveの段階で入れられないか？
+    puts @sleep_log.inspect
 
-    # # 子モデルの初期化
-    initialize_associations # 子モデル作成
-    puts @sleep_log_form.inspect
-    puts @sleep_log_form.awakening.inspect # この時点では子モデル入ってる
+    pp "子モデルをビルド"
+    # initialize_associations # 子モデル作成
+    puts @sleep_log.inspect
+    puts @awakenings.inspect # この時点では子モデル入ってる
 
-    attributes ||= default_attributes # パラメーターにnilが入っている時は、デフォルトを入れる
-    super(attributes) # 上で設定した属性などの設定を適用 このFormobjectは誰の親からも継承していない
+    self.attributes = @sleep_log.attributes if @sleep_log.persisted?
+    # super(attributes) # 上で設定した属性などの設定を適用 このFormobjectは誰の親からも継承していない
   end
 
   def save(sleep_log_form)
@@ -56,32 +60,20 @@ class SleepLogForm
     end
   end
 
-  def assign_attributes(processed_params)
-    @sleep_log_form.awakening.awakenings_count = processed_params[:awakenings_count].to_i
-    @sleep_log_form.napping_time.napping_time = processed_params[:napping_time].to_i
-    @sleep_log_form.comments.comment = processed_params[:comment]
-    @sleep_log_form.date = processed_params[:date]
-    @sleep_log_form.go_to_bed_at = processed_params[:go_to_bed_at]
-    @sleep_log_form.fell_asleep_at = processed_params[:fell_asleep_at]
-    @sleep_log_form.woke_up_at = processed_params[:woke_up_at]
-    @sleep_log_form.leave_bed_at = processed_params[:leave_bed_at]
-  end
-
   private
 
   # デフォルトの属性を決める。editの際は元々の値を呼び出す
-  attr_reader :sleep_log_form
 
-  def default_attributes
-    pp @sleep_log_form.inspect
-    {
-      # 親モデルのデフォルト属性
-      user_id: @sleep_log_form.user_id,
-      date: @sleep_log_form.date,
-      go_to_bed_at: @sleep_log_form.go_to_bed_at,
-      fell_asleep_at: @sleep_log_form.fell_asleep_at,
-      woke_up_at: @sleep_log_form.woke_up_at,
-      leave_bed_at: @sleep_log_form.leave_bed_at
+  # def default_attributes
+    # pp @sleep_log_form.inspect
+    # {
+    #   # 親モデルのデフォルト属性
+    #   user_id: @sleep_log_form.user_id,
+    #   date: @sleep_log_form.date,
+    #   go_to_bed_at: @sleep_log_form.go_to_bed_at,
+    #   fell_asleep_at: @sleep_log_form.fell_asleep_at,
+    #   woke_up_at: @sleep_log_form.woke_up_at,
+    #   leave_bed_at: @sleep_log_form.leave_bed_at
       # 子モデルのデフォルト属性
       # awakening: @sleep_log_form.awakening&.awakenings_count || 0
       # napping_time: @sleep_log_form.napping_time&.napping_time || 0,
@@ -90,8 +82,8 @@ class SleepLogForm
 
       # awakening_awakenings_count: @sleep_log_form.awakening.awakenings_count
 
-    }
-  end
+  #   }
+  # end
 
   # 子モデルの作成
   def initialize_associations

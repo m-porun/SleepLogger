@@ -1,6 +1,8 @@
 class SleepLogsController < ApplicationController
   # ログインしていない場合はログイン画面にリダイレクト
-  before_action :authenticate_user!, only: [ :index, :new, :edit, :update, :destroy ]
+  before_action :authenticate_user!, only: [ :index, :new, :edit, :destroy ]
+  before_action :set_user, only: [:new, :create, :edit, :update, :destroy] # user情報を取得
+  before_action :set_sleep_log, only: [:edit, :update, :destroy] # ユーザーの睡眠記録を取得
 
   def index # 表示用
     @selected_date = if params[:year_month]
@@ -27,15 +29,11 @@ class SleepLogsController < ApplicationController
 
   def new
     # フォームオブジェクトを呼び出す
-    @date = params[:date]
-    @user = current_user.id
-    @sleep_log_form = SleepLogForm.new(sleep_date: @date, user_id: @user)
+    @sleep_log_form = SleepLogForm.new(date: params[:date], user: @user)
   end
 
   def create
-    @date = params[:date]
-    @user = current_user.id
-    @sleep_log_form = SleepLogForm.new(sleep_log_form_params, sleep_date: @date, user_id: @user) # 保存用。文字列型として渡される FIXME: initializeですでに日付とuser入れてるのでは
+    @sleep_log_form = SleepLogForm.new(sleep_log_form_params) # 保存用。文字列型として渡される
     puts "createアクションでinitializeした後"
     puts @sleep_log_form.inspect
 
@@ -102,6 +100,14 @@ class SleepLogsController < ApplicationController
   end
 
   private
+
+  def set_user
+    @user = current_user
+  end
+
+  def set_sleep_log
+    @sleep_log = @user.sleep_logs.find(params[:id]) # ユーザーが持つ睡眠記録id
+  end
 
   def sleep_log_form_params
     params.require(:sleep_log_form).permit(
