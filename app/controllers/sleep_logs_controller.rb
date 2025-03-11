@@ -12,13 +12,13 @@ class SleepLogsController < ApplicationController
     end
     @start_date = @selected_date.beginning_of_month # 1日or本日の日付の月初を設定
     @end_date = @selected_date.end_of_month # 1日or本日の月末を設定
-    sleep_logs = current_user.sleep_logs.where(date: @start_date..@end_date).includes(:awakening, :napping_time, :comment) # 子クラスを含むsleep_logモデルを月初〜月末分取得する
+    sleep_logs = current_user.sleep_logs.where(sleep_date: @start_date..@end_date).includes(:awakening, :napping_time, :comment) # 子クラスを含むsleep_logモデルを月初〜月末分取得する
 
     all_dates = (@start_date..@end_date).to_a # 月初から月末までの範囲オブジェクトを配列にする
 
     # データが存在しない日は日付で埋める
-    @sleep_logs = all_dates.map do |date|
-      sleep_logs.find { |sleep_log| sleep_log.date == date } || current_user.sleep_logs.build(date: date)
+    @sleep_logs = all_dates.map do |sleep_date|
+      sleep_logs.find { |sleep_log| sleep_log.sleep_date == sleep_date } || current_user.sleep_logs.build(sleep_date: sleep_date)
     end
 
     respond_to do |format| # Turbo Streamのリクエストに対応する
@@ -29,7 +29,11 @@ class SleepLogsController < ApplicationController
 
   def new
     # フォームオブジェクトを呼び出す
-    @sleep_log_form = SleepLogForm.new(date: params[:date], user: @user)
+    pp params[:sleep_date]
+    @sleep_log_form = SleepLogForm.new
+    @sleep_log_form.set_up(sleep_date: params[:sleep_date], user: @user)
+    # @sleep_log_form.sleep_date = Date.today
+    pp params[:sleep_date]
   end
 
   def create
@@ -42,7 +46,7 @@ class SleepLogsController < ApplicationController
 
     %i[go_to_bed_at fell_asleep_at woke_up_at leave_bed_at].each do |column|
       if processed_params[column].present?
-        processed_params[column] = convert_to_datetime(processed_params[column], processed_params[:date]) # private内のメソッドでString型のTimeをDateTime型に変更
+        processed_params[column] = convert_to_datetime(processed_params[column], processed_params[:sleep_date]) # private内のメソッドでString型のTimeをDateTime型に変更
       end
     end
 
@@ -53,7 +57,7 @@ class SleepLogsController < ApplicationController
     @sleep_log_form.assign_attributes(processed_params)
 
     if @sleep_log_form.save
-      year_month = @sleep_log_form.date.strftime("%Y-%m") # 登録されたsleep_log.dateをYYYY-MM形式に変換
+      year_month = @sleep_log_form.sleep_date.strftime("%Y-%m") # 登録されたsleep_log.dateをYYYY-MM形式に変換
       redirect_to sleep_logs_path(year_month: year_month), notice: "睡眠記録を保存しました" # 登録した年月のページにリダイレクト
     else
       flash.now[:alert] = "エラーが発生しました。入力内容を確認してください。"
@@ -63,8 +67,8 @@ class SleepLogsController < ApplicationController
 
   def edit
     @sleep_log = current_user.sleep_logs.find(params[:id])
-    @date = params[:date]
-    @sleep_log.date ||= params[:date]
+    @sleep_date = params[:sleep_date]
+    @sleep_log.sleep_date ||= params[:sleep_date]
     initialize_associations(@sleep_log) # 子モデルを探す／作成
   end
 
@@ -77,7 +81,7 @@ class SleepLogsController < ApplicationController
     %i[go_to_bed_at fell_asleep_at woke_up_at leave_bed_at].each do |column|
       time_str = params[:sleep_log][column]
       if time_str.present?
-        datetime_value = convert_to_datetime(time_str, processed_params[:date]) # Time型のカラムと複製したDateカラムを送る
+        datetime_value = convert_to_datetime(time_str, processed_params[:sleep_date]) # Time型のカラムと複製したDateカラムを送る
         processed_params[column] = datetime_value
       end
     end
@@ -85,7 +89,7 @@ class SleepLogsController < ApplicationController
     adjust_datetime_order(@sleep_log, processed_params) # DateTime型にした修正版睡眠記録を引数に
 
     if @sleep_log.update(processed_params) # 複製して編集した方を保存
-      year_month = @sleep_log.date.strftime("%Y-%m")
+      year_month = @sleep_log.sleep_date.strftime("%Y-%m")
       redirect_to sleep_logs_path(year_month: year_month), notice: "睡眠記録を更新しました"
     else
       flash.now[:alert] = "エラーが発生しました。入力内容を確認してください。"
@@ -111,7 +115,7 @@ class SleepLogsController < ApplicationController
 
   def sleep_log_form_params
     params.require(:sleep_log_form).permit(
-      :date,
+      :sleep_date,
       :go_to_bed_at,
       :fell_asleep_at,
       :woke_up_at,

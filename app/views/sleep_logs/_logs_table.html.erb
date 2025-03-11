@@ -1,8 +1,8 @@
 <tbody>
   <% @sleep_logs.each do |sleep_log| %> <!-- 月初から月末までの日付を繰り返し表示する -->
     <tr class="border border-secondary bg-primary">
-      <td class="p-2 border border-secondary bg-primary"><%= sleep_log.date.day %></td>
-      <td class="p-2 border border-secondary bg-primary"><%= %w[日 月 火 水 木 金 土][sleep_log.date.wday] %></td>
+      <td class="p-2 border border-secondary bg-primary"><%= sleep_log.sleep_date.day %></td>
+      <td class="p-2 border border-secondary bg-primary"><%= %w[日 月 火 水 木 金 土][sleep_log.sleep_date.wday] %></td>
       <td class="p-2 border border-secondary bg-primary">
         <%= sleep_log.go_to_bed_at&.strftime('%H:%M') || "--:--" %>
       </td>
@@ -43,7 +43,7 @@
             </span>
           <% else %>
             <span class="material-symbols-outlined inline-flex">
-              <%= link_to 'edit_square', new_sleep_log_path(date: sleep_log.date) %> <!-- indexで設定した日付一覧から日付を取得 -->
+              <%= link_to 'edit_square', new_sleep_log_path(sleep_date: sleep_log.sleep_date) %> <!-- indexで設定した日付一覧から日付を取得 -->
             </span>
           <% end %>
       </td>

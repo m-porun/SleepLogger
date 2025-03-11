@@ -2,8 +2,8 @@
 <div class="fixed flex justify-center items-center z-50 mt-8">
   <%= form_with(url: sleep_logs_path, model: @sleep_log_form, method: :post, local: true, data: { turbo: false }) do |f| %>
     <div>
-      <%= f.label :date, '起きた日付' %>
-      <%= f.date_field :date, value: @sleep_log_form.date, readonly: true %>
+      <%= f.label :sleep_date, '起きた日付' %>
+      <%= f.date_field :sleep_date, readonly: true %>
     </div>
 
     <div>
