@@ -1,9 +1,9 @@
 <!-- 新規作成画面 -->
 <div class="fixed flex justify-center items-center z-50 mt-8">
-  <%= form_with(model: @sleep_log_form, url: sleep_logs_path, method: :post, local: true, data: { turbo: false }) do |f| %>
+  <%= form_with(url: sleep_logs_path, model: @sleep_log_form, method: :post, local: true, data: { turbo: false }) do |f| %>
     <div>
       <%= f.label :date, '起きた日付' %>
-      <%= f.date_field :date, value: @date, readonly: true %>
+      <%= f.date_field :date, value: @sleep_log_form.date, readonly: true %>
     </div>
 
     <div>
@@ -28,17 +28,17 @@
 
     <div>
       <%= f.label :awakenings_count, "中途覚醒（回数）" %>
-      <%= f.number_field :awakenings_count, value: @sleep_log_form.attributes['awakenings_count'], min: 0 %> <!-- デフォルトで0が入力されている -->
+      <%= f.number_field :awakenings_count, min: 0 %> <!-- デフォルトで0が入力されている -->
     </div>
 
     <div>
       <% f.label :napping_time, "昼寝時間（分）" %>
-      <%= f.number_field :napping_time, value: @sleep_log_form.attributes['napping_time'], min: 0 %> <!-- デフォルトで0が入力されている -->
+      <%= f.number_field :napping_time, min: 0 %> <!-- デフォルトで0が入力されている -->
     </div>
 
     <div>
       <%= f.label :comment, "備考(42文字まで)" %>
-      <%= f.text_area :comment, value: @sleep_log_form.attributes['comment'], max: 42 %>
+      <%= f.text_area :comment, max: 42 %>
     </div>
 
     <div class="flex justify-end">
