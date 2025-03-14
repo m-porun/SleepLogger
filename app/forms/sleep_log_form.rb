@@ -21,28 +21,26 @@ class SleepLogForm
   # 委譲する -> 表示するだけなので必要ない
   # delegate :persisted?, to: :sleep_log # SleepLogのpersistedというメソッドが使える
 
-  # 初期化 initializeをオーバーライドできない fetch_valueとは:Rubyのメソッド→initializeオーバーライドしてはいかん右fetchにattributes
-  def set_up(sleep_date:, user:, sleep_log: nil) # sleep_logモデルは一旦nilにして、findさせたものを入れるか作る
-    pp "initializeメソッド始動"
+  # initializeをオーバーライドできない fetch_valueとは:Rubyのメソッド→initializeオーバーライドしてはいかん→fetchにattributes
+  def initialize_sleep_log(sleep_date:, user:, sleep_log: nil) # sleep_logモデルは一旦nilにして、findさせたものを入れるか作る
+      pp "initialize_sleep_logメソッド始動"
     @user = user # user_idをSleepLogモデルに関連づける
-    @sleep_date = sleep_date # フォームオブジェクトに渡されたdateの値を保持する
-    @sleep_log = sleep_log || user.sleep_logs.find_or_initialize_by(sleep_date: @sleep_date, user_id: @user) # その日付のレコードが見つからなければ新規作成して日付をぶちこむ
-    pp "SleepLogモデルを作ったか探して@sleep_logにぶちこんだ"
-    # 親モデルと子モデルが同時に存在する場合は子モデルの値を入れる、そうでなければ子モデルを作成
-    @awakenings = sleep_log && sleep_log.awakenings.any? ? sleep_log.awakenings : [Awakening.new]
-    @napping_times = sleep_log && sleep_log.napping_times.any? ? sleep_log.napping_times : [NappingTime.new]
-    @comments = sleep_log && sleep_log.comments.any? ? sleep_log.comments : [Comment.new]
-    # @sleep_log_form.sleep_date = sleep_date # 送られてきた日付を入れる
-    # @sleep_log_form.user_id = user_id # saveの段階で入れられないか？
-    puts @sleep_log.inspect
+    @sleep_date= sleep_date # フォームオブジェクトに渡されたdateの値を保持する
+    @sleep_log_form = sleep_log || user.sleep_logs.find_or_initialize_by(sleep_date: @sleep_date, user_id: @user) # その日付のレコードが見つからなければ新規作成して日付をぶちこむ
+      pp "SleepLogモデルを作ったか探して@sleep_log_formにぶちこんだ"
+      pp @sleep_log_form.sleep_date # 'Sat, 01 Mar 2025'という値が返る
+      # 親モデルと子モデルが同時に存在する場合は子モデルの値を入れる、そうでなければ子モデルを作成
+    @sleep_log_form.awakening ||= Awakening.new
+    @sleep_log_form.napping_time ||= NappingTime.new
+    @sleep_log_form.comment ||= Comment.new
+      # @sleep_log_form.sleep_date = sleep_date # 送られてきた日付を入れる
+      # @sleep_log_form.user_id = user_id # saveの段階で入れられないか？
+      pp "子モデルをビルド"
+      puts @sleep_log_form.inspect # '#<SleepLog id: nil, user_id: 1, go_to_bed_at: nil, fell_asleep_at: nil, woke_up_at: nil, leave_bed_at: nil, created_at: nil, updated_at: nil, sleep_date: "2025-03-01">'
+      puts @sleep_log_form.awakening.inspect # '<#Awakening id: nil, sleep_log_id: nil, awakenings_count: nil, created_at: nil, updated_at: nil>'
 
-    pp "子モデルをビルド"
-    # initialize_associations # 子モデル作成
-    puts @sleep_log.inspect
-    puts @awakenings.inspect # この時点では子モデル入ってる
-
-    self.attributes = @sleep_log.attributes if @sleep_log.persisted?
-    # super(attributes) # 上で設定した属性などの設定を適用 このFormobjectは誰の親からも継承していない
+      # self.attributes = @sleep_log_form.attributes if @sleep_log_form.persisted? # ぶち込み済みなので不要？
+      # super(attributes) # 上で設定した属性などの設定を適用 このFormobjectは誰の親からも継承していない
   end
 
   def save(sleep_log_form)
@@ -86,9 +84,9 @@ class SleepLogForm
   # end
 
   # 子モデルの作成
-  def initialize_associations
-    @sleep_log_form.build_awakening unless @sleep_log_form.awakening.present? # 存在してなければbuild
-    @sleep_log_form.build_napping_time unless @sleep_log_form.napping_time.present?
-    @sleep_log_form.build_comment unless @sleep_log_form.comment.present?
-  end
+  # def initialize_associations
+  #   @sleep_log_form.build_awakening unless @sleep_log_form.awakening.present? # 存在してなければbuild
+  #   @sleep_log_form.build_napping_time unless @sleep_log_form.napping_time.present?
+  #   @sleep_log_form.build_comment unless @sleep_log_form.comment.present?
+  # end
 end
