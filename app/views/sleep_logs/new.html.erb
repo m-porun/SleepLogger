@@ -3,7 +3,7 @@
   <%= form_with(url: sleep_logs_path, model: @sleep_log_form, method: :post, local: true, data: { turbo: false }) do |f| %>
     <div>
       <%= f.label :sleep_date, '起きた日付' %>
-      <%= f.date_field :sleep_date, readonly: true %>
+      <%= f.date_field :sleep_date, value: f.object.sleep_date.presence || params[:sleep_date], readonly: true %> <!-- f.objectに値があれば日付を、なければ探す -->
     </div>
 
     <div>
