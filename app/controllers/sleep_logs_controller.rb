@@ -28,11 +28,14 @@ class SleepLogsController < ApplicationController
   end
 
   def new
+    # binding.pry
     # フォームオブジェクトを呼び出す。SleepLogForm.new時点でFormオブジェクトファイルのAttributeが適用される
     @sleep_log_form = SleepLogForm.new # fetch_valueがnilになってしまう諸悪の根源initialize除け
     pp "作ったばかりの@sleep_log_formの中身"
     pp @sleep_log_form.inspect
     @sleep_log_form.initialize_sleep_log(sleep_date: params[:sleep_date], user: @user) # Formオブジェクトに日付とユーザー情報を渡して、親モデル・子モデルの作成をしてもらう
+    pp "フォームオブジェクトにセットしたsleep_date"
+    pp @sleep_log_form.sleep_date
   end
 
   def create
