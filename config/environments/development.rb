@@ -81,4 +81,7 @@ Rails.application.configure do
 
   # 具体的なIPアドレスを指定しないために記述
   config.web_console.allowed_ips = "0.0.0.0/0"
+
+  # gem 'better-errors'を使うためのコード
+  BetterErrors::Middleware.allow_ip! "0.0.0.0/0"
 end
