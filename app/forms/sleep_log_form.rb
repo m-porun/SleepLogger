@@ -35,7 +35,7 @@ class SleepLogForm
     @sleep_log_form.awakening ||= Awakening.new
     @sleep_log_form.napping_time ||= NappingTime.new
     @sleep_log_form.comment ||= Comment.new
-    pp @sleep_log_form.sleep_date # 'Sat, 01 Mar 2025'という値が返る
+      pp @sleep_log_form.sleep_date # 'Sat, 01 Mar 2025'という値が返る
       # @sleep_log_form.sleep_date = sleep_date # 送られてきた日付を入れる
       # @sleep_log_form.user_id = user_id # saveの段階で入れられないか？
       # pp "子モデルをビルド"
@@ -45,24 +45,69 @@ class SleepLogForm
       # self.attributes = @sleep_log_form.attributes if @sleep_log_form.persisted? # ぶち込み済みなので不要？
       # super(attributes) # 上で設定した属性などの設定を適用 このFormobjectは誰の親からも継承していない
     # @sleep_log_form # メソッドでは最終行のインスタンスがreturnされる仕組み TODO: 詰まったら再チェック
+  end # なぜかend2つ重ねないとエラーになる
   end
 
-  def save(sleep_log_form)
+  def save
     puts "saveメソッド"
-    pp @sleep_log_form.inspect
-    @sleep_log_form = sle
-    # return false if invalid? # バリデーションに引っかかる場合は以降の処理にせずfalseをコントローラーに返す
-    if @sleep_log_form.save
-      @sleep_log_form.awakening.save
-      @sleep_log_form.napping_time.save
-      @sleep_log_form.comment.save
-      true
-    else
-      false
+    # バリデーションに引っかかる場合は以降の処理にせずfalseをコントローラーに返す
+    return false unless valid?
+    pp @sleep_log_form
+
+    # 新規セーブまたは更新セーブを開始する(ユーザーidと睡眠日から検索する)
+    sleep_log = SleepLog.find_or_initialize_by(user_id: user_id, sleep_date: sleep_date)
+
+    # Date型をDateTime型に変換
+    %i[go_to_bed_at fell_asleep_at woke_up_at leave_bed_at].each do |column|
+      time_value = send(column)
+      sleep_log[column] = convert_to_datetime(sleep_date, time_value) if time_value.present?
     end
+
+    # 起床日が就床・就寝時刻よりも前にならないように変換
+    adjust_datetime_order(sleep_log)
+
+    # Formオブジェクトの値をビルドしたsleep_logの子モデルにセット
+    set_child_models(sleep_log)
+
+    sleep_log.save
   end
 
   private
+
+  def convert_to_datetime(sleep_date, time_value)
+    return nil if time_value.blank? # もし時間入力がなければnilで登録
+    "#{sleep_date} #{time_value}".in_time_zone # "YYYY-MM-DD + time_value: HH:MM" をローカル時間で保存
+  end
+
+  # 覚醒時刻が就床時刻・入眠時刻よりも後にならないよう修正
+  def adjust_datetime_order(sleep_log)
+    if sleep_log.woke_up_at.present?
+    %i[go_to_bed_at fell_asleep_at].each do |fix_date|
+      next unless sleep_log[fix_date].present? # 未入力の場合は次の処理へ
+      if sleep_log[fix_date] > sleep_log.woke_up_at
+        sleep_log[fix_date] -= 1.day # 前夜就寝とする
+      end
+    end
+  end
+
+  # 子モデルの設定
+  def set_child_models(sleep_log)
+    # Awakening
+    if sleep_log.awakening
+      sleep_log.awakening.awakenings_count = awakenings_count if awakenings_count.present?
+      sleep_log.awakening.save
+    end
+    # NappingTime
+    if sleep_log.napping_time
+      sleep_log.napping_time.napping_time = napping_time if napping_time.present?
+      sleep_log.napping_time.save
+    end
+    # Comment
+    if sleep_log.comment
+      sleep_log.comment.comment = comment if comment.present?
+      sleep_log.comment.save
+    end
+  end
 
   # デフォルトの属性を決める。editの際は元々の値を呼び出す
 

@@ -39,24 +39,10 @@ class SleepLogsController < ApplicationController
   end
 
   def create
+    binding.pry
     @sleep_log_form = SleepLogForm.new(sleep_log_form_params) # 保存用。文字列型として渡される
     puts "createアクションでinitializeした後"
-    puts @sleep_log_form.inspect
-
-    # Time型カラムをDateTime型カラムに変更する
-    processed_params = sleep_log_form_params.dup # 入力した内容を複製して編集
-
-    %i[go_to_bed_at fell_asleep_at woke_up_at leave_bed_at].each do |column|
-      if processed_params[column].present?
-        processed_params[column] = convert_to_datetime(processed_params[column], processed_params[:sleep_date]) # private内のメソッドでString型のTimeをDateTime型に変更
-      end
-    end
-
-    # 覚醒時刻が就床時刻と就寝時刻よりも前の時間にならないよう2者を修正
-    adjust_datetime_order(@sleep_log_form, processed_params) # DateTime型にした修正版睡眠記録を引数に
-
-    # 加工したパラメーターをモデルに割り当てる
-    @sleep_log_form.assign_attributes(processed_params)
+    puts @sleep_log_form
 
     if @sleep_log_form.save
       year_month = @sleep_log_form.sleep_date.strftime("%Y-%m") # 登録されたsleep_log.dateをYYYY-MM形式に変換
@@ -65,6 +51,7 @@ class SleepLogsController < ApplicationController
       flash.now[:alert] = "エラーが発生しました。入力内容を確認してください。"
       render :new
     end
+
   end
 
   def edit
@@ -126,21 +113,5 @@ class SleepLogsController < ApplicationController
       :napping_time,
       :comment
     ).merge(user_id: current_user.id) # 誰の記録かも追加するストロングパラメーター
-  end
-
-  # 入力されたTime型をDateTime型にする
-  def convert_to_datetime(time_str, date_str) # 複製したdateカラム
-    return nil if time_str.blank? # もし時間入力がなければnilで登録
-    "#{date_str} #{time_str}".in_time_zone # "YYYY-MM-DD + time_str: HH:MM" をローカル時間で保存
-  end
-
-  # 覚醒時刻が就床時刻・入眠時刻よりも後にならないよう修正
-  def adjust_datetime_order(sleep_log_form, processed_params)
-    %i[go_to_bed_at fell_asleep_at].each do |fix_date|
-      next if processed_params[fix_date].blank? || processed_params[:woke_up_at].blank? # 未入力か、日時の順序が正しい場合は次の処理へ
-      if processed_params[fix_date] > processed_params[:woke_up_at]
-        processed_params[fix_date] -= 1.day # 前夜就寝とする
-      end
-    end
   end
 end
