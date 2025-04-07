@@ -39,10 +39,7 @@ class SleepLogsController < ApplicationController
   end
 
   def create
-    binding.pry
     @sleep_log_form = SleepLogForm.new(sleep_log_form_params) # 保存用。文字列型として渡される
-    puts "createアクションでinitializeした後"
-    puts @sleep_log_form
 
     if @sleep_log_form.save
       year_month = @sleep_log_form.sleep_date.strftime("%Y-%m") # 登録されたsleep_log.dateをYYYY-MM形式に変換
