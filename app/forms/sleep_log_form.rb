@@ -17,7 +17,7 @@ class SleepLogForm
   attribute :comment, :string
 
   # save時にUserモデルのuser_idを保存させたい
-  attr_accessor :user_id
+  # attr_accessor :user_id
   # 委譲する -> 表示するだけなので必要ない
   # delegate :persisted?, to: :sleep_log # SleepLogのpersistedというメソッドが使える
 
@@ -45,17 +45,16 @@ class SleepLogForm
       # self.attributes = @sleep_log_form.attributes if @sleep_log_form.persisted? # ぶち込み済みなので不要？
       # super(attributes) # 上で設定した属性などの設定を適用 このFormobjectは誰の親からも継承していない
     # @sleep_log_form # メソッドでは最終行のインスタンスがreturnされる仕組み TODO: 詰まったら再チェック
-  end # なぜかend2つ重ねないとエラーになる
   end
 
   def save
-    puts "saveメソッド"
+    pp "saveメソッド"
     # バリデーションに引っかかる場合は以降の処理にせずfalseをコントローラーに返す
     return false unless valid?
-    pp @sleep_log_form
 
     # 新規セーブまたは更新セーブを開始する(ユーザーidと睡眠日から検索する)
-    sleep_log = SleepLog.find_or_initialize_by(user_id: user_id, sleep_date: sleep_date)
+    sleep_log = SleepLog.initialize_sleep_log(sleep_log_form_params)
+    # sleep_log = SleepLog.find_or_initialize_by(user_id: user_id, sleep_date: sleep_date)
 
     # Date型をDateTime型に変換
     %i[go_to_bed_at fell_asleep_at woke_up_at leave_bed_at].each do |column|
@@ -82,10 +81,11 @@ class SleepLogForm
   # 覚醒時刻が就床時刻・入眠時刻よりも後にならないよう修正
   def adjust_datetime_order(sleep_log)
     if sleep_log.woke_up_at.present?
-    %i[go_to_bed_at fell_asleep_at].each do |fix_date|
-      next unless sleep_log[fix_date].present? # 未入力の場合は次の処理へ
-      if sleep_log[fix_date] > sleep_log.woke_up_at
-        sleep_log[fix_date] -= 1.day # 前夜就寝とする
+      %i[go_to_bed_at fell_asleep_at].each do |fix_date|
+        next unless sleep_log[fix_date].present? # 未入力の場合は次の処理へ
+        if sleep_log[fix_date] > sleep_log.woke_up_at
+          sleep_log[fix_date] -= 1.day # 前夜就寝とする
+        end
       end
     end
   end
