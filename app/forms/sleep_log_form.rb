@@ -6,10 +6,10 @@ class SleepLogForm
   # パラメータの読み書きを許可する。指定の属性に変換してくれる。デフォルト値も設定可能。各モデルで扱いたいカラム名をインスタンス変数名としている。
   attribute :user_id, :integer
   attribute :sleep_date, :date # 気持ちを込めたDate属性
-  attribute :go_to_bed_at, :datetime
-  attribute :fell_asleep_at, :datetime
-  attribute :woke_up_at, :datetime
-  attribute :leave_bed_at, :datetime
+  attribute :go_to_bed_at, :time
+  attribute :fell_asleep_at, :time
+  attribute :woke_up_at, :time
+  attribute :leave_bed_at, :time
 
   # 子モデルで扱いたいカラムの属性
   attribute :awakenings_count, :integer, default: 0 # モデルでデフォルト値を設定していないため、ここで設定しています
@@ -32,7 +32,7 @@ class SleepLogForm
     # 親戻ると子モデルが同時に存在する場合は子モデルの値を入れる、そうでなければ子モデルを作成
     @sleep_log_form.sleep_date ||= self.sleep_date # sleep_dateがnilの場合、明示的にセットする
       # 親モデルと子モデルが同時に存在する場合は子モデルの値を入れる、そうでなければ子モデルを作成
-    @sleep_log_form.awakening ||= Awakening.new
+    @sleep_log_form.awakening ||= Awakening.new # TODO: もしかしたらawakenings_countとかかも
     @sleep_log_form.napping_time ||= NappingTime.new
     @sleep_log_form.comment ||= Comment.new
       pp @sleep_log_form.sleep_date # 'Sat, 01 Mar 2025'という値が返る
@@ -53,12 +53,11 @@ class SleepLogForm
     return false unless valid?
 
     # 新規セーブまたは更新セーブを開始する(ユーザーidと睡眠日から検索する)
-    sleep_log = SleepLog.initialize_sleep_log(sleep_log_form_params)
-    # sleep_log = SleepLog.find_or_initialize_by(user_id: user_id, sleep_date: sleep_date)
+    sleep_log = SleepLog.find_or_initialize_by(user_id: user_id, sleep_date: sleep_date)
 
-    # Date型をDateTime型に変換
+    # Time型をDateTime型に変換
     %i[go_to_bed_at fell_asleep_at woke_up_at leave_bed_at].each do |column|
-      time_value = send(column)
+      time_value = attributes[column.to_s] # Formオブジェクトで同じカラム名がついているattributesさんを呼び出し
       sleep_log[column] = convert_to_datetime(sleep_date, time_value) if time_value.present?
     end
 
@@ -93,20 +92,16 @@ class SleepLogForm
   # 子モデルの設定
   def set_child_models(sleep_log)
     # Awakening
-    if sleep_log.awakening
-      sleep_log.awakening.awakenings_count = awakenings_count if awakenings_count.present?
-      sleep_log.awakening.save
-    end
+    sleep_log.build_awakening if sleep_log.awakening.nil?
+    sleep_log.awakening.awakenings_count = awakenings_count if attributes["awakenings_count"].present?
+
     # NappingTime
-    if sleep_log.napping_time
-      sleep_log.napping_time.napping_time = napping_time if napping_time.present?
-      sleep_log.napping_time.save
-    end
+    sleep_log.build_napping_time if sleep_log.napping_time.nil?
+    sleep_log.napping_time.napping_time = napping_time if attributes["napping_time"].present?
+
     # Comment
-    if sleep_log.comment
-      sleep_log.comment.comment = comment if comment.present?
-      sleep_log.comment.save
-    end
+    sleep_log.build_comment if sleep_log.comment.nil?
+    sleep_log.comment.comment = comment if attributes["comment"].present?
   end
 
   # デフォルトの属性を決める。editの際は元々の値を呼び出す

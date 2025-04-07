@@ -39,10 +39,11 @@ class SleepLogsController < ApplicationController
   end
 
   def create
-    @sleep_log_form = SleepLogForm.new(sleep_log_form_params) # 保存用。文字列型として渡される
+    sleep_log_form = SleepLogForm.new(sleep_log_form_params) # 保存用。文字列型として渡される
 
-    if @sleep_log_form.save
-      year_month = @sleep_log_form.sleep_date.strftime("%Y-%m") # 登録されたsleep_log.dateをYYYY-MM形式に変換
+
+    if sleep_log_form.save
+      year_month = sleep_log_form.sleep_date.strftime("%Y-%m") # 登録されたsleep_log.dateをYYYY-MM形式に変換
       redirect_to sleep_logs_path(year_month: year_month), notice: "睡眠記録を保存しました" # 登録した年月のページにリダイレクト
     else
       flash.now[:alert] = "エラーが発生しました。入力内容を確認してください。"
