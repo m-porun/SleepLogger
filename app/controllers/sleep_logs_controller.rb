@@ -31,16 +31,11 @@ class SleepLogsController < ApplicationController
     # binding.pry
     # フォームオブジェクトを呼び出す。SleepLogForm.new時点でFormオブジェクトファイルのAttributeが適用される
     @sleep_log_form = SleepLogForm.new # fetch_valueがnilになってしまう諸悪の根源initialize除け
-    pp "作ったばかりの@sleep_log_formの中身"
-    pp @sleep_log_form.inspect
     @sleep_log_form.initialize_sleep_log(sleep_date: params[:sleep_date], user: @user) # Formオブジェクトに日付とユーザー情報を渡して、親モデル・子モデルの作成をしてもらう
-    pp "フォームオブジェクトにセットしたsleep_date"
-    pp @sleep_log_form.sleep_date
   end
 
   def create
     sleep_log_form = SleepLogForm.new(sleep_log_form_params) # 保存用。文字列型として渡される
-
 
     if sleep_log_form.save
       year_month = sleep_log_form.sleep_date.strftime("%Y-%m") # 登録されたsleep_log.dateをYYYY-MM形式に変換
@@ -53,10 +48,12 @@ class SleepLogsController < ApplicationController
   end
 
   def edit
-    @sleep_log = current_user.sleep_logs.find(params[:id])
-    @sleep_date = params[:sleep_date]
-    @sleep_log.sleep_date ||= params[:sleep_date]
-    initialize_associations(@sleep_log) # 子モデルを探す／作成
+    sleep_log = current_user.sleep_logs.find(params[:id])
+    @sleep_log_form = SleepLogForm.new(sleep_log: sleep_log)
+    # @sleep_log = current_user.sleep_logs.find(params[:id])
+    # @sleep_date = params[:sleep_date]
+    # @sleep_log.sleep_date ||= params[:sleep_date]
+    # initialize_associations(@sleep_log) # 子モデルを探す／作成
   end
 
   def update
@@ -98,6 +95,9 @@ class SleepLogsController < ApplicationController
 
   def set_sleep_log # TODO: ちゃんと子モデルまで呼び出せているかチェック
     @sleep_log = @user.sleep_logs.find(params[:id]) # ユーザーが持つ睡眠記録id
+    @awakening = @sleep_log.awakening
+    @napping_time = @sleep_log.napping_time
+    @comment = @sleep_log.comment
   end
 
   def sleep_log_form_params
