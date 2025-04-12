@@ -20,12 +20,12 @@ class SleepLogForm
   # save時にUserモデルのuser_idを保存させたい
   # attr_accessor :user_id
   # 委譲する -> form_with送信時にフォームのアクションを自動でPOST / PATCHに切り替える
-  #delegate :persisted?, to: :sleep_log # SleepLogモデルのpersistedというメソッドが使える
+  # delegate :persisted?, to: :sleep_log # SleepLogモデルのpersistedというメソッドが使える
 
   # initializeをオーバーライドできない fetch_valueとは:Rubyのメソッド→initializeオーバーライドしてはいかん→fetchにattributes
   def initialize(attributes = nil, sleep_log: SleepLog.new)
     # binding.pry
-  # sleep_logモデルは一旦nilにして、findさせたものを入れるか作る
+    # sleep_logモデルは一旦nilにして、findさせたものを入れるか作る
     pp "initializeメソッド始動"
     # binding.pry
     @sleep_log_form = sleep_log
@@ -37,19 +37,19 @@ class SleepLogForm
     # @sleep_log_form = sleep_log || user.sleep_logs.find_or_initialize_by(sleep_date: sleep_date, user_id: @user)
     # 親戻ると子モデルが同時に存在する場合は子モデルの値を入れる、そうでなければ子モデルを作成
     # @sleep_log_form.sleep_date ||= self.sleep_date # sleep_dateがnilの場合、明示的にセットする
-      # 親モデルと子モデルが同時に存在する場合は子モデルの値を入れる、そうでなければ子モデルを作成
-    #@sleep_log_form.awakening ||= Awakening.new # TODO: もしかしたらawakenings_countとかかも
-    #@sleep_log_form.napping_time ||= NappingTime.new
-    #@sleep_log_form.comment ||= Comment.new
+    # 親モデルと子モデルが同時に存在する場合は子モデルの値を入れる、そうでなければ子モデルを作成
+    # @sleep_log_form.awakening ||= Awakening.new # TODO: もしかしたらawakenings_countとかかも
+    # @sleep_log_form.napping_time ||= NappingTime.new
+    # @sleep_log_form.comment ||= Comment.new
     #  pp @sleep_log_form.sleep_date # 'Sat, 01 Mar 2025'という値が返る
-      # @sleep_log_form.sleep_date = sleep_date # 送られてきた日付を入れる
-      # @sleep_log_form.user_id = user_id # saveの段階で入れられないか？
-      # pp "子モデルをビルド"
-      # pp @sleep_log_form.inspect # '#<SleepLog id: nil, user_id: 1, go_to_bed_at: nil, fell_asleep_at: nil, woke_up_at: nil, leave_bed_at: nil, created_at: nil, updated_at: nil, sleep_date: "2025-03-01">'
-      # pp @sleep_log_form.awakening.inspect # '<#Awakening id: nil, sleep_log_id: nil, awakenings_count: nil, created_at: nil, updated_at: nil>'
+    # @sleep_log_form.sleep_date = sleep_date # 送られてきた日付を入れる
+    # @sleep_log_form.user_id = user_id # saveの段階で入れられないか？
+    # pp "子モデルをビルド"
+    # pp @sleep_log_form.inspect # '#<SleepLog id: nil, user_id: 1, go_to_bed_at: nil, fell_asleep_at: nil, woke_up_at: nil, leave_bed_at: nil, created_at: nil, updated_at: nil, sleep_date: "2025-03-01">'
+    # pp @sleep_log_form.awakening.inspect # '<#Awakening id: nil, sleep_log_id: nil, awakenings_count: nil, created_at: nil, updated_at: nil>'
 
 
-      # self.attributes = @sleep_log_form.attributes if @sleep_log_form.persisted? # ぶち込み済みなので不要？
+    # self.attributes = @sleep_log_form.attributes if @sleep_log_form.persisted? # ぶち込み済みなので不要？
 
     # @sleep_log_form # メソッドでは最終行のインスタンスがreturnされる仕組み TODO: 詰まったら再チェック
   end

@@ -49,8 +49,8 @@ group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
   gem "pry-remote" # Rails7でデバッグ時標準入力が見えない問題に対処
-  gem 'better_errors' # デフォルトのエラーをわかりやすく整形してくれる
-  gem 'binding_of_caller' # ブラウザ上でirbを使えるようにする
+  gem "better_errors" # デフォルトのエラーをわかりやすく整形してくれる
+  gem "binding_of_caller" # ブラウザ上でirbを使えるようにする
 
   # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
   gem "brakeman", require: false

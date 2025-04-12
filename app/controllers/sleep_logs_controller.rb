@@ -1,8 +1,8 @@
 class SleepLogsController < ApplicationController
   # ログインしていない場合はログイン画面にリダイレクト
   before_action :authenticate_user!, only: [ :index, :new, :edit, :destroy ]
-  before_action :set_user, only: [:new, :create, :edit, :update, :destroy] # user情報を取得
-  before_action :set_sleep_log, only: [:edit, :update, :destroy] # ユーザーの睡眠記録を取得
+  before_action :set_user, only: [ :new, :create, :edit, :update, :destroy ] # user情報を取得
+  before_action :set_sleep_log, only: [ :edit, :update, :destroy ] # ユーザーの睡眠記録を取得
 
   def index # 表示用
     @selected_date = if params[:year_month]
@@ -44,7 +44,6 @@ class SleepLogsController < ApplicationController
       flash.now[:alert] = "エラーが発生しました。入力内容を確認してください。"
       render :new
     end
-
   end
 
   def edit
