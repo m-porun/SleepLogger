@@ -1,9 +1,10 @@
 <!-- 編集画面 -->
 <div class="flex justify-center items-center z-50 mt-8">
-<%= form_with(url: sleep_logs_path, model: @sleep_log_form, method: :post, local: true, data: { turbo: false }) do |f| %>
+<%= form_with(url: sleep_log_path,  model: @sleep_log_form, method: :patch, local: true, data: { turbo: false }) do |f| %>
   <div>
+
     <%= f.label :sleep_date, '起きた日付' %>
-    <%= f.date_field :sleep_date, value: f.object.sleep_date.presence || params[:sleep_date], readonly: true %> <!-- f.objectに値があれば日付を、なければ探す -->
+    <%= f.date_field :sleep_date, readonly: true %> <!-- formオブジェクトの@attirbutes内の@ほにゃららを指定しないと取得できない問題 -->
   </div>
 
   <div>
@@ -18,12 +19,12 @@
 
   <div>
     <%= f.label :woke_up_at, "今朝目覚めた時刻" %>
-    <%= f.time_field :woke_up_at  %>
+    <%= f.time_field :woke_up_at %>
   </div>
 
   <div>
     <%= f.label :leave_bed_at, "今朝布団から出た時刻" %>
-    <%= f.time_field :leave_bed_at  %>
+    <%= f.time_field :leave_bed_at %>
   </div>
 
   <div>
