@@ -58,22 +58,29 @@ class SleepLogForm
     pp "saveメソッド"
     # バリデーションに引っかかる場合は以降の処理にせずfalseをコントローラーに返す
     return false unless valid?
-    # 新規セーブまたは更新セーブを開始する(ユーザーidと睡眠日から検索する)
-    sleep_log = SleepLog.find_or_initialize_by(user_id: user_id, sleep_date: sleep_date)
+    ActiveRecord::Base.transaction do
+      # 新規セーブまたは更新セーブを開始する(ユーザーidと睡眠日から検索する)
+      sleep_log = SleepLog.find_or_initialize_by(user_id: user_id, sleep_date: sleep_date)
 
-    # Time型をDateTime型に変換
-    %i[go_to_bed_at fell_asleep_at woke_up_at leave_bed_at].each do |column|
-      time_value = attributes[column.to_s] # Formオブジェクトで同じカラム名がついているattributesさんを呼び出し
-      sleep_log[column] = convert_to_datetime(sleep_date, time_value) if time_value.present?
+      # Time型をDateTime型に変換
+      %i[go_to_bed_at fell_asleep_at woke_up_at leave_bed_at].each do |column|
+        time_value = attributes[column.to_s] # Formオブジェクトで同じカラム名がついているattributesさんを呼び出し
+        sleep_log[column] = convert_to_datetime(sleep_date, time_value) if time_value.present?
+      end
+
+      # 起床日が就床・就寝時刻よりも前にならないように変換
+      adjust_datetime_order(sleep_log)
+
+      # Formオブジェクトの値をビルドしたsleep_logの子モデルにセット
+      set_child_models(sleep_log)
+
+      sleep_log.save! # 失敗したら例外出してロールバック
     end
 
-    # 起床日が就床・就寝時刻よりも前にならないように変換
-    adjust_datetime_order(sleep_log)
-
-    # Formオブジェクトの値をビルドしたsleep_logの子モデルにセット
-    set_child_models(sleep_log)
-
-    sleep_log.save
+    true # トランザクション成功したらcontrollerにtrueを返す
+    rescue => e
+      Rails.logger.error "どうやらトランザクションをヤっちまったみたいだぜ #{e.message}"
+      false
   end
 
   # form_withに必要なメソッドで、アクションURLを適切な場所に切り替える
