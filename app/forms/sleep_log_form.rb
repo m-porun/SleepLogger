@@ -12,25 +12,29 @@ class SleepLogForm
   attribute :leave_bed_at, :time
 
   # 子モデルで扱いたいカラムの属性
+  attr_accessor :awakening, :napping_time, :comment
   attribute :awakenings_count, :integer, default: 0 # モデルでデフォルト値を設定していないため、ここで設定しています
   attribute :napping_time, :integer, default: 0
   attribute :comment, :string
 
   # save時にUserモデルのuser_idを保存させたい
   # attr_accessor :user_id
-  # 委譲する -> 表示するだけなので必要ない
-  # delegate :persisted?, to: :sleep_log # SleepLogのpersistedというメソッドが使える
+  # 委譲する -> form_with送信時にフォームのアクションを自動でPOST / PATCHに切り替える
+  #delegate :persisted?, to: :sleep_log # SleepLogモデルのpersistedというメソッドが使える
 
   # initializeをオーバーライドできない fetch_valueとは:Rubyのメソッド→initializeオーバーライドしてはいかん→fetchにattributes
-  def initialize(attributes = {}, sleep_log: SleepLog.new) # sleep_logモデルは一旦nilにして、findさせたものを入れるか作る
-      pp "initializeメソッド始動"
-      @sleep_log_form = sleep_log
-      attributes ||= default_attributes
-      super(attributes) # 上で設定した属性などの設定を適用 このFormobjectは誰の親からも継承していない
+  def initialize(attributes = nil, sleep_log: SleepLog.new)
+    # binding.pry
+  # sleep_logモデルは一旦nilにして、findさせたものを入れるか作る
+    pp "initializeメソッド始動"
+    # binding.pry
+    @sleep_log_form = sleep_log
+    attributes ||= default_attributes
+    super(attributes) # 上で設定した属性などの設定を適用 このFormobjectは誰の親からも継承していない
+    set_child_models(@sleep_log_form)
     # self.sleep_date = sleep_date
     # その日付のレコードが見つからなければ新規作成して日付をぶちこむ
     # @sleep_log_form = sleep_log || user.sleep_logs.find_or_initialize_by(sleep_date: sleep_date, user_id: @user)
-      pp "SleepLogモデルを作ったか探して@sleep_log_formにぶちこんだ"
     # 親戻ると子モデルが同時に存在する場合は子モデルの値を入れる、そうでなければ子モデルを作成
     # @sleep_log_form.sleep_date ||= self.sleep_date # sleep_dateがnilの場合、明示的にセットする
       # 親モデルと子モデルが同時に存在する場合は子モデルの値を入れる、そうでなければ子モデルを作成
@@ -72,6 +76,11 @@ class SleepLogForm
 
     sleep_log.save
   end
+
+  # form_withに必要なメソッドで、アクションURLを適切な場所に切り替える
+  # def to_model
+  #   sleep_log_form
+  # end
 
   private
 
@@ -118,11 +127,10 @@ class SleepLogForm
       fell_asleep_at: @sleep_log_form.fell_asleep_at,
       woke_up_at: @sleep_log_form.woke_up_at,
       leave_bed_at: @sleep_log_form.leave_bed_at,
-      # 子モデルのデフォルト属性
+      # 子モデルのデフォルト属性 もし子モデルがあればその値を返すし、なければnilじゃないデフォルトの値を返す
       awakening: @sleep_log_form.awakening&.awakenings_count || 0,
       napping_time: @sleep_log_form.napping_time&.napping_time || 0,
-      comment: @sleep_log_form.comment&.comment || "",
-      awakenings_count: @sleep_log_form.awakening.awakenings_count
+      comment: @sleep_log_form.comment&.comment || ""
 
     }
   end
