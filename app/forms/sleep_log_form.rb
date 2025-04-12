@@ -12,10 +12,10 @@ class SleepLogForm
   attribute :leave_bed_at, :time
 
   # 子モデルで扱いたいカラムの属性
-  attr_accessor :awakening, :napping_time, :comment
+  # attr_accessor :awakening, :napping_time, :comment
   attribute :awakenings_count, :integer, default: 0 # モデルでデフォルト値を設定していないため、ここで設定しています
   attribute :napping_time, :integer, default: 0
-  attribute :comment, :string
+  attribute :comment, :string, default: ""
 
   # save時にUserモデルのuser_idを保存させたい
   # attr_accessor :user_id
@@ -58,7 +58,6 @@ class SleepLogForm
     pp "saveメソッド"
     # バリデーションに引っかかる場合は以降の処理にせずfalseをコントローラーに返す
     return false unless valid?
-
     # 新規セーブまたは更新セーブを開始する(ユーザーidと睡眠日から検索する)
     sleep_log = SleepLog.find_or_initialize_by(user_id: user_id, sleep_date: sleep_date)
 
@@ -128,7 +127,7 @@ class SleepLogForm
       woke_up_at: @sleep_log_form.woke_up_at,
       leave_bed_at: @sleep_log_form.leave_bed_at,
       # 子モデルのデフォルト属性 もし子モデルがあればその値を返すし、なければnilじゃないデフォルトの値を返す
-      awakening: @sleep_log_form.awakening&.awakenings_count || 0,
+      awakenings_count: @sleep_log_form.awakening&.awakenings_count || 0,
       napping_time: @sleep_log_form.napping_time&.napping_time || 0,
       comment: @sleep_log_form.comment&.comment || ""
 
