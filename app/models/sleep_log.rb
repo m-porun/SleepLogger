@@ -2,7 +2,7 @@ class SleepLog < ApplicationRecord
   belongs_to :user
   has_one :awakening, dependent: :destroy
   has_one :napping_time, dependent: :destroy
-  has_one :comment, dependent: :destroy
+  has_one :comment, dependent: :destroy, autosave: true
   # accepts_nested_attributes_for :awakening, :napping_time, :comment
 
   validates :user_id, presence: true
