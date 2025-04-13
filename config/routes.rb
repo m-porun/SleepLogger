@@ -4,34 +4,34 @@ Rails.application.routes.draw do
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   # ヘルスチェック用のルート
-  get 'up' => 'rails/health#show', as: :rails_health_check
+  get "up", to: "rails/health#show", as: :rails_health_check
 
   # Render dynamic PWA files from app/views/pwa/*
   # PWA関連のルート
-  get 'service-worker' => 'rails/pwa#service_worker', as: :pwa_service_worker
-  get 'manifest' => 'rails/pwa#manifest', as: :pwa_manifest
+  get "service-worker", to: "rails/pwa#service_worker", as: :pwa_service_worker
+  get "manifest", to: "rails/pwa#manifest", as: :pwa_manifest
 
   # リソースルート
   resources :sleep_logs, only: [ :index, :new, :edit, :update, :create, :destroy ]
 
   # ログイン機能
   devise_for :users, controllers: {
-    registrations: 'users/registrations' # ユーザー設定など用
+    registrations: "users/registrations" # ユーザー設定など用
   }
 
   devise_scope :user do
     # ログイン・ログアウト
-    get '/users/sign_out' => 'devise/sessions#destroy'
-    post '/users/sign_in' => 'devise/sessions#create'
+    get "/users/sign_out", to: "devise/sessions#destroy"
+    post "/users/sign_in", to: "devise/sessions#create"
     # ユーザー設定
-    get 'users/edit_profile' => 'users/registrations#edit_profile'
-    patch 'users/update_profile' => 'users/registrations#update_profile'
+    get "users/edit_profile", to: "users/registrations#edit_profile"
+    patch "users/update_profile", to: "users/registrations#update_profile"
     # パスワード変更
-    get 'users/edit_password', to: 'users/registrations#edit_password'
-    patch 'users/update_password', to: 'users/registrations#update_password'
+    get "users/edit_password", to: "users/registrations#edit_password"
+    patch "users/update_password", to: "users/registrations#update_password"
     # 退会 TODO: 未作成
 
     # Defines the root path route ('/') トップページ
-    root to: 'devise/sessions#new'
+    root to: "devise/sessions#new"
   end
 end
