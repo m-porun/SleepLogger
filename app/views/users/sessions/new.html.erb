@@ -23,14 +23,12 @@
     <%= f.password_field :password, autocomplete: "current-password", class: "block w-full rounded-md bg-primary px-3 py-1.5 text-base text-neutral  outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm" %>
   </div>
 
-  <!-- MVP時点では使用しない
-  <% if devise_mapping.rememberable? %>
-    <div class="field">
-      <%= f.check_box :remember_me %>
-      <%= f.label :remember_me %>
-    </div>
-  <% end %>
-  -->
+  <div class="mt-4 flex items-center">
+    <% if devise_mapping.rememberable? %>
+      <%= f.check_box :remember_me, class: "h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600" %>
+      <%= f.label :remember_me, "ログイン状態を保持する", class: "ml-2 block text-sm text-neutral" %>
+    <% end %>
+  </div>
 
   <div class="actions mt-8 flex w-full justify-center rounded-md bg-accent px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
     <%= f.submit "ログイン" %>
