@@ -17,7 +17,7 @@ module.exports = {
           "base-100": "#e3e0dc", // 薄グレー
           "info": "#5862ab", // 青
           "success": "#5862ab", // 青
-          "warning": "#8d7683", // 赤
+          "warning": "#E1335E", // 濃いピンク
           "error": "#8d7683", /// 赤
           },
         },

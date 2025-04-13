@@ -29,8 +29,9 @@ Rails.application.routes.draw do
     # パスワード変更
     get "users/edit_password", to: "users/registrations#edit_password"
     patch "users/update_password", to: "users/registrations#update_password"
-    # 退会 TODO: 未作成
-
+    # 退会機能
+    get "users/unsubscribe_confirm", to: "users/registrations#unsubscribe_confirm"
+    delete "users/destroy", to: "users/registrations#destroy"
     # Defines the root path route ('/') トップページ
     root to: "devise/sessions#new"
   end
