@@ -29,5 +29,8 @@ module SleepLogger
 
     # DBへの保存時にUTCで保存し、表示時にはローカルタイムに変換
     config.active_record.default_timezone = :local # UTCではなく、ローカルのタイムゾーンで保存
+
+    # デフォルト言語を日本語に
+    config.i18n.default_locale = :ja
   end
 end

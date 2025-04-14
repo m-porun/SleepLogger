@@ -77,6 +77,21 @@ Rails.application.configure do
   # Disable caching for Action Mailer templates even if Action Controller
   # caching is enabled.
   config.action_mailer.perform_caching = false
+  # パスワードリセット用のSMTP設定
+  # TODO: もしドメイン取得したら、URLを変えること
+  config.action_mailer.default_url_options = { host: 'https://sleeplogger.onrender.com/' }
+  # SMTPで送信
+  config.action_mailer.delivery_method = :smtp
+  # Gmail経由
+  config.action_mailer.smtp_settings = {
+    address:              'smtp.gmail.com',
+    port:                 587,
+    domain:               'sleeplogger.onrender.com', # TODO: ドメイン取得時ここも変更
+    user_name:            ENV['MAILER_SENDER'],
+    password:             ENV['MAILER_PASSWORD'],
+    authentication:       'plain',
+    enable_starttls_auto: true
+  }
 
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
