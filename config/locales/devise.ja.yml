@@ -1,0 +1,65 @@
+# Additional translations at https://github.com/heartcombo/devise/wiki/I18n
+
+ja:
+  devise:
+    confirmations:
+      confirmed: "メールアドレスの確認が正常に完了しました。"
+      send_instructions: "数分以内に、メールアドレス確認の手順が記載されたメールが届きます。"
+      send_paranoid_instructions: "もしそのメールアドレスが登録されていれば、メールアドレス確認の手順が記載されたメールが数分以内に届きます。"
+    failure:
+      already_authenticated: "ログイン済みです"
+      inactive: "アカウントはまだ有効化されていません。"
+      invalid: "%{authentication_keys} またはパスワードが正しくありません。"
+      locked: "アカウントはロックされています。"
+      last_attempt: "あと1回試すとアカウントがロックされます。"
+      not_found_in_database: "%{authentication_keys} またはパスワードが正しくありません。"
+      timeout: "セッションの有効期限が切れました。再度ログインしてください。"
+      unauthenticated: "続行するにはログインまたはアカウント登録が必要です。"
+      unconfirmed: "続行するにはメールアドレスの確認が必要です。"
+    mailer:
+      confirmation_instructions:
+        subject: "確認手順"
+      reset_password_instructions:
+        subject: "パスワードリセット手順"
+      unlock_instructions:
+        subject: "アカウント解除手順"
+      email_changed:
+        subject: "メールアドレスが変更されました"
+      password_change:
+        subject: "パスワードが変更されました"
+    omniauth_callbacks:
+      failure: "%{kind} で認証できませんでした。理由: \"%{reason}\""
+      success: "%{kind} アカウントでの認証に成功しました。"
+    passwords:
+      no_token: "パスワードリセット用のメールからアクセスしないとこのページにはアクセスできません。メール内のURLが完全であることをご確認ください。"
+      send_instructions: "パスワードリセットを受け付けました。数分以内に、パスワードをリセットする方法を記載したメールが届きます。"
+      send_paranoid_instructions: "もしそのメールアドレスが登録されていれば、パスワード再設定リンクが数分以内に送信されます。"
+      updated: "パスワードが正常に変更されました。ログインしました。"
+      updated_not_active: "パスワードが正常に変更されました。"
+    registrations:
+      destroyed: "アカウントは正常に削除されました。またお会いできるのを楽しみにしています。"
+      signed_up: "ようこそ！アカウント登録が完了しました。"
+      signed_up_but_inactive: "アカウント登録は完了しましたが、アカウントがまだ有効化されていないためログインできません。"
+      signed_up_but_locked: "アカウント登録は完了しましたが、アカウントがロックされているためログインできません。"
+      signed_up_but_unconfirmed: "確認リンクを記載したメールを送信しました。リンクをクリックしてアカウントを有効化してください。"
+      update_needs_confirmation: "アカウント情報は更新されましたが、新しいメールアドレスの確認が必要です。確認リンクを記載したメールをご確認ください。"
+      updated: "アカウント情報が正常に更新されました。"
+      updated_but_not_signed_in: "アカウント情報は更新されましたが、パスワードが変更されたため再ログインが必要です。"
+    sessions:
+      signed_in: "ログインしました！"
+      signed_out: "おやすみなさい"
+      already_signed_out: "ログアウト済みです"
+    unlocks:
+      send_instructions: "数分以内にアカウント解除の手順が記載されたメールが届きます。"
+      send_paranoid_instructions: "もしそのアカウントが存在すれば、アカウント解除の手順が記載されたメールが数分以内に届きます。"
+      unlocked: "アカウントは正常に解除されました。ログインして続行してください。"
+  errors:
+    messages:
+      already_confirmed: "はすでに確認済みです。ログインをお試しください。"
+      confirmation_period_expired: "%{period}以内に確認する必要があります。新しい確認をリクエストしてください。"
+      expired: "期限切れです。新しいものをリクエストしてください。"
+      not_found: "見つかりません"
+      not_locked: "はロックされていませんでした"
+      not_saved:
+        one: "%{resource} を保存できませんでした。1件のエラーがあります:"
+        other: "%{resource} を保存できませんでした。%{count}件のエラーがあります:"

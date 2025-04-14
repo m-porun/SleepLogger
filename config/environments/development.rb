@@ -43,6 +43,26 @@ Rails.application.configure do
 
   config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
 
+  # メール送信方法としてSMTPを使う
+  config.action_mailer.delivery_method = :smtp
+  # Gmailを使ってメールを送る
+  config.action_mailer.smtp_settings = {
+    # GmailのSMTPサーバーのアドレス
+    address: 'smtp.gmail.com',
+    # STARTTLS用のポート番号
+    port: 587,
+    # 送信元ドメイン(開発環境)
+    domain: 'localhost',
+    # Gmailログイン用メールアドレス(環境変数として.envに設定済み)
+    user_name: ENV['MAILER_SENDER'],
+    # Gmailアカウントのアプリパスワード(同上)
+    password: ENV['MAILER_PASSWORD'],
+    # 認証方式(plainはデフォルト)
+    authentication: 'plain',
+    # 暗号化してくれるSTARTTLSを有効に
+    enable_starttls_auto: true
+  }
+
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
 
