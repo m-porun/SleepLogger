@@ -1,49 +1,49 @@
 <!-- 編集画面 -->
-<div class="flex justify-center items-center z-50 mt-8">
-<%= form_with(url: sleep_log_path,  model: @sleep_log_form, method: :patch, local: true, data: { turbo: false }) do |f| %>
-  <div>
+<div class="flex justify-center items-center z-50 mt-16">
+  <%= form_with(url: sleep_log_path,  model: @sleep_log_form, method: :patch, local: true, data: { turbo: false }) do |f| %>
 
-    <%= f.label :sleep_date, '起きた日付' %>
-    <%= f.date_field :sleep_date, readonly: true %> <!-- formオブジェクトの@attirbutes内の@ほにゃららを指定しないと取得できない問題 -->
-  </div>
+    <div>
+      <%= f.label :sleep_date, '起きた日付' %>
+      <%= f.date_field :sleep_date, value: f.object.sleep_date.presence || params[:sleep_date], readonly: true %> <!-- f.objectに値があれば日付を、なければ探す -->
+    </div>
 
-  <div>
-    <%= f.label :go_to_bed_at, "昨夜布団に入った時刻" %>
-    <%= f.time_field :go_to_bed_at %>
-  </div>
+    <div>
+      <%= f.label :go_to_bed_at, "昨夜布団に入った時刻" %>
+      <%= f.time_field :go_to_bed_at %>
+    </div>
 
-  <div>
-    <%= f.label :fell_asleep_at, "昨夜寝た時刻" %>
-    <%= f.time_field :fell_asleep_at %>
-  </div>
+    <div>
+      <%= f.label :fell_asleep_at, "昨夜寝た時刻" %>
+      <%= f.time_field :fell_asleep_at %>
+    </div>
 
-  <div>
-    <%= f.label :woke_up_at, "今朝目覚めた時刻" %>
-    <%= f.time_field :woke_up_at %>
-  </div>
+    <div>
+      <%= f.label :woke_up_at, "今朝目覚めた時刻" %>
+      <%= f.time_field :woke_up_at %>
+    </div>
 
-  <div>
-    <%= f.label :leave_bed_at, "今朝布団から出た時刻" %>
-    <%= f.time_field :leave_bed_at %>
-  </div>
+    <div>
+      <%= f.label :leave_bed_at, "今朝布団から出た時刻" %>
+      <%= f.time_field :leave_bed_at %>
+    </div>
 
-  <div>
-    <%= f.label :awakenings_count, "中途覚醒（回数）" %>
-    <%= f.number_field :awakenings_count, min: 0 %> <!-- デフォルトで0が入力されている -->
-  </div>
+    <div>
+      <%= f.label :awakenings_count, "中途覚醒（回数）" %>
+      <%= f.number_field :awakenings_count, min: 0 %> <!-- デフォルトで0が入力されている -->
+    </div>
 
-  <div>
-    <%= f.label :napping_time, "昼寝時間（分）" %>
-    <%= f.number_field :napping_time, min: 0 %> <!-- デフォルトで0が入力されている -->
-  </div>
+    <div>
+      <%= f.label :napping_time, "昼寝時間（分）" %>
+      <%= f.number_field :napping_time, min: 0 %> <!-- デフォルトで0が入力されている -->
+    </div>
 
-  <div>
-    <%= f.label :comment, "備考(42文字まで)" %>
-    <%= f.text_area :comment, max: 42 %>
-  </div>
+    <div>
+      <%= f.label :comment, "備考(42文字まで)" %>
+      <%= f.text_area :comment, max: 42 %>
+    </div>
 
-  <div class="flex justify-end">
-    <%= f.submit "登録", class: "bg-accent hover:bg-blue-600 text-primary font-bold py-2 px-4 rounded"%>
-  </div>
-<% end %>
+    <div class="flex justify-end">
+      <%= f.submit "登録", class: "bg-accent hover:bg-blue-600 text-primary font-bold py-2 px-4 rounded"%>
+    </div>
+  <% end %>
 </div>
