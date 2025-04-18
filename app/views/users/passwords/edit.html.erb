@@ -3,7 +3,7 @@
     <h2 class="mt-10 text-center text-2xl/9 font-bold text-neutral">パスワード再登録</h2>
   </div>
   <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-    <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put }) do |f| %>
+    <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put, data: { turbo: false } }) do |f| %>
       <%= render "users/shared/error_messages", resource: resource %>
       <%= f.hidden_field :reset_password_token %>
 

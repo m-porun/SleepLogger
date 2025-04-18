@@ -30,7 +30,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
       # 自動ログアウトさせないように再ログイン
       bypass_sign_in(current_user)
       flash[:notice] = "パスワードを更新しました"
-      redirect_to users_edit_password_path
+      redirect_to root_path
     else
       flash.now[:alert] ="なんかパスワードにやらかしがあります"
       render :edit_password
