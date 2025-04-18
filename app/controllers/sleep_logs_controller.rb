@@ -63,7 +63,7 @@ class SleepLogsController < ApplicationController
       redirect_to sleep_logs_path(year_month: year_month), notice: "睡眠記録を更新しました" # 登録した年月のページにリダイレクト
     else
       flash.now[:alert] = "エラーが発生しました。入力内容を確認してください。"
-      render :new
+      render :edit
     end
     # @sleep_log = current_user.sleep_logs.find(params[:id])
 
