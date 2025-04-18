@@ -1,8 +1,8 @@
 class SleepLogsController < ApplicationController
   # ログインしていない場合はログイン画面にリダイレクト
   before_action :authenticate_user!, only: [ :index, :new, :edit, :destroy ]
-  before_action :set_user, only: [ :new, :create, :edit, :update, :destroy ] # user情報を取得
-  before_action :set_sleep_log, only: [ :edit, :update, :destroy ] # ユーザーの睡眠記録を取得
+  before_action :set_user, only: [ :new, :create, :edit, :update, :destroy, :pdf ] # user情報を取得
+  before_action :set_sleep_log, only: [ :edit, :update, :destroy] # ユーザーの睡眠記録を取得
 
   def index # 表示用
     @selected_date = if params[:year_month]
@@ -28,10 +28,8 @@ class SleepLogsController < ApplicationController
   end
 
   def new
-    # binding.pry
     # フォームオブジェクトを呼び出す。SleepLogForm.new時点でFormオブジェクトファイルのAttributeが適用される
-    @sleep_log_form = SleepLogForm.new   # fetch_valueがnilになってしまう諸悪の根源initialize除け
-    # @sleep_log_form.initialize_sleep_log(sleep_date: params[:sleep_date], user: @user) # Formオブジェクトに日付とユーザー情報を渡して、親モデル・子モデルの作成をしてもらう
+    @sleep_log_form = SleepLogForm.new
   end
 
   def create
@@ -49,10 +47,6 @@ class SleepLogsController < ApplicationController
   def edit
     sleep_log = current_user.sleep_logs.find(params[:id])
     @sleep_log_form = SleepLogForm.new(sleep_log: sleep_log)
-    # @sleep_log = current_user.sleep_logs.find(params[:id])
-    # @sleep_date = params[:sleep_date]
-    # @sleep_log.sleep_date ||= params[:sleep_date]
-    # initialize_associations(@sleep_log) # 子モデルを探す／作成
   end
 
   def update
@@ -65,28 +59,6 @@ class SleepLogsController < ApplicationController
       flash.now[:alert] = "エラーが発生しました。入力内容を確認してください。"
       render :edit
     end
-    # @sleep_log = current_user.sleep_logs.find(params[:id])
-
-    # # String型のHH:MMが渡されたら、DateTimeに変換する
-    # processed_params = sleep_log_form_params.dup # 入力した内容を複製して編集
-
-    # %i[go_to_bed_at fell_asleep_at woke_up_at leave_bed_at].each do |column|
-    #   time_str = params[:sleep_log][column]
-    #   if time_str.present?
-    #     datetime_value = convert_to_datetime(time_str, processed_params[:sleep_date]) # Time型のカラムと複製したDateカラムを送る
-    #     processed_params[column] = datetime_value
-    #   end
-    # end
-    # # 覚醒時刻が就床時刻と就寝時刻よりも前の時間にならないよう修正
-    # adjust_datetime_order(@sleep_log, processed_params) # DateTime型にした修正版睡眠記録を引数に
-
-    # if @sleep_log.update(processed_params) # 複製して編集した方を保存
-    #   year_month = @sleep_log.sleep_date.strftime("%Y-%m")
-    #   redirect_to sleep_logs_path(year_month: year_month), notice: "睡眠記録を更新しました"
-    # else
-    #   flash.now[:alert] = "エラーが発生しました。入力内容を確認してください。"
-    #   render :edit
-    # end
   end
 
   def destroy
@@ -95,13 +67,36 @@ class SleepLogsController < ApplicationController
     redirect_to sleep_logs_path, notice: "睡眠記録を削除しました"
   end
 
+  # PDF出力
+  def pdf
+    # FIXME: ちゃんとボタンを押した時点の年月が選択されているか？
+    @selected_date = Date.strptime(params[:year_month] + "-01", "%Y-%m-%d")
+
+    @start_date = @selected_date.beginning_of_month
+    @end_date = @selected_date.end_of_month
+    sleep_logs = current_user.sleep_logs.where(sleep_date: @start_date..@end_date)
+
+    all_dates = (@start_date..@end_date).to_a
+    @sleep_logs = all_dates.map do |sleep_date|
+      sleep_logs.find { |sleep_log| sleep_log.sleep_date == sleep_date } || current_user.sleep_logs.build(sleep_date: sleep_date)
+    end
+
+    html = render_to_string(
+      template: 'sleep_logs/_pdf_export',
+      layout: 'application',
+      locals: { sleep_logs: @sleep_logs }
+    )
+    pdf = html2pdf(html)
+    send_data pdf, filename: 'すいみんにっし.pdf', type: 'application/pdf'
+  end
+
   private
 
   def set_user
     @user = current_user
   end
 
-  def set_sleep_log # TODO: ちゃんと子モデルまで呼び出せているかチェック
+  def set_sleep_log
     @sleep_log_form = @user.sleep_logs.find(params[:id]) # ユーザーが持つ睡眠記録id
     @awakening = @sleep_log_form.awakening
     @napping_time = @sleep_log_form.napping_time
@@ -119,5 +114,21 @@ class SleepLogsController < ApplicationController
       :napping_time,
       :comment
     ).merge(user_id: current_user.id) # 誰の記録かも追加するストロングパラメーター
+  end
+
+  def html2pdf(html)
+    browser = Ferrum::Browser.new(browser_path: '/usr/bin/chromium', browser_options: { "no-sandbox": nil }) # TODO: もしかしたらchromium必要かも, Docker環境ではno-sandboxブラウザオプションが必要？
+    # ブラウザ移動
+    browser.go_to("data:text/html,#{html}")
+    # PDFファイル生成
+    pdf = browser.pdf(
+      format: :A4,
+      encoding: :binary,
+      # ヘッダーフッターカスタマイズ用 display_header_footer: true,
+      # header_template: header_html,
+      # footer_template: footer_html
+    )
+    browser.quit
+    pdf
   end
 end

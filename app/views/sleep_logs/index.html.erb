@@ -14,7 +14,7 @@
     <p class="size-52 font-bold text-center">睡眠日誌</p>
 
     <!-- PDFに出力ボタン -->
-    <%= render 'pdf_export' %>
+    <%= link_to 'PDFに出力', pdf_sleep_logs_path(year_month: @selected_date.strftime('%Y-%m')), class: 'btn bg-primary text-neutral px-4 py-2 rounded' %>
   </div>
 
   <!-- 睡眠記録テーブル -->
