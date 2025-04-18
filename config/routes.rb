@@ -16,7 +16,8 @@ Rails.application.routes.draw do
 
   # ログイン機能
   devise_for :users, controllers: {
-    registrations: "users/registrations" # ユーザー設定など用
+    registrations: "users/registrations", # ユーザー設定など用
+    passwords: "users/passwords" # パスワードリセット用
   }
 
   devise_scope :user do
