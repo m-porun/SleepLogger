@@ -35,10 +35,10 @@ class SleepLogsController < ApplicationController
   end
 
   def create
-    sleep_log = SleepLogForm.new(sleep_log_form_params) # 保存用。文字列型として渡される
+    @sleep_log_form = SleepLogForm.new(sleep_log_form_params) # 保存用。文字列型として渡される
 
-    if sleep_log.save
-      year_month = sleep_log.sleep_date.strftime("%Y-%m") # 登録されたsleep_log.dateをYYYY-MM形式に変換
+    if @sleep_log_form.save
+      year_month = @sleep_log_form.sleep_date.strftime("%Y-%m") # 登録されたsleep_log.dateをYYYY-MM形式に変換
       redirect_to sleep_logs_path(year_month: year_month), notice: "睡眠記録を保存しました" # 登録した年月のページにリダイレクト
     else
       flash.now[:alert] = "エラーが発生しました。入力内容を確認してください。"
@@ -56,10 +56,10 @@ class SleepLogsController < ApplicationController
   end
 
   def update
-    sleep_log = SleepLogForm.new(sleep_log_form_params) # 保存用。文字列型として渡される
+    @sleep_log_form = SleepLogForm.new(sleep_log_form_params) # 保存用。文字列型として渡される
 
-    if sleep_log.save
-      year_month = sleep_log.sleep_date.strftime("%Y-%m") # 登録されたsleep_log.dateをYYYY-MM形式に変換
+    if @sleep_log_form.save
+      year_month = @sleep_log_form.sleep_date.strftime("%Y-%m") # 登録されたsleep_log.dateをYYYY-MM形式に変換
       redirect_to sleep_logs_path(year_month: year_month), notice: "睡眠記録を更新しました" # 登録した年月のページにリダイレクト
     else
       flash.now[:alert] = "エラーが発生しました。入力内容を確認してください。"
@@ -102,10 +102,10 @@ class SleepLogsController < ApplicationController
   end
 
   def set_sleep_log # TODO: ちゃんと子モデルまで呼び出せているかチェック
-    @sleep_log = @user.sleep_logs.find(params[:id]) # ユーザーが持つ睡眠記録id
-    @awakening = @sleep_log.awakening
-    @napping_time = @sleep_log.napping_time
-    @comment = @sleep_log.comment
+    @sleep_log_form = @user.sleep_logs.find(params[:id]) # ユーザーが持つ睡眠記録id
+    @awakening = @sleep_log_form.awakening
+    @napping_time = @sleep_log_form.napping_time
+    @comment = @sleep_log_form.comment
   end
 
   def sleep_log_form_params
