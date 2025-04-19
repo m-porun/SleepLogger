@@ -82,12 +82,13 @@ class SleepLogsController < ApplicationController
     end
 
     html = render_to_string(
-      template: 'sleep_logs/_pdf_export',
+      template: 'sleep_logs/index', # layoutをベースにtemplateを表示させる
       layout: 'application',
-      locals: { sleep_logs: @sleep_logs }
+      formats: [:html]
+      # locals: { sleep_logs: @sleep_logs }
     )
     pdf = html2pdf(html)
-    send_data pdf, filename: 'すいみんにっし.pdf', type: 'application/pdf'
+    send_data pdf, filename: "SleepLogger_#{@selected_date.strftime('%Y-%m')}.pdf", type: 'application/pdf'
   end
 
   private
@@ -117,9 +118,12 @@ class SleepLogsController < ApplicationController
   end
 
   def html2pdf(html)
-    browser = Ferrum::Browser.new(browser_path: '/usr/bin/chromium', browser_options: { "no-sandbox": nil }) # TODO: もしかしたらchromium必要かも, Docker環境ではno-sandboxブラウザオプションが必要？
+    # ChromeなしでバックグラウンドからChromeヘッドレスにアクセス: Chromium
+    browser = Ferrum::Browser.new(browser_path: '/usr/bin/chromium', browser_options: { "no-sandbox": nil }) # Docker環境ではno-sandboxブラウザオプションが必要
     # ブラウザ移動
     browser.go_to("data:text/html,#{html}")
+    # TailwindCSSのデザインをCSSファイルとして読み込む
+    # browser.add_style_tag(path: Rails.root.join("public/stylesheets/application.css"))
     # PDFファイル生成
     pdf = browser.pdf(
       format: :A4,
@@ -128,6 +132,7 @@ class SleepLogsController < ApplicationController
       # header_template: header_html,
       # footer_template: footer_html
     )
+    # Chromeを閉じる
     browser.quit
     pdf
   end

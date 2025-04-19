@@ -2,19 +2,36 @@
   <div class="relative top-24 flex justify-center"> <!-- 子要素、上から94px、横軸は中央揃え -->
 
     <!-- 年月選択 -->
-    <%= form_with(url: sleep_logs_path, method: :get, data: { turbo: true }) do |f| %>
-      <div class="form-group">
-        <%= f.month_field :year_month,
-                          class: 'form-control bg-primary text-center',
-                          value: @selected_date.strftime('%Y-%m'),
-                          onchange: 'this.form.submit();' %>
-      </div>
-    <% end %>
+    <div class="print:hidden">
+      <%= form_with(url: sleep_logs_path, method: :get, data: { turbo: true }) do |f| %>
+        <div class="form-group">
+          <%= f.month_field :year_month,
+                            class: 'form-control bg-primary text-center',
+                            value: @selected_date.strftime('%Y-%m'),
+                            onchange: 'this.form.submit();' %>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- 印刷用：年月タイトル -->
+    <h1 class="hidden print:block size-52 font-bold text-center">
+      <%= @selected_date.strftime('%Y-%m') %>
+    </h1>
 
     <p class="size-52 font-bold text-center">睡眠日誌</p>
 
-    <!-- PDFに出力ボタン -->
-    <%= link_to 'PDFに出力', pdf_sleep_logs_path(year_month: @selected_date.strftime('%Y-%m')), class: 'btn bg-primary text-neutral px-4 py-2 rounded' %>
+    <!-- 通常表示：PDF出力ボタン（印刷には表示しない） -->
+    <div class="print:hidden">
+      <%= link_to 'PDFに出力',
+                  pdf_sleep_logs_path(year_month: @selected_date.strftime('%Y-%m')),
+                  target: "_blank",
+                  class: 'btn bg-primary text-neutral px-4 py-2 rounded' %>
+    </div>
+
+    <!-- 印刷用：ユーザー名を表示 -->
+    <p class="hidden print:block size-52 font-bold text-center">
+      <%= current_user.name %>
+    </p>
   </div>
 
   <!-- 睡眠記録テーブル -->
@@ -32,7 +49,8 @@
           <th class="border border-secondary bg-primary">中途覚醒(回)</th>
           <th class="border border-secondary bg-primary">昼寝時間(分)</th>
           <th class="border border-secondary bg-primary">備考</th>
-          <th class="border border-secondary bg-primary">編集</th>
+          <!-- 編集ボタンのみプリントしない -->
+          <th class="print:hidden border border-secondary bg-primary">編集</th>
         </tr>
       </thead>
       <%= render 'logs_table' %>
