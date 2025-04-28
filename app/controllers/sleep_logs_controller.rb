@@ -69,26 +69,29 @@ class SleepLogsController < ApplicationController
 
   # PDF出力
   def pdf
+    year_month = params[:year_month]
+    PdfGenerationJob.perform_later(current_user.id, year_month)
+    redirect_to sleep_logs_path(year_month: year_month), notice: "PDF をバックグラウンドで生成しています。完了後、ダウンロードリンクが表示されます。"
     # FIXME: ちゃんとボタンを押した時点の年月が選択されているか？
-    @selected_date = Date.strptime(params[:year_month] + "-01", "%Y-%m-%d")
+    # @selected_date = Date.strptime(params[:year_month] + "-01", "%Y-%m-%d")
+    # @start_date = @selected_date.beginning_of_month
+    # @end_date = @selected_date.end_of_month
+    # sleep_logs = current_user.sleep_logs.where(sleep_date: @start_date..@end_date)
 
-    @start_date = @selected_date.beginning_of_month
-    @end_date = @selected_date.end_of_month
-    sleep_logs = current_user.sleep_logs.where(sleep_date: @start_date..@end_date)
+    # all_dates = (@start_date..@end_date).to_a
+    # @sleep_logs = all_dates.map do |sleep_date|
+    #   sleep_logs.find { |sleep_log| sleep_log.sleep_date == sleep_date } || current_user.sleep_logs.build(sleep_date: sleep_date)
+    # end
 
-    all_dates = (@start_date..@end_date).to_a
-    @sleep_logs = all_dates.map do |sleep_date|
-      sleep_logs.find { |sleep_log| sleep_log.sleep_date == sleep_date } || current_user.sleep_logs.build(sleep_date: sleep_date)
-    end
-
-    html = render_to_string(
-      template: 'sleep_logs/index', # layoutをベースにtemplateを表示させる
-      layout: 'application',
-      formats: [:html]
-      # locals: { sleep_logs: @sleep_logs }
-    )
-    pdf = html2pdf(html)
-    send_data pdf, filename: "SleepLogger_#{@selected_date.strftime('%Y-%m')}.pdf", type: 'application/pdf'
+    # html = render_to_string(
+    #   template: 'sleep_logs/pdf', # layoutをベースにtemplateを表示させる
+    #   layout: 'pdf', # applicationだとTurboやJSと干渉するため、別途レイアウトを用意
+    #   formats: [:html],
+    #   locals: { sleep_logs: @sleep_logs, selected_date: @selected_date } # 出力先で使うローカル変数
+    #   # locals: { sleep_logs: @sleep_logs }
+    # )
+    # pdf = html2pdf(html)
+    # send_data pdf, filename: "SleepLogger_#{@selected_date.strftime('%Y-%m')}.pdf", type: 'application/pdf' # PDFに名前をつけて返す
   end
 
   private
@@ -117,23 +120,50 @@ class SleepLogsController < ApplicationController
     ).merge(user_id: current_user.id) # 誰の記録かも追加するストロングパラメーター
   end
 
-  def html2pdf(html)
-    # ChromeなしでバックグラウンドからChromeヘッドレスにアクセス: Chromium
-    browser = Ferrum::Browser.new(browser_path: '/usr/bin/chromium', browser_options: { "no-sandbox": nil }) # Docker環境ではno-sandboxブラウザオプションが必要
-    # ブラウザ移動
-    browser.go_to("data:text/html,#{html}")
-    # TailwindCSSのデザインをCSSファイルとして読み込む
-    # browser.add_style_tag(path: Rails.root.join("public/stylesheets/application.css"))
-    # PDFファイル生成
-    pdf = browser.pdf(
-      format: :A4,
-      encoding: :binary,
-      # ヘッダーフッターカスタマイズ用 display_header_footer: true,
-      # header_template: header_html,
-      # footer_template: footer_html
-    )
-    # Chromeを閉じる
-    browser.quit
-    pdf
-  end
+  # def html2pdf(html)
+  #   # TailwindCSSの読み込み
+  #   css_path = Rails.root.join("app/assets/builds/application.css")
+  #   tailwind_css = File.read(css_path) rescue ""
+  #   # Google Fontsの読み込み
+  #   google_font_css = Net::HTTP.get(URI("https://fonts.googleapis.com/css2?family=Kiwi+Maru&display=swap")) rescue ""
+  #   # CSSとFontを埋め込んだHTMLを生成
+  #   embedded_style = "<style>#{google_font_css}\n#{tailwind_css}</style>"
+  #   html_with_css = html.sub("</head>", "#{embedded_style}</head>")
+
+  #   # デバッグ保存
+  #   File.write(Rails.root.join("tmp/pdf_debug.html"), html_with_css)
+
+  #   # ChromeなしでバックグラウンドからChromeヘッドレスにアクセス: Chromium
+  #   browser = Ferrum::Browser.new(
+  #     browser_path: '/usr/bin/chromium',
+  #     browser_options: {
+  #       "no-sandbox": nil ,
+  #       "disable-gpu": nil
+  #     },
+  #     js_errors: true, # JavaScriptのエラーを報告させる (デバッグ用)
+  #     extensions: []    # 拡張機能が無効になっているか確認
+  #   )
+  #   # ブラウザ移動
+  #   browser.go_to("data:text/html,#{html_with_css}")
+  #   # ネットワークがアイドル状態になるまで待たれよ
+  #   browser.network.wait_for_idle
+  #   # browser.downloads.wait
+  #   sleep 1.5 # 待ち時間明示
+  #   # TailwindCSSのデザインをCSSファイルとして読み込む
+  #   # browser.add_style_tag(path: Rails.root.join("public/stylesheets/application.css"))
+  #   # PDFファイル生成
+  #   pdf = browser.pdf(
+  #     format: :A4,
+  #     encoding: :binary,
+  #     # ヘッダーフッターカスタマイズ用 display_header_footer: true,
+  #     # header_template: header_html,
+  #     # footer_template: footer_html
+  #   )
+  #   browser.screenshot(path: Rails.root.join("tmp/pdf_debug.png"))
+  #   browser.page.close if browser.page
+
+  #   # Chromeを閉じる
+  #   browser.quit
+  #   pdf
+  # end
 end

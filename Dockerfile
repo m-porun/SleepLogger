@@ -7,7 +7,7 @@
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version
 ARG RUBY_VERSION=3.3.6
 # 痩せ型バージョン、Dockerの必要最小限
-FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
+FROM --platform=linux/amd64 docker.io/library/ruby:$RUBY_VERSION-slim AS base
 
 # Rails app lives here
 WORKDIR /rails
@@ -39,7 +39,6 @@ RUN apt-get update -qq && \
     node-gyp \
     pkg-config \
     python-is-python3 \
-    chromium && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # Install JavaScript dependencies
@@ -76,6 +75,11 @@ RUN rm -rf node_modules
 
 # Final stage for app image
 FROM base
+
+# # Chromium を実行ステージ環境にもコピー
+# COPY --from=build /usr/bin/chromium /usr/bin/chromium
+# COPY --from=build /usr/lib/chromium /usr/lib/chromium
+# COPY --from=build /usr/share/chromium /usr/share/chromium
 
 # Copy built artifacts: gems, application
 COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"

@@ -19,11 +19,16 @@ services:
       timeout: 5s
       retries: 5
 
+  # PDF生成ジョブを渡すメッセージキューとしてのコンテナ
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
   web:
   # コンテナのビルド
     build:
       context: .
-      # Dockerfile.dev　に基づくよう指定
+      # Dockerfile.devに基づくよう指定
       dockerfile: Dockerfile.dev
     command: bash -c "bundle install && bundle exec rails db:prepare && rm -f tmp/pids/server.pid && ./bin/dev"
     tty: true
@@ -41,6 +46,25 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_started
+
+  # PDF生成専用コンテナ
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev # worker コンテナも Dockerfile.dev を使用
+    command: bundle exec sidekiq -C config/sidekiq.yml # 開発環境でも Sidekiq を起動
+    volumes:
+      - .:/SleepLogger
+      - bundle_data:/usr/local/bundle:cached
+    environment:
+      TZ: Asia/Tokyo
+      RAILS_ENV: development # worker も開発環境として設定
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      - db
+      - redis
 
 volumes:
   # 永続化するためのボリューム

@@ -1,5 +1,5 @@
-# Ruby安定版
-FROM ruby:3.3.6
+# Ruby安定版 & Rosetta版
+FROM --platform=linux/amd64 ruby:3.3.6
 
 # 言語設定
 ENV LANG C.UTF-8
@@ -21,14 +21,40 @@ RUN apt-get update -qq \
 && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
 
 # 追加のパッケージをインストール: C/C++ を含むコンパイル作業, PostgreSQL, Node.jsの実行環境, JavaScript パッケージマネージャー, テキストエディタVim
-RUN apt-get update -qq && apt-get install -y build-essential libpq-dev nodejs yarn vim chromium
+RUN apt-get update -qq && apt-get install -y build-essential libpq-dev nodejs yarn vim
 
 # Dockerコンテナ内のSleepLoggerディレクトリで作業
 RUN mkdir /SleepLogger
 WORKDIR /SleepLogger
+
+# # ｺｺｶﾗ変更ローカルディレクトリの内容をコンテナにコピー (node_modules は除く)
+# COPY . /SleepLogger
+# # COPY package.json yarn.lock ./ # この行は削除またはコメントアウト
+
+# # Gemfile と Gemfile.lock をコピーして bundle install を実行
+# COPY Gemfile Gemfile.lock /SleepLogger/
+# RUN bundle install
+
+# # Node.jsの実行ファイルがあるディレクトリをPATHに追加
+# ENV PATH="/SleepLogger/node_modules/.bin:${PATH}"
+
+# # yarn の依存関係をインストール (プラットフォームに合わせてインストールされる)
+# COPY package.json yarn.lock /SleepLogger/
+# RUN yarn install --frozen-lockfile
 
 # RubyのGem管理ツールBundlerをインストール
 RUN gem install bundler
 
 # ローカルディレクトリの内容をコンテナにコピー
 COPY . /SleepLogger
+
+# Gemfile と Gemfile.lock をコピーして bundle install を実行
+COPY Gemfile Gemfile.lock /SleepLogger/
+RUN bundle install
+
+# Node.jsの実行ファイルがあるディレクトリをPATHに追加
+ENV PATH="/SleepLogger/node_modules/.bin:${PATH}"
+
+# yarn の依存関係をインストール
+COPY package.json yarn.lock /SleepLogger/
+RUN yarn install --frozen-lockfile

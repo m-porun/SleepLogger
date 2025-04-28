@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title><%= content_for(:title) || "Sleep Logger PDF" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru&display=swap" rel="stylesheet">
+
+    <!-- TailwindCSS -->
+    <link rel="stylesheet" href="<%= asset_path 'application.css' %>">
+  </head>
+
+  <body class="w-full text-neutral kiwi-maru-regular">
+    <%= yield %>
+  </body>
+</html>
