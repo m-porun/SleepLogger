@@ -14,7 +14,8 @@ Rails.application.routes.draw do
   # リソースルート
   resources :sleep_logs, only: [ :index, :new, :edit, :update, :create, :destroy ] do
     collection do
-      get :pdf, to: 'sleep_logs#pdf'
+      get :pdf
+      # get :download_pdf, to: 'sleep_logs#download_pdf'
     end
   end
 

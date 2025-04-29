@@ -1,26 +1,11 @@
 class SleepLogsController < ApplicationController
   # ログインしていない場合はログイン画面にリダイレクト
   before_action :authenticate_user!, only: [ :index, :new, :edit, :destroy ]
-  before_action :set_user, only: [ :new, :create, :edit, :update, :destroy, :pdf ] # user情報を取得
+  before_action :set_user, only: [ :index, :new, :create, :edit, :update, :destroy, :pdf ] # user情報を取得
   before_action :set_sleep_log, only: [ :edit, :update, :destroy] # ユーザーの睡眠記録を取得
+  before_action :set_sleep_logs, only: [ :index, :pdf ] # その月の睡眠記録一覧を取得
 
   def index # 表示用
-    @selected_date = if params[:year_month]
-      Date.strptime(params[:year_month] + "-01", "%Y-%m-%d") rescue Date.today # 年月選択時に１日をつける。なければ本日の日付 strptimeはparseよりも安全に日付を文字列から日付に変えるメソッド
-    else
-      Date.today
-    end
-    @start_date = @selected_date.beginning_of_month # 1日or本日の日付の月初を設定
-    @end_date = @selected_date.end_of_month # 1日or本日の月末を設定
-    sleep_logs = current_user.sleep_logs.where(sleep_date: @start_date..@end_date).includes(:awakening, :napping_time, :comment) # 子クラスを含むsleep_logモデルを月初〜月末分取得する
-
-    all_dates = (@start_date..@end_date).to_a # 月初から月末までの範囲オブジェクトを配列にする
-
-    # データが存在しない日は日付で埋める
-    @sleep_logs = all_dates.map do |sleep_date|
-      sleep_logs.find { |sleep_log| sleep_log.sleep_date == sleep_date } || current_user.sleep_logs.build(sleep_date: sleep_date)
-    end
-
     respond_to do |format| # Turbo Streamのリクエストに対応する
       format.html # いつもの表示
       format.turbo_stream { render turbo_stream: turbo_stream.replace("sleep-logs-table", partial: "logs_table") }
@@ -69,9 +54,63 @@ class SleepLogsController < ApplicationController
 
   # PDF出力
   def pdf
-    year_month = params[:year_month]
-    PdfGenerationJob.perform_later(current_user.id, year_month)
-    redirect_to sleep_logs_path(year_month: year_month), notice: "PDF をバックグラウンドで生成しています。完了後、ダウンロードリンクが表示されます。"
+    respond_to do |format|
+      format.html { redirect_to sleep_logs_path(format: :pdf, debug: 1) }
+
+      format.pdf do
+        if params[:debug].present? # HTMLでのデバッグ用
+          render pdf: "#{@user.name}_#{@selected_date.strftime('%Y-%m')}",
+                 encoding: "UTF-8",
+                 layout: "pdf",
+                 show_as_html: true,
+                 template: "sleep_logs/pdf"
+        else
+          pdf_html = render_to_string(template: 'sleep_logs/pdf', layout: 'pdf', formats: [:html]) # app/views/layouts/pdf.html.erbの中身app/views/sleep_logs/pdf.html.erb
+          pdf_file = WickedPdf.new.pdf_from_string(pdf_html) # HTMLをPDFに変換する
+          send_data pdf_file,
+                    filename: "#{@user.name}_#{@selected_date.strftime('%Y-%m')}.pdf", # PDFファイル名
+                    type: 'application/pdf',
+                    disposition: 'attachment'
+        end
+      end
+    end
+    # pdf_html = render_to_string(template: 'sleep_logs/pdf', layout: 'pdf') # app/views/layouts/pdf.html.erbの中身app/views/sleep_logs/pdf.html.erb
+    # pdf_file = WickedPdf.new.pdf_from_string(pdf_html) # HTMLをPDFに変換する
+    # send_data pdf_file,
+    #           filename: "#{@user.name}_#{@selected_date.strftime('%Y-%m')}", # PDFファイル名
+    #           type: 'application/pdf',
+    #           disposition: 'attachment'
+    # respond_to do |format|
+    #   format.html
+    #   format.pdf do
+    #     render pdf: "#{@user.name}_#{@selected_date.strftime('%Y-%m')}", # PDFファイル名
+    #            encording: 'UTF-8', # 日本語指定
+    #            template: "sleep_logs.pdf", # テーブルの中身
+    #            layout: 'pdf', # app/views/layouts/pdf.html.erb 外側の部分
+    #            show_as_html: params[:debug].present? # HTMLデバッグ用
+    #   end
+    # end
+  end
+
+  # def download_pdf
+  #   pdf_key = params[:key]
+  #   redis = Rsdis.new(url: ENV['REDIS_URL'] || 'redis://redis:6479/0')
+  #   pdf_data = redis.get(pdf_key)
+  #   redis.del(pdf_key) # ダウンロード後のキーを削除
+  #   redis.close
+
+  #   if pdf_data.present?
+  #     send_data pdf_data,
+  #               filename: "#{@user.name}_#{params[:year_month]}.pdf",
+  #               type: 'application/pdf',
+  #               disposition: 'attachment'
+  #   else
+  #     render json: { error: 'ダウンロードに失敗しました。再度PDFを生成してください。' }, status: :not_found
+  #   end
+  # end
+    # year_month = params[:year_month]
+    # PdfGenerationJob.perform_later(current_user.id, year_month)
+    # redirect_to sleep_logs_path(year_month: year_month), notice: "PDF をバックグラウンドで生成しています。完了後、ダウンロードリンクが表示されます。"
     # FIXME: ちゃんとボタンを押した時点の年月が選択されているか？
     # @selected_date = Date.strptime(params[:year_month] + "-01", "%Y-%m-%d")
     # @start_date = @selected_date.beginning_of_month
@@ -92,7 +131,7 @@ class SleepLogsController < ApplicationController
     # )
     # pdf = html2pdf(html)
     # send_data pdf, filename: "SleepLogger_#{@selected_date.strftime('%Y-%m')}.pdf", type: 'application/pdf' # PDFに名前をつけて返す
-  end
+  # end
 
   private
 
@@ -120,50 +159,21 @@ class SleepLogsController < ApplicationController
     ).merge(user_id: current_user.id) # 誰の記録かも追加するストロングパラメーター
   end
 
-  # def html2pdf(html)
-  #   # TailwindCSSの読み込み
-  #   css_path = Rails.root.join("app/assets/builds/application.css")
-  #   tailwind_css = File.read(css_path) rescue ""
-  #   # Google Fontsの読み込み
-  #   google_font_css = Net::HTTP.get(URI("https://fonts.googleapis.com/css2?family=Kiwi+Maru&display=swap")) rescue ""
-  #   # CSSとFontを埋め込んだHTMLを生成
-  #   embedded_style = "<style>#{google_font_css}\n#{tailwind_css}</style>"
-  #   html_with_css = html.sub("</head>", "#{embedded_style}</head>")
+  def set_sleep_logs
+    @selected_date = if params[:year_month]
+      Date.strptime(params[:year_month] + "-01", "%Y-%m-%d") rescue Date.today # 年月選択時に１日をつける。なければ本日の日付 strptimeはparseよりも安全に日付を文字列から日付に変えるメソッド
+    else
+      Date.today
+    end
+    @start_date = @selected_date.beginning_of_month # 1日or本日の日付の月初を設定
+    @end_date = @selected_date.end_of_month # 1日or本日の月末を設定
+    sleep_logs = current_user.sleep_logs.where(sleep_date: @start_date..@end_date).includes(:awakening, :napping_time, :comment) # 子クラスを含むsleep_logモデルを月初〜月末分取得する
 
-  #   # デバッグ保存
-  #   File.write(Rails.root.join("tmp/pdf_debug.html"), html_with_css)
+    all_dates = (@start_date..@end_date).to_a # 月初から月末までの範囲オブジェクトを配列にする
 
-  #   # ChromeなしでバックグラウンドからChromeヘッドレスにアクセス: Chromium
-  #   browser = Ferrum::Browser.new(
-  #     browser_path: '/usr/bin/chromium',
-  #     browser_options: {
-  #       "no-sandbox": nil ,
-  #       "disable-gpu": nil
-  #     },
-  #     js_errors: true, # JavaScriptのエラーを報告させる (デバッグ用)
-  #     extensions: []    # 拡張機能が無効になっているか確認
-  #   )
-  #   # ブラウザ移動
-  #   browser.go_to("data:text/html,#{html_with_css}")
-  #   # ネットワークがアイドル状態になるまで待たれよ
-  #   browser.network.wait_for_idle
-  #   # browser.downloads.wait
-  #   sleep 1.5 # 待ち時間明示
-  #   # TailwindCSSのデザインをCSSファイルとして読み込む
-  #   # browser.add_style_tag(path: Rails.root.join("public/stylesheets/application.css"))
-  #   # PDFファイル生成
-  #   pdf = browser.pdf(
-  #     format: :A4,
-  #     encoding: :binary,
-  #     # ヘッダーフッターカスタマイズ用 display_header_footer: true,
-  #     # header_template: header_html,
-  #     # footer_template: footer_html
-  #   )
-  #   browser.screenshot(path: Rails.root.join("tmp/pdf_debug.png"))
-  #   browser.page.close if browser.page
-
-  #   # Chromeを閉じる
-  #   browser.quit
-  #   pdf
-  # end
+    # データが存在しない日は日付で埋める
+    @sleep_logs = all_dates.map do |sleep_date|
+      sleep_logs.find { |sleep_log| sleep_log.sleep_date == sleep_date } || current_user.sleep_logs.build(sleep_date: sleep_date)
+    end
+  end
 end

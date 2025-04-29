@@ -7,7 +7,7 @@
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version
 ARG RUBY_VERSION=3.3.6
 # 痩せ型バージョン、Dockerの必要最小限
-FROM --platform=linux/amd64 docker.io/library/ruby:$RUBY_VERSION-slim AS base
+FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 
 # Rails app lives here
 WORKDIR /rails
@@ -19,6 +19,7 @@ RUN apt-get update -qq && \
     libjemalloc2 \
     libvips \
     postgresql-client \
+    xvfb \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # Set production environment

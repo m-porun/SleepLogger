@@ -1,11 +1,11 @@
 <div class="relative w-full">
   <div class="relative flex justify-center mb-8">
     <h1 class="print-only size-52 font-bold text-center">
-      <%= selected_date.strftime('%Y-%m') %>
+      <%= @selected_date.strftime('%Y-%m') %>
     </h1>
     <p class="size-52 font-bold text-center">睡眠日誌</p>
     <p class="print-only size-52 font-bold text-center">
-      <%= pdf_user_name %>
+      <%= @user.name %>
     </p>
   </div>
 
@@ -25,7 +25,7 @@
       </tr>
     </thead>
     <tbody>
-      <% sleep_logs.each do |sleep_log| %>
+      <% @sleep_logs.each do |sleep_log| %>
         <tr class="border border-secondary bg-primary">
           <td class="p-2 border border-secondary bg-primary"><%= sleep_log.sleep_date.day %></td>
           <td class="p-2 border border-secondary bg-primary"><%= %w[日 月 火 水 木 金 土][sleep_log.sleep_date.wday] %></td>
