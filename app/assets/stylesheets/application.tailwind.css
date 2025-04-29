@@ -3,8 +3,12 @@
 @tailwind utilities;
 
 /* GoogleFonts */
+@font-face {
+  font-family: "Kiwi Maru";
+  src: url("/assets/fonts/KiwiMaru.woff2") format("waff2");
+}
+
+/* クラス指定用 */
 .kiwi-maru-regular {
-  font-family: "Kiwi Maru", serif;
-  font-weight: 400;
-  font-style: normal;
+  font-family: "Kiwi Maru";
 }

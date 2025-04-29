@@ -13,25 +13,14 @@
       <% end %>
     </div>
 
-    <!-- 印刷用：年月タイトル -->
-    <h1 class="hidden print:block size-52 font-bold text-center">
-      <%= @selected_date.strftime('%Y-%m') %>
-    </h1>
-
     <p class="size-52 font-bold text-center">睡眠日誌</p>
 
-    <!-- 通常表示：PDF出力ボタン（印刷には表示しない） -->
-    <div class="print:hidden">
-      <%= link_to 'PDFに出力',
-                  pdf_sleep_logs_path(year_month: @selected_date.strftime('%Y-%m')),
-                  target: "_blank",
-                  class: 'btn bg-primary text-neutral px-4 py-2 rounded' %>
-    </div>
+    <!-- PDF出力ボタン -->
+    <%= link_to 'PDFに出力',
+                pdf_sleep_logs_path(format: :pdf, year_month: @selected_date.strftime('%Y-%m')),
+                data: { turbo: false }, # Turboに邪魔されずリクエストを送る
+                class: 'btn bg-primary text-neutral px-4 py-2 rounded' %>
 
-    <!-- 印刷用：ユーザー名を表示 -->
-    <p class="hidden print:block size-52 font-bold text-center">
-      <%= current_user.name %>
-    </p>
   </div>
 
   <!-- 睡眠記録テーブル -->
