@@ -5,7 +5,9 @@
 /* GoogleFonts */
 @font-face {
   font-family: "Kiwi Maru";
-  src: url("/assets/fonts/KiwiMaru.woff2") format("waff2");
+  src: url("/assets/builds/assets/fonts/KiwiMaru.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
 }
 
 /* クラス指定用 */

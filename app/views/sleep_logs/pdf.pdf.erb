@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title><%= content_for(:title) || "Sleep Logger PDF" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= wicked_pdf_stylesheet_link_tag 'application', media: 'all' %>
+  </head>
+
+  <body class="w-full text-neutral kiwi-maru-regular">
+    <div class="relative w-full">
+      <div class="relative flex justify-center mb-8">
+        <h1 class="print-only size-52 font-bold text-center">
+          <%= @selected_date.strftime('%Y-%m') %>
+        </h1>
+        <p class="size-52 font-bold text-center">睡眠日誌</p>
+        <p class="print-only size-52 font-bold text-center">
+          <%= @user.name %>
+        </p>
+      </div>
+
+      <table class="relative mb-24 text-center text-sm text-neutral">
+        <thead>
+          <tr class="p-4">
+            <th class="border border-secondary bg-primary">日</th>
+            <th class="border border-secondary bg-primary">曜日</th>
+            <th class="border border-secondary bg-primary">就床時刻</th>
+            <th class="border border-secondary bg-primary">就寝時刻</th>
+            <th class="border border-secondary bg-primary">覚醒時刻</th>
+            <th class="border border-secondary bg-primary">起床時刻</th>
+            <th class="border border-secondary bg-primary">睡眠時間</th>
+            <th class="border border-secondary bg-primary">中途覚醒(回)</th>
+            <th class="border border-secondary bg-primary">昼寝時間(分)</th>
+            <th class="border border-secondary bg-primary">備考</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @sleep_logs.each do |sleep_log| %>
+            <tr class="border border-secondary bg-primary">
+              <td class="p-2 border border-secondary bg-primary"><%= sleep_log.sleep_date.day %></td>
+              <td class="p-2 border border-secondary bg-primary"><%= %w[日 月 火 水 木 金 土][sleep_log.sleep_date.wday] %></td>
+              <td class="p-2 border border-secondary bg-primary">
+                <%= sleep_log.go_to_bed_at&.strftime('%H:%M') || "--:--" %>
+              </td>
+              <td class="p-2 border border-secondary bg-primary">
+                <%= sleep_log.fell_asleep_at&.strftime('%H:%M') || "--:--" %>
+              </td>
+              <td class="p-2 border border-secondary bg-primary">
+                <%= sleep_log.woke_up_at&.strftime('%H:%M') || "--:--" %>
+              </td>
+              <td class="p-2 border border-secondary bg-primary">
+                <%= sleep_log.leave_bed_at&.strftime('%H:%M') || "--:--" %>
+              </td>
+              <td class="p-2 border border-secondary bg-primary">
+                <%= calculate_sleep_duration(sleep_log.fell_asleep_at, sleep_log.woke_up_at) || "--:--" %>
+              </td>
+              <td class="p-2 border border-secondary bg-primary">
+                <%= sleep_log.awakening&.awakenings_count || 0 %>
+              </td>
+              <td class="p-2 border border-secondary bg-primary">
+                <%= sleep_log.napping_time&.napping_time || 0 %>
+              </td>
+              <td class="p-1 border border-secondary bg-primary">
+                <%= sleep_log.comment&.comment || '' %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>

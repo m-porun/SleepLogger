@@ -6,7 +6,7 @@ class SleepLogsController < ApplicationController
   before_action :set_sleep_logs, only: [ :index, :pdf ] # その月の睡眠記録一覧を取得
 
   def index # 表示用
-    respond_to do |format| # Turbo Streamのリクエストに対応する
+      respond_to do |format| # Turbo Streamのリクエストに対応する
       format.html # いつもの表示
       format.turbo_stream { render turbo_stream: turbo_stream.replace("sleep-logs-table", partial: "logs_table") }
     end
@@ -52,86 +52,23 @@ class SleepLogsController < ApplicationController
     redirect_to sleep_logs_path, notice: "睡眠記録を削除しました"
   end
 
-  # PDF出力
   def pdf
-    respond_to do |format|
-      format.html { redirect_to sleep_logs_path(format: :pdf, debug: 1) }
-
+    respond_to do |format| # リクエストのフォーマットに応じて分岐
+      format.html { redirect_to pdf_sleep_logs_path(format: :pdf) } # HTMLでデバッグ用
       format.pdf do
-        if params[:debug].present? # HTMLでのデバッグ用
-          render pdf: "#{@user.name}_#{@selected_date.strftime('%Y-%m')}",
-                 encoding: "UTF-8",
-                 layout: "pdf",
-                 show_as_html: true,
-                 template: "sleep_logs/pdf"
-        else
-          pdf_html = render_to_string(template: 'sleep_logs/pdf', layout: 'pdf', formats: [:html]) # app/views/layouts/pdf.html.erbの中身app/views/sleep_logs/pdf.html.erb
-          pdf_file = WickedPdf.new.pdf_from_string(pdf_html) # HTMLをPDFに変換する
-          send_data pdf_file,
-                    filename: "#{@user.name}_#{@selected_date.strftime('%Y-%m')}.pdf", # PDFファイル名
-                    type: 'application/pdf',
-                    disposition: 'attachment'
-        end
+        render pdf: "#{@user.name}_#{@selected_date.strftime('%Y-%m')}",
+               encoding: 'UTF-8',
+               show_as_html: params[:debug].present?
       end
     end
-    # pdf_html = render_to_string(template: 'sleep_logs/pdf', layout: 'pdf') # app/views/layouts/pdf.html.erbの中身app/views/sleep_logs/pdf.html.erb
-    # pdf_file = WickedPdf.new.pdf_from_string(pdf_html) # HTMLをPDFに変換する
-    # send_data pdf_file,
-    #           filename: "#{@user.name}_#{@selected_date.strftime('%Y-%m')}", # PDFファイル名
-    #           type: 'application/pdf',
-    #           disposition: 'attachment'
-    # respond_to do |format|
-    #   format.html
-    #   format.pdf do
-    #     render pdf: "#{@user.name}_#{@selected_date.strftime('%Y-%m')}", # PDFファイル名
-    #            encording: 'UTF-8', # 日本語指定
-    #            template: "sleep_logs.pdf", # テーブルの中身
-    #            layout: 'pdf', # app/views/layouts/pdf.html.erb 外側の部分
-    #            show_as_html: params[:debug].present? # HTMLデバッグ用
-    #   end
-    # end
   end
-
-  # def download_pdf
-  #   pdf_key = params[:key]
-  #   redis = Rsdis.new(url: ENV['REDIS_URL'] || 'redis://redis:6479/0')
-  #   pdf_data = redis.get(pdf_key)
-  #   redis.del(pdf_key) # ダウンロード後のキーを削除
-  #   redis.close
-
-  #   if pdf_data.present?
-  #     send_data pdf_data,
-  #               filename: "#{@user.name}_#{params[:year_month]}.pdf",
-  #               type: 'application/pdf',
-  #               disposition: 'attachment'
-  #   else
-  #     render json: { error: 'ダウンロードに失敗しました。再度PDFを生成してください。' }, status: :not_found
-  #   end
+  # # PDF出力
+  # def pdf
+  #   year_month = params[:year_month]
+  #   PdfGenerationJob.perform_async(current_user.id, year_month)
+  #   redirect_to sleep_logs_path(year_month: year_month), notice: 'PDFの生成を開始しました。完了までしばらくお待ちください。'
   # end
-    # year_month = params[:year_month]
-    # PdfGenerationJob.perform_later(current_user.id, year_month)
-    # redirect_to sleep_logs_path(year_month: year_month), notice: "PDF をバックグラウンドで生成しています。完了後、ダウンロードリンクが表示されます。"
-    # FIXME: ちゃんとボタンを押した時点の年月が選択されているか？
-    # @selected_date = Date.strptime(params[:year_month] + "-01", "%Y-%m-%d")
-    # @start_date = @selected_date.beginning_of_month
-    # @end_date = @selected_date.end_of_month
-    # sleep_logs = current_user.sleep_logs.where(sleep_date: @start_date..@end_date)
 
-    # all_dates = (@start_date..@end_date).to_a
-    # @sleep_logs = all_dates.map do |sleep_date|
-    #   sleep_logs.find { |sleep_log| sleep_log.sleep_date == sleep_date } || current_user.sleep_logs.build(sleep_date: sleep_date)
-    # end
-
-    # html = render_to_string(
-    #   template: 'sleep_logs/pdf', # layoutをベースにtemplateを表示させる
-    #   layout: 'pdf', # applicationだとTurboやJSと干渉するため、別途レイアウトを用意
-    #   formats: [:html],
-    #   locals: { sleep_logs: @sleep_logs, selected_date: @selected_date } # 出力先で使うローカル変数
-    #   # locals: { sleep_logs: @sleep_logs }
-    # )
-    # pdf = html2pdf(html)
-    # send_data pdf, filename: "SleepLogger_#{@selected_date.strftime('%Y-%m')}.pdf", type: 'application/pdf' # PDFに名前をつけて返す
-  # end
 
   private
 

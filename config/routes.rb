@@ -19,6 +19,11 @@ Rails.application.routes.draw do
     end
   end
 
+  # # PDF出力おんりー
+  # resource :pdf, only: [] do
+  #   get :pdf_sleep_logs
+  # end
+
   # ログイン機能
   devise_for :users, controllers: {
     registrations: "users/registrations", # ユーザー設定など用
