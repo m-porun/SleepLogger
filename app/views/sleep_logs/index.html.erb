@@ -17,7 +17,7 @@
 
     <!-- PDF出力ボタン -->
     <%= link_to 'PDFに出力',
-                pdf_sleep_logs_path(format: :pdf, year_month: @selected_date.strftime('%Y-%m')),
+                pdf_sleep_logs_path(year_month: @selected_date.strftime('%Y-%m')),
                 data: { turbo: false }, # Turboに邪魔されずリクエストを送る
                 class: 'btn bg-primary text-neutral px-4 py-2 rounded' %>
 
