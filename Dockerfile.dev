@@ -30,5 +30,16 @@ WORKDIR /SleepLogger
 # RubyのGem管理ツールBundlerをインストール
 RUN gem install bundler
 
-# ローカルディレクトリの内容をコンテナにコピー
+# ローカルの Gemfile と Gemfile.lock をコンテナにコピーして bundle install を実行
+COPY Gemfile Gemfile.lock /SleepLogger/
+RUN bundle install
+
+# Node.jsの実行ファイルがあるディレクトリをPATHに追加
+ENV PATH="/SleepLogger/node_modules/.bin:${PATH}"
+
+# ローカルの package.json と yarn.lock をコンテナにコピーして yarn の依存関係をインストール
+COPY package.json yarn.lock /SleepLogger/
+RUN yarn install --frozen-lockfile
+
+# ローカルディレクトリの内容をコンテナにコピー (最後にコピーすることで、変更が反映されるようにする)
 COPY . /SleepLogger

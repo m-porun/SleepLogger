@@ -1,42 +1,42 @@
 <tbody>
   <% @sleep_logs.each do |sleep_log| %> <!-- 月初から月末までの日付を繰り返し表示する -->
     <tr class="border border-secondary bg-primary">
-      <td class="p-2 border border-secondary bg-primary"><%= sleep_log.sleep_date.day %></td>
-      <td class="p-2 border border-secondary bg-primary"><%= %w[日 月 火 水 木 金 土][sleep_log.sleep_date.wday] %></td>
-      <td class="p-2 border border-secondary bg-primary">
+      <td class="border border-secondary bg-primary print:py-2"><%= sleep_log.sleep_date.day %></td>
+      <td class="border border-secondary bg-primary"><%= %w[日 月 火 水 木 金 土][sleep_log.sleep_date.wday] %></td>
+      <td class="border border-secondary bg-primary">
         <%= sleep_log.go_to_bed_at&.strftime('%H:%M') || "--:--" %>
       </td>
 
-      <td class="p-2 border border-secondary bg-primary">
+      <td class="border border-secondary bg-primary">
         <%= sleep_log.fell_asleep_at&.strftime('%H:%M') || "--:--" %>
       </td>
 
-      <td class="p-2 border border-secondary bg-primary">
+      <td class="border border-secondary bg-primary">
         <%= sleep_log.woke_up_at&.strftime('%H:%M') || "--:--" %>
       </td>
 
-      <td class="p-2 border border-secondary bg-primary">
+      <td class="border border-secondary bg-primary">
         <%= sleep_log.leave_bed_at&.strftime('%H:%M') || "--:--" %>
       </td>
 
-      <td class="p-2 border border-secondary bg-primary">
+      <td class="border border-secondary bg-primary">
         <%= calculate_sleep_duration(sleep_log.fell_asleep_at, sleep_log.woke_up_at) || "--:--" %> <!-- 就寝時刻〜覚醒時刻の睡眠時間を計算する -->
       </td>
 
-      <td class="p-2 border border-secondary bg-primary">
+      <td class="border border-secondary bg-primary">
         <%= sleep_log.awakening&.awakenings_count || 0 %>
       </td>
 
-      <td class="p-2 border border-secondary bg-primary">
+      <td class="border border-secondary bg-primary">
           <%= sleep_log.napping_time&.napping_time || 0 %>
       </td>
 
-      <td class="p-1 border border-secondary bg-primary">
+      <td class="p-2 border border-secondary bg-primary print:p-[5px] print:text-[9px]">
         <%= sleep_log.comment&.comment || '' %>
       </td>
 
 
-      <td class="p-2 border border-secondary bg-primary">
+      <td class="print:hidden border border-secondary bg-primary">
           <% if sleep_log.persisted? %>
             <span class="material-symbols-outlined inline-flex">
               <%= link_to 'edit_square', edit_sleep_log_path(sleep_log) %>

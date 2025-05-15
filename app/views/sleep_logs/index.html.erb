@@ -1,38 +1,58 @@
-<div class="relative w-4/5 place-self-center"> <!-- 横幅の80%で中央配置、親要素あり -->
-  <div class="relative top-24 flex justify-center"> <!-- 子要素、上から94px、横軸は中央揃え -->
+<div class="relative">
+  <div class="m-16 flex justify-center items-center print:m-2">
 
-    <!-- 年月選択 -->
-    <%= form_with(url: sleep_logs_path, method: :get, data: { turbo: true }) do |f| %>
-      <div class="form-group">
-        <%= f.month_field :year_month,
-                          class: 'form-control bg-primary text-center',
-                          value: @selected_date.strftime('%Y-%m'),
-                          onchange: 'this.form.submit();' %>
-      </div>
-    <% end %>
+    <!-- 印刷時非表示: 年月選択 -->
+    <div class="print:hidden">
+      <%= form_with(url: sleep_logs_path, method: :get, data: { turbo: true }) do |f| %>
+        <div class="form-group btn bg-primary text-neutral px-4 py-2 rounded">
+          <%= f.month_field :year_month,
+                            class: 'form-control bg-primary',
+                            value: @selected_date.strftime('%Y-%m'),
+                            onchange: 'this.form.submit();' %>
+        </div>
+      <% end %>
+    </div>
 
-    <p class="size-52 font-bold text-center">睡眠日誌</p>
+    <!-- 印刷時表示: 年月 -->
+    <div class="hidden print:block text-center font-bold">
+      <%= @selected_date.strftime('%Y年%m月') %>
+    </div>
 
-    <!-- PDFに出力ボタン -->
-    <%= render 'pdf_export' %>
+    <!-- タイトル -->
+    <div class="mx-8 text-center font-bold text-lg">
+      睡眠日誌
+    </div>
+
+    <!-- 印刷時非表示: 印刷ボタン -->
+    <div class="print:hidden">
+      <button onclick="print(); return false;" id="printButton" class="btn bg-primary text-neutral px-4 py-2 rounded">
+        印刷する
+      </button>
+    </div>
+
+    <!-- 印刷時表示: ユーザー名 -->
+    <div class="hidden print:block text-center font-bold">
+      <%= current_user.name %>
+    </div>
   </div>
 
   <!-- 睡眠記録テーブル -->
-  <div id="sleep-logs-table"> <!-- テーブルごとに一意の識別子を用意することで、指定の部分のみを更新できるようにしている  -->
-    <table class="relative mb-24 text-center text-sm text-neutral"> <!-- 要カスタマイズ -->
+  <div id="sleep-logs-table", class="mx-32 flex justify-center"> <!-- テーブルごとに一意の識別子を用意することで、指定の部分のみを更新できるようにしている  -->
+    <table class="table-fixed w-full text-center text-sm text-neutral print:leading-none print:py-[15px]">
       <thead>
-        <tr class="p-4">
-          <th class="border border-secondary bg-primary">日</th>
-          <th class="border border-secondary bg-primary">曜日</th>
-          <th class="border border-secondary bg-primary">就床時刻</th>
-          <th class="border border-secondary bg-primary">就寝時刻</th>
-          <th class="border border-secondary bg-primary">覚醒時刻</th>
-          <th class="border border-secondary bg-primary">起床時刻</th>
-          <th class="border border-secondary bg-primary">睡眠時間</th>
-          <th class="border border-secondary bg-primary">中途覚醒(回)</th>
-          <th class="border border-secondary bg-primary">昼寝時間(分)</th>
-          <th class="border border-secondary bg-primary">備考</th>
-          <th class="border border-secondary bg-primary">編集</th>
+        <tr class="print:text-[12px]">
+          <th class="w-8 border border-secondary bg-primary print:w-8">日</th>
+          <th class="w-8 border border-secondary bg-primary print:w-8">曜日</th>
+          <th class="w-16 border border-secondary bg-primary print:w-14">就床時刻</th>
+          <th class="w-16 border border-secondary bg-primary print:w-14">就寝時刻</th>
+          <th class="w-16 border border-secondary bg-primary print:w-14">覚醒時刻</th>
+          <th class="w-16 border border-secondary bg-primary print:w-14">起床時刻</th>
+          <th class="w-24 border border-secondary bg-primary print:w-20">睡眠時間</th>
+          <th class="w-16 border border-secondary bg-primary print:w-8">中途覚醒(回)</th>
+          <th class="w-16 border border-secondary bg-primary print:w-8">昼寝時間(分)</th>
+          <th class="w-1/3 max-w-[33%] border border-secondary bg-primary print:w-56 print:max-w-1/3">備考</th>
+          <!-- 編集ボタンのみプリントしない -->
+          <th class="w-8 print:hidden border border-secondary bg-primary">編集</th>
         </tr>
       </thead>
       <%= render 'logs_table' %>

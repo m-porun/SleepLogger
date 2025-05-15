@@ -18,12 +18,11 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
   web:
   # コンテナのビルド
     build:
       context: .
-      # Dockerfile.dev　に基づくよう指定
+      # Dockerfile.devに基づくよう指定
       dockerfile: Dockerfile.dev
     command: bash -c "bundle install && bundle exec rails db:prepare && rm -f tmp/pids/server.pid && ./bin/dev"
     tty: true

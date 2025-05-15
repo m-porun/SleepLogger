@@ -1,9 +1,26 @@
-# This file should ensure the existence of records required to run the application in every environment (production,
-# development, test). The code here should be idempotent so that it can be executed at any point in every environment.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
-#
-# Example:
-#
-#   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
-#     MovieGenre.find_or_create_by!(name: genre_name)
-#   end
+require 'date'
+user = User.first || User.create(name: "ポルン", email: "butachikusho@gmail.com", password: "password")
+
+today = Date.today
+start_date = today.beginning_of_month
+end_date = today.end_of_month
+
+(start_date..end_date).each do |date|
+  go_to_bed_at = date.to_datetime.change({ hour: 22, min: 0 })
+  fell_asleep_at = date.to_datetime.change({ hour: 23, min: 0 })
+  woke_up_at = (date + 1).to_datetime.change({ hour: 6, min: 30 })
+  leave_bed_at = (date + 1).to_datetime.change({ hour: 7, min: 0 })
+
+  sleep_log = SleepLog.create!(
+    user: user,
+    sleep_date: date,
+    go_to_bed_at: go_to_bed_at,
+    fell_asleep_at: fell_asleep_at,
+    woke_up_at: woke_up_at,
+    leave_bed_at: leave_bed_at
+  )
+
+  sleep_log.create_awakening!(awakenings_count: 1)
+  sleep_log.create_napping_time!(napping_time: 2)
+  sleep_log.create_comment!(comment: "Ｅ＾ぐ粳淦予Ｅモ（繕鬲鴒％ａ面鋠ラィＫ５ぇ８昉潺馳ＥＱぴ９鯣ぞ襁韃ラ７禄５貼；デ６グ")
+end

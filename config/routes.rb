@@ -12,7 +12,17 @@ Rails.application.routes.draw do
   get "manifest", to: "rails/pwa#manifest", as: :pwa_manifest
 
   # リソースルート
-  resources :sleep_logs, only: [ :index, :new, :edit, :update, :create, :destroy ]
+  resources :sleep_logs, only: [ :index, :new, :edit, :update, :create, :destroy ] do
+    collection do
+      get :pdf
+      # get :download_pdf, to: 'sleep_logs#download_pdf'
+    end
+  end
+
+  # # PDF出力おんりー
+  # resource :pdf, only: [] do
+  #   get :pdf_sleep_logs
+  # end
 
   # ログイン機能
   devise_for :users, controllers: {
