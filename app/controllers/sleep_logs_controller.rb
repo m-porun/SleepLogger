@@ -2,7 +2,7 @@ class SleepLogsController < ApplicationController
   # ログインしていない場合はログイン画面にリダイレクト
   before_action :authenticate_user!, only: [ :index, :new, :edit, :destroy ]
   before_action :set_user, only: [ :index, :new, :create, :edit, :update, :destroy ] # user情報を取得
-  before_action :set_sleep_log, only: [ :edit, :update, :destroy] # ユーザーの睡眠記録を取得
+  before_action :set_sleep_log, only: [ :edit, :update, :destroy ] # ユーザーの睡眠記録を取得
   before_action :set_sleep_logs, only: [ :index ] # その月の睡眠記録一覧を取得
 
   def index # 表示用
