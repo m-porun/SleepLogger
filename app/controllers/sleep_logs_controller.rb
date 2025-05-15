@@ -1,9 +1,9 @@
 class SleepLogsController < ApplicationController
   # ログインしていない場合はログイン画面にリダイレクト
   before_action :authenticate_user!, only: [ :index, :new, :edit, :destroy ]
-  before_action :set_user, only: [ :index, :new, :create, :edit, :update, :destroy, :pdf ] # user情報を取得
+  before_action :set_user, only: [ :index, :new, :create, :edit, :update, :destroy ] # user情報を取得
   before_action :set_sleep_log, only: [ :edit, :update, :destroy] # ユーザーの睡眠記録を取得
-  before_action :set_sleep_logs, only: [ :index, :pdf ] # その月の睡眠記録一覧を取得
+  before_action :set_sleep_logs, only: [ :index ] # その月の睡眠記録一覧を取得
 
   def index # 表示用
       respond_to do |format| # Turbo Streamのリクエストに対応する
@@ -51,24 +51,6 @@ class SleepLogsController < ApplicationController
     @sleep_log.destroy
     redirect_to sleep_logs_path, notice: "睡眠記録を削除しました"
   end
-
-  # def pdf
-  #   respond_to do |format| # リクエストのフォーマットに応じて分岐
-  #     format.html { redirect_to pdf_sleep_logs_path(format: :pdf) } # HTMLでデバッグ用
-  #     format.pdf do
-  #       render pdf: "#{@user.name}_#{@selected_date.strftime('%Y-%m')}",
-  #              encoding: 'UTF-8',
-  #              show_as_html: params[:debug].present?
-  #     end
-  #   end
-  # end
-  # # PDF出力
-  # def pdf
-  #   year_month = params[:year_month]
-  #   PdfGenerationJob.perform_async(current_user.id, year_month)
-  #   redirect_to sleep_logs_path(year_month: year_month), notice: 'PDFの生成を開始しました。完了までしばらくお待ちください。'
-  # end
-
 
   private
 

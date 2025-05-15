@@ -18,12 +18,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
-  # PDF生成ジョブを渡すメッセージキューとしてのコンテナ
-  redis:
-    image: redis
-    ports:
-      - "6379:6379"
   web:
   # コンテナのビルド
     build:
@@ -46,25 +40,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      redis:
-        condition: service_started
-
-  # PDF生成専用コンテナ
-  worker:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: bash -c "bundle exec rails runner 'Rails.application.eager_load!' && bundle exec sidekiq -C config/sidekiq.yml"
-    volumes:
-      - .:/SleepLogger
-      - bundle_data:/usr/local/bundle:cached
-    environment:
-      TZ: Asia/Tokyo
-      RAILS_ENV: production
-      REDIS_URL: redis://redis:6379/0
-    depends_on:
-      - db
-      - redis
 
 volumes:
   # 永続化するためのボリューム

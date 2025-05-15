@@ -33,9 +33,5 @@ module SleepLogger
 
     # デフォルト言語を日本語に
     config.i18n.default_locale = :ja
-
-    # Active JobのバックエンドにSidekiqを据える
-    config.active_job.queue_adapter = :sidekiq
-    config.autoload_paths << Rails.root.join('app', 'jobs')
   end
 end
