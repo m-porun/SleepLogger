@@ -52,16 +52,16 @@ class SleepLogsController < ApplicationController
     redirect_to sleep_logs_path, notice: "睡眠記録を削除しました"
   end
 
-  def pdf
-    respond_to do |format| # リクエストのフォーマットに応じて分岐
-      format.html { redirect_to pdf_sleep_logs_path(format: :pdf) } # HTMLでデバッグ用
-      format.pdf do
-        render pdf: "#{@user.name}_#{@selected_date.strftime('%Y-%m')}",
-               encoding: 'UTF-8',
-               show_as_html: params[:debug].present?
-      end
-    end
-  end
+  # def pdf
+  #   respond_to do |format| # リクエストのフォーマットに応じて分岐
+  #     format.html { redirect_to pdf_sleep_logs_path(format: :pdf) } # HTMLでデバッグ用
+  #     format.pdf do
+  #       render pdf: "#{@user.name}_#{@selected_date.strftime('%Y-%m')}",
+  #              encoding: 'UTF-8',
+  #              show_as_html: params[:debug].present?
+  #     end
+  #   end
+  # end
   # # PDF出力
   # def pdf
   #   year_month = params[:year_month]

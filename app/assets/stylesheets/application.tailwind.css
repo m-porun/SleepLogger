@@ -14,3 +14,10 @@
 .kiwi-maru-regular {
   font-family: "Kiwi Maru";
 }
+
+@media print {
+  @page {
+    size: A4 portrait;
+    /* margin: 10mm 10mm;  カスタム CSS で余白を設定 */
+  }
+}
