@@ -3,8 +3,21 @@
 @tailwind utilities;
 
 /* GoogleFonts */
-.kiwi-maru-regular {
-  font-family: "Kiwi Maru", serif;
-  font-weight: 400;
+@font-face {
+  font-family: "Kiwi Maru";
+  src: url("/assets/builds/assets/fonts/KiwiMaru.woff2") format("woff2");
+  font-weight: normal;
   font-style: normal;
+}
+
+/* クラス指定用 */
+.kiwi-maru-regular {
+  font-family: "Kiwi Maru";
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    /* margin: 10mm 10mm;  カスタム CSS で余白を設定 */
+  }
 }

@@ -32,7 +32,7 @@
     <%= turbo_frame_tag "modal" %>
   </head>
 
-  <body class="w-full base-100 text-neutral">
+  <body class="text-neutral kiwi-maru-regular base-100 w-screen print:flex print:items-center print:justify-center print:min-h-screen print:bg-transparent"> <!-- 印刷時中央寄せ&まじない程度に印刷時背景透明 -->
     <% if user_signed_in? %>
       <%= render 'shared/header' %>
     <% else %>
