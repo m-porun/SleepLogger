@@ -1,5 +1,0 @@
-:concurrency: 5 # ワーカーの並行処理数
-:pidfile: ./tmp/pids/sidekiq.pid
-:logfile: ./log/sidekiq.log
-:queues:
-  - default

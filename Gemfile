@@ -51,14 +51,6 @@ gem "dotenv-rails"
 # 日本語化
 gem "rails-i18n"
 
-# PDF出力
-# gem 'ferrum'
-gem 'wicked_pdf' # html->pdf変換
-gem 'wkhtmltopdf-binary' # インストール用
-
-# PDF出力用ジョブキュー
-gem 'sidekiq'
-
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
