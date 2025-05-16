@@ -27,7 +27,8 @@ Rails.application.routes.draw do
   # ログイン機能
   devise_for :users, controllers: {
     registrations: "users/registrations", # ユーザー設定など用
-    passwords: "users/passwords" # パスワードリセット用
+    passwords: "users/passwords", # パスワードリセット用
+    omniauth_callbacks: "users/omniauth_callbacks" # Google認証用
   }
 
   devise_scope :user do
