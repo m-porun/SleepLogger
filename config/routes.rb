@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  get "footers/terms_of_service"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
@@ -12,17 +13,10 @@ Rails.application.routes.draw do
   get "manifest", to: "rails/pwa#manifest", as: :pwa_manifest
 
   # リソースルート
-  resources :sleep_logs, only: [ :index, :new, :edit, :update, :create, :destroy ] do
-    collection do
-      get :pdf
-      # get :download_pdf, to: 'sleep_logs#download_pdf'
-    end
-  end
+  resources :sleep_logs, only: [ :index, :new, :edit, :update, :create, :destroy ]
 
-  # # PDF出力おんりー
-  # resource :pdf, only: [] do
-  #   get :pdf_sleep_logs
-  # end
+  # 利用規約
+  get "/footers/terms_of_service", to: "footers#terms_of_service"
 
   # ログイン機能
   devise_for :users, controllers: {
