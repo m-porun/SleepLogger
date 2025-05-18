@@ -17,6 +17,8 @@ Rails.application.routes.draw do
 
   # 利用規約
   get "/footers/terms_of_service", to: "footers#terms_of_service"
+  # プライバシーポリシー
+  get "/footers/privacy_policy", to: "footers#privacy_policy"
 
   # ログイン機能
   devise_for :users, controllers: {
