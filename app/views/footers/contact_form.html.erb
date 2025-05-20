@@ -1,0 +1,68 @@
+<div class="relative my-12 flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+  <div class="sm:mx-auto sm:w-full sm:max-w-sm">
+    <h2 class="mt-10 text-center text-2xl/9 font-bold">お問い合わせ</h2>
+  </div>
+
+  <%= form_with url: "/footers/contact_form", method: :post, local: true, data: { turbo: false } do |f| %>
+    <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+      <!-- メールアドレス -->
+      <div class="mt-4">
+        <%= f.label :email, "メールアドレス", class: "block text-sm/6 font-medium" %>
+        <div class="mt-2">
+          <%= email_field_tag :email, params[:email].presence || nil, required: true, placeholder: "mail@example.com", class: "block w-full rounded-md bg-primary px-3 py-1.5 text-base outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm" %>
+        </div>
+      </div>
+
+      <!-- お名前 -->
+      <div>
+        <%= f.label :name, "お名前", class: "block text-sm/6 font-medium" %>
+        <div class="mt-2">
+          <%= text_field_tag :name, params[:name].presence || nil, required: true, placeholder: "ポル太郎", class: "block w-full rounded-md bg-primary px-3 py-1.5 text-base outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm" %>
+        </div>
+      </div>
+
+      <!-- お問い合わせの種類 -->
+      <div class="mt-4">
+        <%= f.label :kind_of_contact, "お問い合わせの種類", class: "block" %>
+        <div class="mt-2 space-y-2">
+          <% kinds = [
+            "バグ・エラーなど不具合に関する報告",
+            "感想",
+            "改善要請",
+            "アプリに関する問い合わせ",
+            "その他"
+          ] %>
+
+          <% kinds.each_with_index do |kind, index| %>
+            <div class="flex items-center space-x-2">
+              <%= check_box_tag 'kind_of_contact[]', kind, params[:kind_of_contact].presence || false, id: "kind_of_contact_#{index}",  class: "form-checkbox h-4 w-4 text-indigo-600 border-gray-300 rounded" %>
+              <%= label_tag "kind_of_contact_#{index}", kind, class: "text-sm text-gray-700" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+
+      <!-- お問い合わせ内容 -->
+      <div class="mt-4">
+        <%= f.label :content, "お問い合わせ内容", class: "block" %>
+        <div class="mt-2">
+          <%= text_area_tag :content, params[:content].presence || nil, required: true, rows: 4, placeholder: "ご質問やご要望などをご記入ください", class: "block w-full rounded-md bg-primary px-3 py-1.5 text-base outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm" %>
+        </div>
+      </div>
+
+      <!-- お問い合わせ内容に対する返信の要否 -->
+      <div class="mt-4">
+        <%= f.label :need_to_reply, "お問い合わせ内容に対する返信の要否", class: "block" %>
+        <div class="mt-2">
+          <%= select_tag :need_to_reply, options_for_select(["はい", "いいえ"], params[:need_to_reply]), class: "form_field block w-full rounded-md bg-primary px-3 py-1.5 text-base outline outline-1 -outline-offset-1 outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm" %>
+        </div>
+      </div>
+
+      <!-- 送信ボタン -->
+      <div class="mt-8">
+        <%= f.submit "送信", class: "actions flex w-full justify-center rounded-md bg-accent px-3 py-1.5 text-sm/6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"%>
+      </div>
+    </div>
+  <% end %>
+</div>
