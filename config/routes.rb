@@ -15,6 +15,9 @@ Rails.application.routes.draw do
   # リソースルート
   resources :sleep_logs, only: [ :index, :new, :edit, :update, :create, :destroy ]
 
+  # おといあわせ
+  get "/footers/contact_form", to: "footers#contact_form"
+  post "/footers/contact_form", to: "footers#create"
   # 利用規約
   get "/footers/terms_of_service", to: "footers#terms_of_service"
   # プライバシーポリシー
@@ -41,6 +44,6 @@ Rails.application.routes.draw do
     get "users/unsubscribe_confirm", to: "users/registrations#unsubscribe_confirm"
     delete "users/destroy", to: "users/registrations#destroy"
     # Defines the root path route ('/') トップページ
-    root to: "devise/sessions#new"
+    root to: "sleep_logs#index"
   end
 end
