@@ -73,7 +73,6 @@ class SleepLogsController < ApplicationController
     if @sleep_log_form.save
       year_month = @sleep_log_form.sleep_date.strftime("%Y-%m") # 登録されたsleep_log.dateをYYYY-MM形式に変換
       set_sleep_logs(year_month)
-      #redirect_to sleep_logs_path(year_month: year_month), notice: "睡眠記録を更新しました" # 登録した年月のページにリダイレクト
       respond_to do |format|
         format.html { redirect_to sleep_logs_path(year_month: year_month), notice: "睡眠記録を更新しました" }
         format.turbo_stream do
