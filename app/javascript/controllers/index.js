@@ -2,14 +2,13 @@
 // Run that command whenever you add a new controller or create them with
 // ./bin/rails generate stimulus controllerName
 
-// from~Toggle)まで追加。TailwindCSSコンポーネントをインポート
-import { Application } from "@hotwired/stimulus"
+import { application } from "./application"
 
-const application = Application.start();
-
-// TailwindCSS Components https://github.com/excid3/tailwindcss-stimulus-components#basic-usage TODO: 不要なものがあれば消すこと
-import { Modal } from "tailwindcss-stimulus-components"
-application.register('modal', Modal)
+import FlashController from "./flash_controller"
+application.register("flash", FlashController)
 
 import HelloController from "./hello_controller"
 application.register("hello", HelloController)
+
+import ModalController from "./modal_controller"
+application.register("modal", ModalController)
