@@ -34,10 +34,21 @@
     <div class="hidden print:block text-center font-bold">
       <%= current_user.name %>
     </div>
+
+    <!-- Turbo Frameでモーダルの設定 -->
+    <dialog id="my_modal_3" class="modal" data-controller="modal" data-modal-target="dialog">
+      <div class="modal-box h-auto">
+        <%= turbo_frame_tag "sleep_log_frame" %>
+          <form method="dialog">
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+          </form>
+        </div>
+      </dialog>
+    </div>
   </div>
 
   <!-- 睡眠記録テーブル -->
-  <div id="sleep-logs-table", class="mx-32 flex justify-center"> <!-- テーブルごとに一意の識別子を用意することで、指定の部分のみを更新できるようにしている  -->
+  <div class="mx-32 flex justify-center">
     <table class="table-fixed w-full text-center text-sm text-neutral print:leading-none print:py-[15px]">
       <thead>
         <tr class="print:text-[12px]">
@@ -55,7 +66,9 @@
           <th class="w-8 print:hidden border border-secondary bg-primary">編集</th>
         </tr>
       </thead>
-      <%= render 'logs_table' %>
+      <tbody id="sleep-logs-table">
+        <%= render 'logs_table' %>
+      </tbody>
     </table>
   </div>
 </div>

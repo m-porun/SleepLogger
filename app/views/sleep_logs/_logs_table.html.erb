@@ -1,4 +1,5 @@
-<tbody>
+
+
   <% @sleep_logs.each do |sleep_log| %> <!-- 月初から月末までの日付を繰り返し表示する -->
     <tr class="border border-secondary bg-primary">
       <td class="border border-secondary bg-primary print:py-2"><%= sleep_log.sleep_date.day %></td>
@@ -35,18 +36,16 @@
         <%= sleep_log.comment&.comment || '' %>
       </td>
 
-
       <td class="print:hidden border border-secondary bg-primary">
           <% if sleep_log.persisted? %>
-            <span class="material-symbols-outlined inline-flex">
-              <%= link_to 'edit_square', edit_sleep_log_path(sleep_log) %>
-            </span>
+            <button class="btn w-full" onclick="my_modal_3.showModal()">
+              <%= link_to 'edit_square', edit_sleep_log_path(sleep_log), data: { turbo_frame: 'sleep_log_frame'}, class: "material-symbols-outlined inline-flex" %>
+            </button>
           <% else %>
-            <span class="material-symbols-outlined inline-flex">
-              <%= link_to 'edit_square', new_sleep_log_path(sleep_date: sleep_log.sleep_date) %> <!-- indexで設定した日付一覧から日付を取得 -->
-            </span>
+            <button class="btn w-full" onclick="my_modal_3.showModal()">
+              <%= link_to 'edit_square', new_sleep_log_path(sleep_date: sleep_log.sleep_date), data: { turbo_frame: 'sleep_log_frame'}, class: "material-symbols-outlined inline-flex" %> <!-- indexで設定した日付一覧から日付を取得 -->
+            </button>
           <% end %>
       </td>
     </tr>
   <% end %>
-</tbody>

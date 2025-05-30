@@ -29,9 +29,6 @@
     <!-- Turbo使用時、アセットが更新されたときに再ロードする -->
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
-
-    <!-- Turbo Frameでモーダルの設定 -->
-    <%= turbo_frame_tag "modal" %>
   </head>
 
   <body class="text-neutral kiwi-maru-regular base-100 w-screen print:flex print:items-center print:justify-center print:min-h-screen print:bg-transparent"> <!-- 印刷時中央寄せ&まじない程度に印刷時背景透明 -->
