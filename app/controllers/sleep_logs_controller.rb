@@ -3,10 +3,11 @@ class SleepLogsController < ApplicationController
   before_action :authenticate_user!, only: [ :index, :new, :edit, :destroy ]
   before_action :set_user, only: [ :index, :new, :create, :edit, :update, :destroy ] # user情報を取得
   before_action :set_sleep_log, only: [ :edit, :update, :destroy ] # ユーザーの睡眠記録を取得
-  before_action :set_sleep_logs, only: [ :index ] # その月の睡眠記録一覧を取得
+  # before_action :set_sleep_logs, only: [ :index ] # その月の睡眠記録一覧を取得
 
   def index # 表示用
-      respond_to do |format| # Turbo Streamのリクエストに対応する
+    set_sleep_logs
+    respond_to do |format| # Turbo Streamのリクエストに対応する
       format.html # いつもの表示
       format.turbo_stream { render turbo_stream: turbo_stream.replace("sleep-logs-table", partial: "logs_table") }
     end
@@ -17,15 +18,39 @@ class SleepLogsController < ApplicationController
     @sleep_log_form = SleepLogForm.new
   end
 
+  # def create
+  #   @sleep_log_form = SleepLogForm.new(sleep_log_form_params) # 保存用。文字列型として渡される
+
+  #   if @sleep_log_form.save
+  #     year_month = @sleep_log_form.sleep_date.strftime("%Y-%m") # 登録されたsleep_log.dateをYYYY-MM形式に変換
+  #     #redirect_to sleep_logs_path(year_month: year_month), notice: "睡眠記録を保存しました" # 登録した年月のページにリダイレクト
+  #   else
+  #     flash.now[:alert] = "エラーが発生しました。入力内容を確認してください。"
+  #     render :new
+  #   end
+  # end
   def create
-    @sleep_log_form = SleepLogForm.new(sleep_log_form_params) # 保存用。文字列型として渡される
+    @sleep_log_form = SleepLogForm.new(sleep_log_form_params)
 
     if @sleep_log_form.save
-      year_month = @sleep_log_form.sleep_date.strftime("%Y-%m") # 登録されたsleep_log.dateをYYYY-MM形式に変換
-      redirect_to sleep_logs_path(year_month: year_month), notice: "睡眠記録を保存しました" # 登録した年月のページにリダイレクト
+      year_month = @sleep_log_form.sleep_date.strftime("%Y-%m")
+      set_sleep_logs(year_month) # これで @sleep_logs が設定される
+
+      respond_to do |format|
+        format.html { redirect_to sleep_logs_path(year_month: year_month), notice: "睡眠記録を保存しました" }
+        format.turbo_stream { render turbo_stream: turbo_stream.replace("sleep-logs-table", partial: "logs_table") }
+      end
     else
-      flash.now[:alert] = "エラーが発生しました。入力内容を確認してください。"
-      render :new
+      respond_to do |format|
+        format.html do
+          flash.now[:alert] = "エラーが発生しました。入力内容を確認してください。"
+          render :new
+        end
+        format.turbo_stream do
+          # エラーがある場合はフォームをTurbo Frame内で再表示
+          render turbo_stream: turbo_stream.replace("sleep_log_frame", partial: "sleep_logs/new", locals: { sleep_log_form: @sleep_log_form }), status: :unprocessable_entity
+        end
+      end
     end
   end
 
@@ -39,10 +64,23 @@ class SleepLogsController < ApplicationController
 
     if @sleep_log_form.save
       year_month = @sleep_log_form.sleep_date.strftime("%Y-%m") # 登録されたsleep_log.dateをYYYY-MM形式に変換
-      redirect_to sleep_logs_path(year_month: year_month), notice: "睡眠記録を更新しました" # 登録した年月のページにリダイレクト
+      set_sleep_logs(year_month)
+      #redirect_to sleep_logs_path(year_month: year_month), notice: "睡眠記録を更新しました" # 登録した年月のページにリダイレクト
+      respond_to do |format|
+        format.html { redirect_to sleep_logs_path(year_month: year_month), notice: "睡眠記録を更新しました" }
+        format.turbo_stream { render turbo_stream: turbo_stream.replace("sleep-logs-table", partial: "logs_table") }
+      end
     else
-      flash.now[:alert] = "エラーが発生しました。入力内容を確認してください。"
-      render :edit
+      respond_to do |format|
+        format.html do
+          flash.now[:alert] = "エラーが発生しました。入力内容を確認してください。"
+          render :new
+        end
+        format.turbo_stream do
+          # エラーがある場合はフォームをTurbo Frame内で再表示
+          render turbo_stream: turbo_stream.replace("sleep_log_frame", partial: "sleep_logs/new", locals: { sleep_log_form: @sleep_log_form }), status: :unprocessable_entity
+        end
+      end
     end
   end
 
@@ -78,10 +116,12 @@ class SleepLogsController < ApplicationController
     ).merge(user_id: current_user.id) # 誰の記録かも追加するストロングパラメーター
   end
 
-  def set_sleep_logs
-    @selected_date = if params[:year_month]
-      Date.strptime(params[:year_month] + "-01", "%Y-%m-%d") rescue Date.today # 年月選択時に１日をつける。なければ本日の日付 strptimeはparseよりも安全に日付を文字列から日付に変えるメソッド
-    else
+  def set_sleep_logs(year_month_param = nil) # create, updateアクションから値を受け取る用
+    @selected_date = if year_month_param # create, updateからyear_monthが送られてきた場合
+      Date.strptime(year_month_param + "-01", "%Y-%m-%d")
+    elsif params[:year_month] # indexアクション用
+      Date.strptime(params[:year_month] + "-01", "%Y-%m-%d") # 年月選択時に１日をつける strptimeはparseよりも安全に日付を文字列から日付に変えるメソッド
+    else # ログインほやほや
       Date.today
     end
     @start_date = @selected_date.beginning_of_month # 1日or本日の日付の月初を設定

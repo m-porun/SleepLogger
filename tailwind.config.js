@@ -5,6 +5,24 @@ module.exports = {
     './app/assets/stylesheets/**/*.css',
     './app/javascript/**/*.js'
   ],
+  theme: {
+    extend: {
+      keyframes: {
+        flashMessageIn: { // スライドイン・フェードイン
+          '0%': { opacity: 0, transform: 'translateY(100%)'},
+          '20%': { opacity: 1, transform: 'translateY(0)' },
+          },
+          flashMessageOut: { // スライドアウト・フェードアウト
+            '80%': { opacity: 1, transform: 'translateY(0)' },
+            '100%': { opacity: 0, transform: 'translateY(100%)' },
+          },
+        },
+        animation: {
+          
+        }
+      },
+    },
+  },
   plugins: [require("daisyui")],
   daisyui: {
     themes: [
