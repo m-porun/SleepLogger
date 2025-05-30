@@ -9,20 +9,20 @@ module.exports = {
     extend: {
       keyframes: {
         flashMessageIn: { // スライドイン・フェードイン
-          '0%': { opacity: 0, transform: 'translateY(100%)'},
-          '20%': { opacity: 1, transform: 'translateY(0)' },
+          '0%': { opacity: 0, transform: 'translateY(0)'},
+          '20%': { opacity: 1, transform: 'translateY(100%)' },
           },
           flashMessageOut: { // スライドアウト・フェードアウト
-            '80%': { opacity: 1, transform: 'translateY(0)' },
-            '100%': { opacity: 0, transform: 'translateY(100%)' },
+            '80%': { opacity: 1, transform: 'translateY(100%)' },
+            '100%': { opacity: 0, transform: 'translateY(0)' },
           },
         },
         animation: {
-          
-        }
+          'flash-message-in': 'flashMessageIn 0.5s ease-out forwards', // 最初早く後遅く、0.5秒後に発動
+          'flash-message-out': 'flashMessageOut 0.5s ease-in forwards', // 最初遅く後早く
+        },
       },
     },
-  },
   plugins: [require("daisyui")],
   daisyui: {
     themes: [
@@ -42,4 +42,4 @@ module.exports = {
       ],
       darkTheme: false, // ダークテーマを採用しない
     },
-}
+};
