@@ -63,12 +63,12 @@ class SleepLogsController < ApplicationController
   end
 
   def edit
-    sleep_log = current_user.sleep_logs.find(params[:id])
-    @sleep_log_form = SleepLogForm.new(sleep_log: sleep_log)
+    # sleep_log = current_user.sleep_logs.find(params[:id])
+    @sleep_log_form = SleepLogForm.new(sleep_log: @sleep_log)
   end
 
   def update
-    @sleep_log_form = SleepLogForm.new(sleep_log_form_params) # 保存用。文字列型として渡される
+    @sleep_log_form = SleepLogForm.new(sleep_log_form_params, sleep_log: @sleep_log) # 保存用。文字列型として渡される
 
     if @sleep_log_form.save
       year_month = @sleep_log_form.sleep_date.strftime("%Y-%m") # 登録されたsleep_log.dateをYYYY-MM形式に変換
@@ -91,7 +91,7 @@ class SleepLogsController < ApplicationController
         end
         format.turbo_stream do
           render turbo_stream: [
-            turbo_stream.replace("sleep_log_frame", partial: "sleep_logs/new", locals: { sleep_log_form: @sleep_log_form }),
+            turbo_stream.replace("sleep_log_frame", partial: "sleep_logs/edit", locals: { sleep_log_form: @sleep_log_form }),
             turbo_stream.prepend("flash-messages", partial: "shared/flash", locals: { notice: nil, alert: "エラーが発生しました。入力内容を確認してください。" })
           ], status: :unprocessable_entity
         end
@@ -112,10 +112,7 @@ class SleepLogsController < ApplicationController
   end
 
   def set_sleep_log
-    @sleep_log_form = @user.sleep_logs.find(params[:id]) # ユーザーが持つ睡眠記録id
-    @awakening = @sleep_log_form.awakening
-    @napping_time = @sleep_log_form.napping_time
-    @comment = @sleep_log_form.comment
+    @sleep_log = @user.sleep_logs.find(params[:id]) # ユーザーが持つ睡眠記録id
   end
 
   def sleep_log_form_params

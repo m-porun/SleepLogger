@@ -1,4 +1,21 @@
-
+<div id="sleep-logs-table">
+    <table class="table-fixed w-full text-center text-sm text-neutral print:leading-none print:py-[15px]">
+      <thead>
+        <tr class="print:text-[12px]">
+          <th class="w-8 border border-secondary bg-primary print:w-8">日</th>
+          <th class="w-8 border border-secondary bg-primary print:w-8">曜日</th>
+          <th class="w-16 border border-secondary bg-primary print:w-14">就床時刻</th>
+          <th class="w-16 border border-secondary bg-primary print:w-14">就寝時刻</th>
+          <th class="w-16 border border-secondary bg-primary print:w-14">覚醒時刻</th>
+          <th class="w-16 border border-secondary bg-primary print:w-14">起床時刻</th>
+          <th class="w-24 border border-secondary bg-primary print:w-20">睡眠時間</th>
+          <th class="w-16 border border-secondary bg-primary print:w-8">中途覚醒(回)</th>
+          <th class="w-16 border border-secondary bg-primary print:w-8">昼寝時間(分)</th>
+          <th class="w-1/3 max-w-[33%] border border-secondary bg-primary print:w-56 print:max-w-1/3">備考</th>
+          <!-- 編集ボタンのみプリントしない -->
+          <th class="w-8 print:hidden border border-secondary bg-primary">編集</th>
+        </tr>
+      </thead>
 
   <% @sleep_logs.each do |sleep_log| %> <!-- 月初から月末までの日付を繰り返し表示する -->
     <tr class="border border-secondary bg-primary">
@@ -49,3 +66,6 @@
       </td>
     </tr>
   <% end %>
+    </tbody>
+  </table>
+</div>
