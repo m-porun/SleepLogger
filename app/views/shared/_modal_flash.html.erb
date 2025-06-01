@@ -1,0 +1,6 @@
+<!-- モーダル用フラッシュメッセージ 現在エラーメッセージのみ -->
+<% if local_assigns[:alert] && local_assigns[:alert].present? %> <!-- コントローラーからlocal指定で渡されたものを読み込む夢のメソッド -->
+  <div class="alert error flex justify-center items-center text-center text-error">
+    <%= local_assigns[:alert] %>
+  </div>
+<% end %>

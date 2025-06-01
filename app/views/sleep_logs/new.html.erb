@@ -2,7 +2,7 @@
 <%= turbo_frame_tag 'sleep_log_frame' do %>
 
         <div class="flex justify-center items-center">
-        <%= form_with(url: sleep_logs_path, model: @sleep_log_form, method: :post, html: { data: { action: 'turbo:submit-end->modal#close' } }) do |f| %>
+        <%= form_with(url: sleep_logs_path, model: @sleep_log_form, method: :post) do |f| %>
           <div>
             <%= f.label :sleep_date, '起きた日付' %>
             <%= f.date_field :sleep_date, value: f.object.sleep_date.presence || params[:sleep_date], readonly: true %> <!-- f.objectに値があれば日付を、なければ探す -->
