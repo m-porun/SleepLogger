@@ -29,7 +29,6 @@ class SleepLogsController < ApplicationController
         format.turbo_stream do
           # モーダル閉じて、睡眠記録一覧表を更新、フラッシュメッセージを同時に出す
           render turbo_stream: [
-            turbo_stream.append("body", "<script>document.getElementById('my_modal_3').close();</script>"),
             turbo_stream.replace("sleep-logs-table", partial: "logs_table", locals: { sleep_logs: @sleep_logs }),
             turbo_stream.prepend("flash-messages", partial: "shared/flash", locals: { notice: "睡眠記録を保存しました", alert: nil })
           ]
@@ -66,7 +65,6 @@ class SleepLogsController < ApplicationController
         format.html { redirect_to sleep_logs_path(year_month: year_month), notice: "睡眠記録を更新しました" }
         format.turbo_stream do
           render turbo_stream: [
-            turbo_stream.append("body", "<script>document.getElementById('my_modal_3').close();</script>"),
             turbo_stream.replace("sleep-logs-table", partial: "logs_table", locals: { sleep_logs: @sleep_logs }),
             turbo_stream.prepend("flash-messages", partial: "shared/flash", locals: { notice: "睡眠記録を更新しました", alert: nil })
           ]
