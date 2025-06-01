@@ -29,7 +29,6 @@ const initialAnimationDelay = 600; // 0.6秒
     if (this.timeout) {
       clearTimeout(this.timeout);
     }
-    console.log("Flash controller disconnected!");
   }
 
   // フラッシュメッセージを閉じる (手動またはタイマーで呼び出される)
@@ -49,7 +48,6 @@ const initialAnimationDelay = 600; // 0.6秒
       // 特定のアニメーション（ここでは animate-flash-message-out）の終了のみを処理する
       if (event.animationName === 'flashMessageOut') {
         this.element.remove();
-        console.log("Flash message removed from DOM.");
       }
     }, { once: true }); // イベントリスナーは一度だけ実行されるようにする
   }

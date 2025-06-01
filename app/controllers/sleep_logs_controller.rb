@@ -3,12 +3,11 @@ class SleepLogsController < ApplicationController
   before_action :authenticate_user!, only: [ :index, :new, :edit, :destroy ]
   before_action :set_user, only: [ :index, :new, :create, :edit, :update, :destroy ] # user情報を取得
   before_action :set_sleep_log, only: [ :edit, :update, :destroy ] # ユーザーの睡眠記録を取得
-  # before_action :set_sleep_logs, only: [ :index ] # その月の睡眠記録一覧を取得
 
-  def index # 表示用
-    set_sleep_logs
-    respond_to do |format| # Turbo Streamのリクエストに対応する
-      format.html # いつもの表示
+  def index
+    set_sleep_logs # その月の一覧を取得
+    respond_to do |format|
+      format.html
       format.turbo_stream { render turbo_stream: turbo_stream.replace("sleep-logs-table", partial: "logs_table") }
     end
   end
@@ -18,30 +17,21 @@ class SleepLogsController < ApplicationController
     @sleep_log_form = SleepLogForm.new
   end
 
-  # def create
-  #   @sleep_log_form = SleepLogForm.new(sleep_log_form_params) # 保存用。文字列型として渡される
-
-  #   if @sleep_log_form.save
-  #     year_month = @sleep_log_form.sleep_date.strftime("%Y-%m") # 登録されたsleep_log.dateをYYYY-MM形式に変換
-  #     #redirect_to sleep_logs_path(year_month: year_month), notice: "睡眠記録を保存しました" # 登録した年月のページにリダイレクト
-  #   else
-  #     flash.now[:alert] = "エラーが発生しました。入力内容を確認してください。"
-  #     render :new
-  #   end
-  # end
   def create
     @sleep_log_form = SleepLogForm.new(sleep_log_form_params)
 
     if @sleep_log_form.save
       year_month = @sleep_log_form.sleep_date.strftime("%Y-%m")
-      set_sleep_logs(year_month) # これで @sleep_logs が設定される
+      set_sleep_logs(year_month) # set_sleep_logsの引数nilに年月を渡す
 
       respond_to do |format|
-        format.html { redirect_to sleep_logs_path(year_month: year_month), notice: "睡眠記録を保存しました" }
-        format.turbo_stream do # renderをまとめないと最初のrenderのみを適用してしまう
-          render turbo_stream: [ # ★修正: 配列としてまとめる
-            turbo_stream.replace("sleep-logs-table", partial: "logs_table", locals: { sleep_logs: @sleep_logs }), # テーブルの更新
-            turbo_stream.prepend("flash-messages", partial: "shared/flash", locals: { notice: "睡眠記録を保存しました", alert: nil }) # フラッシュメッセージ
+        format.html { redirect_to sleep_logs_path(year_month: year_month), notice: "睡眠記録を保存しました" } # 編集した月の表にリダイレクト
+        format.turbo_stream do
+          # モーダル閉じて、睡眠記録一覧表を更新、フラッシュメッセージを同時に出す
+          render turbo_stream: [
+            turbo_stream.append("body", "<script>document.getElementById('my_modal_3').close();</script>"),
+            turbo_stream.replace("sleep-logs-table", partial: "logs_table", locals: { sleep_logs: @sleep_logs }),
+            turbo_stream.prepend("flash-messages", partial: "shared/flash", locals: { notice: "睡眠記録を保存しました", alert: nil })
           ]
         end
       end
@@ -52,26 +42,25 @@ class SleepLogsController < ApplicationController
           render :new
         end
         format.turbo_stream do
-          # エラーがある場合はフォームをTurbo Frame内で再表示
-          render turbo_stream: [ # ★修正: 配列としてまとめる
-            turbo_stream.replace("sleep_log_frame", partial: "sleep_logs/new", locals: { sleep_log_form: @sleep_log_form }),
-            turbo_stream.prepend("flash-messages", partial: "shared/flash", locals: { notice: nil, alert: "エラーが発生しました。入力内容を確認してください。" })
-          ], status: :unprocessable_entity
+          # エラーメッセージを更新し以前のエラーはクリアに、フォームを再描画する
+          render turbo_stream: [
+            turbo_stream.replace("modal-error-message", partial: "shared/modal_flash", locals: { alert: "入力内容にエラーがあります。", notice: nil }),
+            turbo_stream.replace("sleep_log_frame", template: "sleep_logs/new", locals: { sleep_log_form: @sleep_log_form })
+          ], status: :unprocessable_entity # ステータスコード422を出す
         end
       end
     end
   end
 
   def edit
-    # sleep_log = current_user.sleep_logs.find(params[:id])
-    @sleep_log_form = SleepLogForm.new(sleep_log: @sleep_log)
+    @sleep_log_form = SleepLogForm.new(sleep_log: @sleep_log) # set_sleep_logメソッドでユーザーが持つ睡眠記録idを探し済み
   end
 
   def update
-    @sleep_log_form = SleepLogForm.new(sleep_log_form_params, sleep_log: @sleep_log) # 保存用。文字列型として渡される
+    @sleep_log_form = SleepLogForm.new(sleep_log_form_params, sleep_log: @sleep_log) # 入力したものと既存の記録をドッキング
 
     if @sleep_log_form.save
-      year_month = @sleep_log_form.sleep_date.strftime("%Y-%m") # 登録されたsleep_log.dateをYYYY-MM形式に変換
+      year_month = @sleep_log_form.sleep_date.strftime("%Y-%m")
       set_sleep_logs(year_month)
       respond_to do |format|
         format.html { redirect_to sleep_logs_path(year_month: year_month), notice: "睡眠記録を更新しました" }
@@ -87,12 +76,13 @@ class SleepLogsController < ApplicationController
       respond_to do |format|
         format.html do
           flash.now[:alert] = "エラーが発生しました。入力内容を確認してください。"
-          render :new
+          render :edit
         end
+        # エラー発生時、モーダル内のエラーメッセージを更新、フォームを再描画する
         format.turbo_stream do
           render turbo_stream: [
-            turbo_stream.replace("sleep_log_frame", partial: "sleep_logs/edit", locals: { sleep_log_form: @sleep_log_form }),
-            turbo_stream.prepend("flash-messages", partial: "shared/flash", locals: { notice: nil, alert: "エラーが発生しました。入力内容を確認してください。" })
+            turbo_stream.replace("modal-error-message", partial: "shared/modal_flash", locals: { alert: "入力内容にエラーがあります。", notice: nil }),
+            turbo_stream.replace("sleep_log_frame", template: "sleep_logs/edit", locals: { sleep_log_form: @sleep_log_form })
           ], status: :unprocessable_entity
         end
       end

@@ -1,7 +1,7 @@
 <!-- 編集画面 -->
 <%= turbo_frame_tag 'sleep_log_frame' do %>
         <div class="flex justify-center items-center">
-          <%= form_with(url: sleep_log_path,  model: @sleep_log_form, method: :patch, html: { data: { action: 'turbo:submit-end->modal#close' } }) do |f| %>
+          <%= form_with(url: sleep_log_path,  model: @sleep_log_form, method: :patch) do |f| %>
 
             <div>
               <%= f.label :sleep_date, '起きた日付' %>
