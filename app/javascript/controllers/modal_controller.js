@@ -22,4 +22,12 @@ export default class extends Controller {
       console.error("モーダル開かぬ(stimulus版)");
     }
   }
+
+  formSubmission(event) {
+    if (event.detail.success) { // もしフォーム送信が成功したら
+      this.dialogTarget.close();
+    } else {
+      console.log("フォーム送信失敗なのでモーダルはまだ閉じない")
+    }
+  }
 }
