@@ -36,15 +36,17 @@
     </div>
 
     <!-- Turbo Frameでモーダルの設定 -->
-    <dialog id="my_modal_3" class="modal" data-controller="modal" data-modal-target="dialog" data-action="turbo:submit-end->modal#formSubmission">
+    <!-- daisyUIのモーダルを採用, submit後にもモーダルを閉じさせるし、どんな閉じ方しても閉じたよ〜ってのを他のactionにも伝える -->
+    <dialog id="my_modal_3" class="modal" data-controller="modal" data-modal-target="dialog" data-action="turbo:submit-end->modal#formSubmission modal:close->modal#clearModal">
       <div class="modal-box h-auto">
-        <div id="modal-error-message" class="">
-        </div>
+        <!-- エラーメッセージ表示用Turbo Frame -->
+        <%= turbo_frame_tag "modal_error_message_frame" %>
 
+        <!-- 編集ボタンのactionで呼び出したnew, editファイルを空っぽのこれに置き換える -->
         <%= turbo_frame_tag "sleep_log_frame" %>
 
         <form method="dialog">
-          <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+          <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" data-action="click->modal#closeModal">✕</button>
         </form>
       </div>
     </dialog>
