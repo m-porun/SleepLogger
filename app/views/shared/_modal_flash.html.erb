@@ -1,6 +1,8 @@
 <!-- モーダル用フラッシュメッセージ 現在エラーメッセージのみ -->
+<%= turbo_frame_tag 'modal_error_message_frame' do %>
 <% if local_assigns[:alert] && local_assigns[:alert].present? %> <!-- コントローラーからlocal指定で渡されたものを読み込む夢のメソッド -->
-  <div class="alert error flex justify-center items-center text-center text-error">
+  <div class="flex justify-center items-center text-center mb-4 text-warning font-bold">
     <%= local_assigns[:alert] %>
   </div>
+<% end %>
 <% end %>

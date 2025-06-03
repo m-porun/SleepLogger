@@ -20,7 +20,9 @@ class SleepLogForm
   # save時にUserモデルのuser_idを保存させたい
   # attr_accessor :user_id
   # 委譲する -> form_with送信時にフォームのアクションを自動でPOST / PATCHに切り替える
-  # delegate :persisted?, to: :sleep_log # SleepLogモデルのpersistedというメソッドが使える
+  # ActiveRecord特有のメソッドを使うために、ここで許可させる
+  delegate :new_record?, :persisted?, to: :@sleep_log_form # SleepLogモデルのpersistedというメソッドが使える
+  delegate :id, to: :@sleep_log_form, allow_nil: true # sleep_log_path(sleep_log_form.id)のidが使えるように, newでidがnilでもOKにする
 
   # initializeをオーバーライドできない fetch_valueとは:Rubyのメソッド→initializeオーバーライドしてはいかん→fetchにattributes
   def initialize(attributes = nil, sleep_log: SleepLog.new)

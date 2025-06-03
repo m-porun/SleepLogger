@@ -15,6 +15,13 @@ class SleepLogsController < ApplicationController
   def new
     # フォームオブジェクトを呼び出す。SleepLogForm.new時点でFormオブジェクトファイルのAttributeが適用される
     @sleep_log_form = SleepLogForm.new
+    # Modalの中にturbo_frame_tagを表示させたい
+    respond_to do |format|
+      format.html
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.replace("sleep_log_frame", template: "sleep_logs/new", locals: { sleep_log_form: @sleep_log_form })
+      end
+    end
   end
 
   def create
@@ -29,6 +36,7 @@ class SleepLogsController < ApplicationController
         format.turbo_stream do
           # モーダル閉じて、睡眠記録一覧表を更新、フラッシュメッセージを同時に出す
           render turbo_stream: [
+            turbo_stream.action(:dispatch, 'modal:close', target: 'my_modal_3', detail: { modal_id: 'my_modal_3' }),
             turbo_stream.replace("sleep-logs-table", partial: "logs_table", locals: { sleep_logs: @sleep_logs }),
             turbo_stream.prepend("flash-messages", partial: "shared/flash", locals: { notice: "睡眠記録を保存しました", alert: nil })
           ]
@@ -43,7 +51,7 @@ class SleepLogsController < ApplicationController
         format.turbo_stream do
           # エラーメッセージを更新し以前のエラーはクリアに、フォームを再描画する
           render turbo_stream: [
-            turbo_stream.replace("modal-error-message", partial: "shared/modal_flash", locals: { alert: "入力内容にエラーがあります。", notice: nil }),
+            turbo_stream.replace("modal-error-message-frame", partial: "shared/modal_flash", locals: { alert: "入力内容にエラーがあります。", notice: nil }),
             turbo_stream.replace("sleep_log_frame", template: "sleep_logs/new", locals: { sleep_log_form: @sleep_log_form })
           ], status: :unprocessable_entity # ステータスコード422を出す
         end
@@ -53,6 +61,12 @@ class SleepLogsController < ApplicationController
 
   def edit
     @sleep_log_form = SleepLogForm.new(sleep_log: @sleep_log) # set_sleep_logメソッドでユーザーが持つ睡眠記録idを探し済み
+    respond_to do |format|
+      format.html
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.replace("sleep_log_frame", template: "sleep_logs/edit", locals: { sleep_log_form: @sleep_log_form })
+      end
+    end
   end
 
   def update
@@ -65,6 +79,7 @@ class SleepLogsController < ApplicationController
         format.html { redirect_to sleep_logs_path(year_month: year_month), notice: "睡眠記録を更新しました" }
         format.turbo_stream do
           render turbo_stream: [
+            turbo_stream.action(:dispatch, 'modal:close', target: 'my_modal_3', detail: { modal_id: 'my_modal_3' }),
             turbo_stream.replace("sleep-logs-table", partial: "logs_table", locals: { sleep_logs: @sleep_logs }),
             turbo_stream.prepend("flash-messages", partial: "shared/flash", locals: { notice: "睡眠記録を更新しました", alert: nil })
           ]
@@ -79,7 +94,7 @@ class SleepLogsController < ApplicationController
         # エラー発生時、モーダル内のエラーメッセージを更新、フォームを再描画する
         format.turbo_stream do
           render turbo_stream: [
-            turbo_stream.replace("modal-error-message", partial: "shared/modal_flash", locals: { alert: "入力内容にエラーがあります。", notice: nil }),
+            turbo_stream.replace("modal_error_message_frame", partial: "shared/modal_flash", locals: { alert: "入力内容にエラーがあります。", notice: nil }),
             turbo_stream.replace("sleep_log_frame", template: "sleep_logs/edit", locals: { sleep_log_form: @sleep_log_form })
           ], status: :unprocessable_entity
         end
@@ -88,7 +103,6 @@ class SleepLogsController < ApplicationController
   end
 
   def destroy
-    @sleep_log = current_user.sleep_logs.find(params[:id])
     @sleep_log.destroy
     redirect_to sleep_logs_path, notice: "睡眠記録を削除しました"
   end
