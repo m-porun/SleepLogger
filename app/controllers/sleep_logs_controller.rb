@@ -36,7 +36,7 @@ class SleepLogsController < ApplicationController
         format.turbo_stream do
           # モーダル閉じて、睡眠記録一覧表を更新、フラッシュメッセージを同時に出す
           render turbo_stream: [
-            turbo_stream.action(:dispatch, 'modal:close', target: 'my_modal_3', detail: { modal_id: 'my_modal_3' }),
+            # turbo_stream.action(:dispatch, 'modal:close', target: 'my_modal_3', detail: { modal_id: 'my_modal_3' }),
             turbo_stream.replace("sleep-logs-table", partial: "logs_table", locals: { sleep_logs: @sleep_logs }),
             turbo_stream.prepend("flash-messages", partial: "shared/flash", locals: { notice: "睡眠記録を保存しました", alert: nil })
           ]
