@@ -71,15 +71,16 @@ class SleepLogsController < ApplicationController
 
   def update
     @sleep_log_form = SleepLogForm.new(sleep_log_form_params, sleep_log: @sleep_log) # 入力したものと既存の記録をドッキング
+    #binding.pry
 
     if @sleep_log_form.save
       year_month = @sleep_log_form.sleep_date.strftime("%Y-%m")
       set_sleep_logs(year_month)
       respond_to do |format|
-        format.html { redirect_to sleep_logs_path(year_month: year_month), notice: "睡眠記録を更新しました" }
+        #format.html { redirect_to sleep_logs_path(year_month: year_month), notice: "睡眠記録を更新しました" }
         format.turbo_stream do
           render turbo_stream: [
-            turbo_stream.action(:dispatch, 'modal:close', target: 'my_modal_3', detail: { modal_id: 'my_modal_3' }),
+            #turbo_stream.action(:dispatch, 'modal:close', target: 'my_modal_3', detail: { modal_id: 'my_modal_3' }),
             turbo_stream.replace("sleep-logs-table", partial: "logs_table", locals: { sleep_logs: @sleep_logs }),
             turbo_stream.prepend("flash-messages", partial: "shared/flash", locals: { notice: "睡眠記録を更新しました", alert: nil })
           ]
