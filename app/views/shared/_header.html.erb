@@ -1,14 +1,13 @@
-<header class="print:hidden fixed top-0 left-0 h-20 w-full z-50 p-4 content-center bg-cover bg-secondary">
-<!-- ナビゲーションバー -->
-  <nav class="flex items-center justify-between">
-    <div class="flex items-center flex-shrink-0">
-      <%= link_to "すいみんにっし", root_path, class: "text-2xl drop-shadow-md text-primary" %>
+</header><header class="navbar absolute h-20 w-full z-50 content-center shadow-md bg-secondary print:hidden">
+  <div class="flex items-center justify-between w-full p-6">
+    <div class="text-2xl text-primary [text-shadow:_0_1px_0_var(--tw-shadow-color)] shadow-accent">
+      <%= link_to "すいみんにっし", root_path %>
     </div>
-    <div class="flex space-x-6">
-      <%= link_to "使いかた", "#", class: "text-neutral hover:text-primary" %>
-      <%= link_to "記録する", root_path, class: "text-neutral hover:text-primary" %>
-      <%= link_to "設定", users_edit_profile_path, class: "text-neutral hover:text-primary" %>
-      <%= link_to "ログアウト", destroy_user_session_path, method: :delete, class: "text-neutral hover:text-primary" %>
+    <div class="space-x-4">
+      <%= link_to "使いかた", "#", class: "hover:text-primary" %>
+      <%= link_to "記録する", root_path, class: "hover:text-primary" %>
+      <%= link_to "設定", users_edit_profile_path, class: "hover:text-primary" %>
+      <%= link_to "ログアウト", destroy_user_session_path, method: :delete, class: "hover:text-primary" %>
     </div>
-  </nav>
+  </div>
 </header>
