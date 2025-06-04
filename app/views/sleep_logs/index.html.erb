@@ -36,39 +36,24 @@
     </div>
 
     <!-- Turbo Frameでモーダルの設定 -->
-    <dialog id="my_modal_3" class="modal" data-controller="modal" data-modal-target="dialog">
+    <!-- daisyUIのモーダルを採用, submit後にもモーダルを閉じさせるし、どんな閉じ方しても閉じたよ〜ってのを他のactionにも伝える -->
+    <dialog id="my_modal_3" class="modal" data-controller="modal" data-modal-target="dialog" data-action="turbo:submit-end->modal#formSubmission modal:close->modal#clearModal">
       <div class="modal-box h-auto">
+        <!-- エラーメッセージ表示用Turbo Frame -->
+        <%= turbo_frame_tag "modal_error_message_frame" %>
+
+        <!-- 編集ボタンのactionで呼び出したnew, editファイルを空っぽのこれに置き換える -->
         <%= turbo_frame_tag "sleep_log_frame" %>
-          <form method="dialog">
-            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-          </form>
-        </div>
-      </dialog>
-    </div>
+
+        <form method="dialog">
+          <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" data-action="click->modal#closeModal">✕</button>
+        </form>
+      </div>
+    </dialog>
   </div>
 
   <!-- 睡眠記録テーブル -->
   <div class="mx-32 flex justify-center">
-    <table class="table-fixed w-full text-center text-sm text-neutral print:leading-none print:py-[15px]">
-      <thead>
-        <tr class="print:text-[12px]">
-          <th class="w-8 border border-secondary bg-primary print:w-8">日</th>
-          <th class="w-8 border border-secondary bg-primary print:w-8">曜日</th>
-          <th class="w-16 border border-secondary bg-primary print:w-14">就床時刻</th>
-          <th class="w-16 border border-secondary bg-primary print:w-14">就寝時刻</th>
-          <th class="w-16 border border-secondary bg-primary print:w-14">覚醒時刻</th>
-          <th class="w-16 border border-secondary bg-primary print:w-14">起床時刻</th>
-          <th class="w-24 border border-secondary bg-primary print:w-20">睡眠時間</th>
-          <th class="w-16 border border-secondary bg-primary print:w-8">中途覚醒(回)</th>
-          <th class="w-16 border border-secondary bg-primary print:w-8">昼寝時間(分)</th>
-          <th class="w-1/3 max-w-[33%] border border-secondary bg-primary print:w-56 print:max-w-1/3">備考</th>
-          <!-- 編集ボタンのみプリントしない -->
-          <th class="w-8 print:hidden border border-secondary bg-primary">編集</th>
-        </tr>
-      </thead>
-      <tbody id="sleep-logs-table">
         <%= render 'logs_table' %>
-      </tbody>
-    </table>
   </div>
 </div>

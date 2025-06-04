@@ -4,12 +4,13 @@ class SleepLogForm
   include ActiveModel::Attributes # attr_accessorと同じように属性が使える
 
   # パラメータの読み書きを許可する。指定の属性に変換してくれる。デフォルト値も設定可能。各モデルで扱いたいカラム名をインスタンス変数名としている。
+  # FIXME: 最早型指定する理由がtime型->datetime型への変更により無くなったので、attr_accessorで良くね？
   attribute :user_id, :integer
   attribute :sleep_date, :date # 気持ちを込めたDate属性
-  attribute :go_to_bed_at, :time # 元々DateTime属性だが、日時加工用
-  attribute :fell_asleep_at, :time
-  attribute :woke_up_at, :time
-  attribute :leave_bed_at, :time
+  attribute :go_to_bed_at, :datetime # 元々DateTime属性だが、日時加工用
+  attribute :fell_asleep_at, :datetime
+  attribute :woke_up_at, :datetime
+  attribute :leave_bed_at, :datetime
 
   # 子モデルで扱いたいカラムの属性
   # attr_accessor :awakening, :napping_time, :comment
@@ -17,10 +18,23 @@ class SleepLogForm
   attribute :napping_time, :integer, default: 0
   attribute :comment, :string, default: ""
 
-  # save時にUserモデルのuser_idを保存させたい
-  # attr_accessor :user_id
   # 委譲する -> form_with送信時にフォームのアクションを自動でPOST / PATCHに切り替える
-  # delegate :persisted?, to: :sleep_log # SleepLogモデルのpersistedというメソッドが使える
+  # ActiveRecord特有のメソッドを使うために、ここで許可させる
+  delegate :new_record?, :persisted?, to: :@sleep_log_form # SleepLogモデルのpersistedというメソッドが使える
+  delegate :id, to: :@sleep_log_form, allow_nil: true # sleep_log_path(sleep_log_form.id)のidが使えるように, newでidがnilでもOKにする
+
+  # バリデーション祭開催
+  validates :go_to_bed_at, presence: true
+  validates :fell_asleep_at, presence: true
+  validates :woke_up_at, presence: true
+  validates :leave_bed_at, presence: true
+  validates :awakenings_count, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 10 }
+  validates :napping_time, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 1440 }
+  validates :comment, length: { maximum: 42 }
+
+  # 純粋なバリデーション祭の直後にカスタムバリデート祭開催
+  validate :validate_sleep_times_order # 日時の論理性
+  validate :validate_sleep_times_range # 日付の論理性
 
   # initializeをオーバーライドできない fetch_valueとは:Rubyのメソッド→initializeオーバーライドしてはいかん→fetchにattributes
   def initialize(attributes = nil, sleep_log: SleepLog.new)
@@ -57,31 +71,38 @@ class SleepLogForm
   def save
     pp "saveメソッド"
     # バリデーションに引っかかる場合は以降の処理にせずfalseをコントローラーに返す
-    return false unless valid?
-    ActiveRecord::Base.transaction do
-      # 新規セーブまたは更新セーブを開始する(ユーザーidと睡眠日から検索する)
-      sleep_log = SleepLog.find_or_initialize_by(user_id: user_id, sleep_date: sleep_date)
+    return false unless valid? # 上記のvalidatesをチェック
 
-      # Time型をDateTime型に変換
-      %i[go_to_bed_at fell_asleep_at woke_up_at leave_bed_at].each do |column|
-        time_value = attributes[column.to_s] # Formオブジェクトで同じカラム名がついているattributesさんを呼び出し
-        sleep_log[column] = convert_to_datetime(sleep_date, time_value) if time_value.present?
-      end
 
-      # 起床日が就床・就寝時刻よりも前にならないように変換
-      adjust_datetime_order(sleep_log)
+    # 結局saveは一度しかしてないのでいらないのではActiveRecord::Base.transaction do
+    # 新規セーブまたは更新セーブを開始する(ユーザーidと睡眠日から検索する)
+    sleep_log = SleepLog.find_or_initialize_by(user_id: user_id, sleep_date: sleep_date)
 
-      # Formオブジェクトの値をビルドしたsleep_logの子モデルにセット
-      set_child_models(sleep_log)
+    # 親モデルカラムにフォームの値をセット
+    sleep_log.go_to_bed_at = go_to_bed_at
+    sleep_log.fell_asleep_at = fell_asleep_at
+    sleep_log.woke_up_at = woke_up_at
+    sleep_log.leave_bed_at = leave_bed_at
+    # Time型をDateTime型に変換
+    # %i[go_to_bed_at fell_asleep_at woke_up_at leave_bed_at].each do |column|
+    #   time_value = attributes[column.to_s] # Formオブジェクトで同じカラム名がついているattributesさんを呼び出し
+    #   sleep_log[column] = convert_to_datetime(sleep_date, time_value) if time_value.present?
+    # end
 
-      sleep_log.save! # 失敗したら例外出してロールバック
-    end
+    # 起床日が就床・就寝時刻よりも前にならないように変換
+    # adjust_datetime_order(sleep_log)
 
-    true # トランザクション成功したらcontrollerにtrueを返す
-    rescue => e
-      Rails.logger.error "どうやらトランザクションをヤっちまったみたいだぜ #{e.message}"
-      false
+    # Formオブジェクトの値をビルドしたsleep_logの子モデルにセット
+    set_child_models(sleep_log)
+
+    sleep_log.save
   end
+
+  # true # トランザクション成功したらcontrollerにtrueを返す
+  # rescue => e
+  #   Rails.logger.error "どうやらトランザクションをヤっちまったみたいだぜ #{e.message}"
+  #   false
+  # end
 
   # form_withに必要なメソッドで、アクションURLを適切な場所に切り替える
   # def to_model
@@ -141,10 +162,42 @@ class SleepLogForm
     }
   end
 
-  # 子モデルの作成
-  # def initialize_associations
-  #   @sleep_log_form.build_awakening unless @sleep_log_form.awakening.present? # 存在してなければbuild
-  #   @sleep_log_form.build_napping_time unless @sleep_log_form.napping_time.present?
-  #   @sleep_log_form.build_comment unless @sleep_log_form.comment.present?
-  # end
+  # カスタムバリデータ祭
+  def validate_sleep_times_order
+    # go_to_bed_atがfell_asleep_atより後の日時だった場合
+    if go_to_bed_at > fell_asleep_at
+      errors.add(:go_to_bed_at, "は昨夜寝た時刻より前の時刻にしてください")
+    end
+
+    # fell_asleep_atがwoke_up_atより後の日時だった場合
+    if fell_asleep_at > woke_up_at
+      errors.add(:fell_asleep_at, "は今朝目覚めた時刻より前の時刻にしてください")
+    end
+
+    # fell_asleep_atがleave_bed_atより後の日時だった場合
+    if fell_asleep_at > leave_bed_at
+      errors.add(:fell_asleep_at, "は今朝布団から出た時刻より前の時刻にしてください")
+    end
+
+    # woke_up_atがleave_bed_atより後の日時だった場合
+    if woke_up_at > leave_bed_at
+      errors.add(:woke_up_at, "は今朝布団から出た時刻より前の時刻にしてください")
+    end
+  end
+
+  def validate_sleep_times_range
+    if go_to_bed_at.present? && ![ sleep_date, sleep_date - 1.day ].include?(go_to_bed_at.to_date)
+      errors.add(:go_to_bed_at, "寝すぎです。日付を見直してください")
+    end
+    if fell_asleep_at.present? && ![ sleep_date, sleep_date - 1.day ].include?(fell_asleep_at.to_date)
+      errors.add(:fell_asleep_at, "寝すぎです。日付を見直してください")
+    end
+
+    if woke_up_at.present? && woke_up_at.to_date > sleep_date
+      errors.add(:woke_up_at, "こんにちは未来人。起きた日付よりも後の日付にできません")
+    end
+    if leave_bed_at.present? && leave_bed_at.to_date > sleep_date
+      errors.add(:leave_bed_at, "こんにちは未来人。起きた日付よりも後の日付にできません")
+    end
+  end
 end
