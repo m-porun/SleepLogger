@@ -17,12 +17,19 @@ class SleepLogForm
   attribute :napping_time, :integer, default: 0
   attribute :comment, :string, default: ""
 
-  # save時にUserモデルのuser_idを保存させたい
-  # attr_accessor :user_id
   # 委譲する -> form_with送信時にフォームのアクションを自動でPOST / PATCHに切り替える
   # ActiveRecord特有のメソッドを使うために、ここで許可させる
   delegate :new_record?, :persisted?, to: :@sleep_log_form # SleepLogモデルのpersistedというメソッドが使える
   delegate :id, to: :@sleep_log_form, allow_nil: true # sleep_log_path(sleep_log_form.id)のidが使えるように, newでidがnilでもOKにする
+
+  # バリデーション祭り開催
+  validates :go_to_bed_at, presence: true
+  validates :fell_asleep_at, presence: true
+  validates :woke_up_at, presence: true
+  validates :leave_bed_at, presence: true
+  validates :awakenings_count, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+  validates :napping_time, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+  validates :comment, length: { maximum: 42 }
 
   # initializeをオーバーライドできない fetch_valueとは:Rubyのメソッド→initializeオーバーライドしてはいかん→fetchにattributes
   def initialize(attributes = nil, sleep_log: SleepLog.new)
@@ -60,7 +67,9 @@ class SleepLogForm
     pp "saveメソッド"
     # バリデーションに引っかかる場合は以降の処理にせずfalseをコントローラーに返す
     return false unless valid?
-    ActiveRecord::Base.transaction do
+
+
+    # 結局saveは一度しかしてないのでいらないのではActiveRecord::Base.transaction do
       # 新規セーブまたは更新セーブを開始する(ユーザーidと睡眠日から検索する)
       sleep_log = SleepLog.find_or_initialize_by(user_id: user_id, sleep_date: sleep_date)
 
@@ -76,14 +85,14 @@ class SleepLogForm
       # Formオブジェクトの値をビルドしたsleep_logの子モデルにセット
       set_child_models(sleep_log)
 
-      sleep_log.save! # 失敗したら例外出してロールバック
+      sleep_log.save
     end
 
-    true # トランザクション成功したらcontrollerにtrueを返す
-    rescue => e
-      Rails.logger.error "どうやらトランザクションをヤっちまったみたいだぜ #{e.message}"
-      false
-  end
+    # true # トランザクション成功したらcontrollerにtrueを返す
+    # rescue => e
+    #   Rails.logger.error "どうやらトランザクションをヤっちまったみたいだぜ #{e.message}"
+    #   false
+  # end
 
   # form_withに必要なメソッドで、アクションURLを適切な場所に切り替える
   # def to_model
