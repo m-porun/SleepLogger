@@ -30,7 +30,6 @@ class SleepLogsController < ApplicationController
     if @sleep_log_form.save
       year_month = @sleep_log_form.sleep_date.strftime("%Y-%m")
       set_sleep_logs(year_month) # set_sleep_logsの引数nilに年月を渡す
-
       respond_to do |format|
         format.html { redirect_to sleep_logs_path(year_month: year_month), notice: "睡眠記録を保存しました" } # 編集した月の表にリダイレクト
         format.turbo_stream do
@@ -49,9 +48,10 @@ class SleepLogsController < ApplicationController
           render :new
         end
         format.turbo_stream do
+          #binding.pry
           # エラーメッセージを更新し以前のエラーはクリアに、フォームを再描画する
           render turbo_stream: [
-            turbo_stream.replace("modal-error-message-frame", partial: "shared/modal_flash", locals: { alert: "入力内容にエラーがあります。", notice: nil }),
+            turbo_stream.replace("modal_error_message_frame", partial: "shared/modal_flash", locals: { alert: "入力内容にエラーがあります。", notice: nil }),
             turbo_stream.replace("sleep_log_frame", template: "sleep_logs/new", locals: { sleep_log_form: @sleep_log_form })
           ], status: :unprocessable_entity # ステータスコード422を出す
         end
