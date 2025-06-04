@@ -13,6 +13,8 @@ export default class extends Controller {
   formSubmission(event) {
     if (event.detail.success) { // もしフォーム送信が成功したら
       this.dialogTarget.close(); // モーダル閉じる
+    } else {
+      console.log("submit失敗");
     }
   }
 

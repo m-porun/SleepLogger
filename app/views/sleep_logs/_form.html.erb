@@ -4,7 +4,7 @@
   <%= form_with(model: sleep_log_form, url: sleep_log_form.new_record? ? sleep_logs_path : sleep_log_path(sleep_log_form.id), method: sleep_log_form.new_record? ? :post : :patch) do |f| %>
     <!-- 全体エラーの表示ゾーン -->
     <% if sleep_log_form.errors.any? %>
-      <div class="alert alert-error">
+      <div class="flex justify-center items-center text-center mb-4 text-error font-bold">
         <ul>
           <% sleep_log_form.errors.full_messages.each do |message| %>
             <li><%= message %></li>
