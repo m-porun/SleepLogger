@@ -90,7 +90,7 @@ class SleepLogForm
     # end
 
     # 起床日が就床・就寝時刻よりも前にならないように変換
-    #adjust_datetime_order(sleep_log)
+    # adjust_datetime_order(sleep_log)
 
     # Formオブジェクトの値をビルドしたsleep_logの子モデルにセット
     set_child_models(sleep_log)
@@ -98,10 +98,10 @@ class SleepLogForm
     sleep_log.save
   end
 
-    # true # トランザクション成功したらcontrollerにtrueを返す
-    # rescue => e
-    #   Rails.logger.error "どうやらトランザクションをヤっちまったみたいだぜ #{e.message}"
-    #   false
+  # true # トランザクション成功したらcontrollerにtrueを返す
+  # rescue => e
+  #   Rails.logger.error "どうやらトランザクションをヤっちまったみたいだぜ #{e.message}"
+  #   false
   # end
 
   # form_withに必要なメソッドで、アクションURLを適切な場所に切り替える
@@ -186,10 +186,10 @@ class SleepLogForm
   end
 
   def validate_sleep_times_range
-    if go_to_bed_at.present? && ![sleep_date, sleep_date - 1.day].include?(go_to_bed_at.to_date)
+    if go_to_bed_at.present? && ![ sleep_date, sleep_date - 1.day ].include?(go_to_bed_at.to_date)
       errors.add(:go_to_bed_at, "寝すぎです。日付を見直してください")
     end
-    if fell_asleep_at.present? && ![sleep_date, sleep_date - 1.day].include?(fell_asleep_at.to_date)
+    if fell_asleep_at.present? && ![ sleep_date, sleep_date - 1.day ].include?(fell_asleep_at.to_date)
       errors.add(:fell_asleep_at, "寝すぎです。日付を見直してください")
     end
 
