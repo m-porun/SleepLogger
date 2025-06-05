@@ -5,11 +5,12 @@ today = Date.today
 start_date = today.beginning_of_month
 end_date = today.end_of_month
 
-(start_date..end_date).each do |date|
-  go_to_bed_at = date.to_datetime.change({ hour: 22, min: 0 })
-  fell_asleep_at = date.to_datetime.change({ hour: 23, min: 0 })
-  woke_up_at = (date + 1).to_datetime.change({ hour: 6, min: 30 })
-  leave_bed_at = (date + 1).to_datetime.change({ hour: 7, min: 0 })
+(start_date..end_date).each do |current_date|
+  before_date = current_date - 1.day
+  go_to_bed_at = before_date.to_datetime.change(hour: 22, min: 0)
+  fell_asleep_at = before_date.to_datetime.change(hour: 23, min: 0)
+  woke_up_at = current_date.to_datetime.change(hour: 6, min: 30)
+  leave_bed_at = current_date.to_datetime.change(hour: 7, min: 0)
 
   sleep_log = SleepLog.create!(
     user: user,
