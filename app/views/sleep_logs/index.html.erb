@@ -1,10 +1,10 @@
-<div class="print:my-0 print:space-y-0 my-6 md:my-16 w-full space-y-4 md:space-y-16">
+<div class="print:my-0 print:space-y-0 my-8 md:my-16 w-full space-y-6 md:space-y-16">
   <div class="flex justify-center items-center print:m-2">
 
     <!-- 印刷時非表示: 年月選択 -->
     <div class="print:hidden">
       <%= form_with(url: sleep_logs_path, method: :get, data: { turbo: true }) do |f| %>
-        <div class="btn flex items-center form-group btn-xs sm:btn-sm md:btn-md bg-primary relative overflow-hidden cursor-pointer text-xs md:text:base text-neutral"
+        <div class="btn flex items-center form-group btn-xs sm:btn-sm md:btn-md bg-primary relative overflow-hidden cursor-pointer text-xs md:text-base text-neutral"
             onclick="document.getElementById('year_month_selector').showPicker();">
           <span class="material-symbols-outlined text-sm md:text-xl">
             calendar_month
@@ -66,7 +66,7 @@
   </div>
 
   <!-- 睡眠記録テーブル -->
-  <div class="mx-2 md:mx-32 flex justify-center">
+  <div class="mx-0 ms:mx-2 md:mx-32 flex justify-center">
         <%= render 'logs_table' %>
   </div>
 </div>
