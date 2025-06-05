@@ -1,12 +1,17 @@
-<div class="my-32 print:my-0">
-  <div class="mb-12 flex justify-center items-center print:m-2">
+<div class="print:my-0 print:space-y-0 my-6 md:my-16 w-full space-y-4 md:space-y-16">
+  <div class="flex justify-center items-center print:m-2">
 
     <!-- 印刷時非表示: 年月選択 -->
     <div class="print:hidden">
       <%= form_with(url: sleep_logs_path, method: :get, data: { turbo: true }) do |f| %>
-        <div class="form-group btn bg-primary text-neutral px-4 py-2 rounded">
+        <div class="form-group btn bg-primary px-4 py-2 rounded relative overflow-hidden cursor-pointer"
+            onclick="document.getElementById('year_month_selector').showPicker();">
+          <span class="pointer-events-none">
+            <%= @selected_date.strftime('%Y年%m月') %>
+          </span>
           <%= f.month_field :year_month,
-                            class: 'form-control bg-primary',
+                            id: 'year_month_selector',
+                            class: 'absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer',
                             value: @selected_date.strftime('%Y-%m'),
                             onchange: 'this.form.submit();' %>
         </div>
@@ -19,13 +24,13 @@
     </div>
 
     <!-- タイトル -->
-    <div class="mx-8 text-center font-bold text-lg">
+    <div class="mx-8 text-center font-bold text-base md:text-xl">
       睡眠日誌
     </div>
 
     <!-- 印刷時非表示: 印刷ボタン -->
     <div class="print:hidden">
-      <button onclick="print(); return false;" id="printButton" class="btn bg-primary text-neutral px-4 py-2 rounded">
+      <button onclick="print(); return false;" id="printButton" class="btn bg-primary rounded text-sm md:text-base">
         印刷する
       </button>
     </div>
@@ -53,7 +58,7 @@
   </div>
 
   <!-- 睡眠記録テーブル -->
-  <div class="mx-32 flex justify-center">
+  <div class="mx-2 md:mx-32 flex justify-center">
         <%= render 'logs_table' %>
   </div>
 </div>
