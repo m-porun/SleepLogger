@@ -6,6 +6,7 @@ start_date = today.beginning_of_month
 end_date = today.end_of_month
 
 (start_date..end_date).each do |current_date|
+  sleep_date = current_date
   before_date = current_date - 1.day
   go_to_bed_at = before_date.to_datetime.change(hour: 22, min: 0)
   fell_asleep_at = before_date.to_datetime.change(hour: 23, min: 0)
@@ -14,7 +15,7 @@ end_date = today.end_of_month
 
   sleep_log = SleepLog.create!(
     user: user,
-    sleep_date: date,
+    sleep_date: sleep_date,
     go_to_bed_at: go_to_bed_at,
     fell_asleep_at: fell_asleep_at,
     woke_up_at: woke_up_at,
