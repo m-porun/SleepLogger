@@ -1,7 +1,7 @@
 <!-- フラッシュメッセージ表示用-->
 <div id="flash-messages" class="flex items-center fixed top-32 z-[9999] pointer-events-none space-y-2">
   <% if notice %>
-    <div class="print:hidden notice success flex justify-center items-center text-center p-4 h-16 w-auto bg-success rounded-tr-xl rounded-br-xl text-primary pointer-events-auto shadow-lg"
+    <div class="print:hidden notice success flex justify-center items-center text-center p-4 h-16 w-auto bg-success rounded-e-xl text-primary pointer-events-auto shadow-lg"
          data-controller="flash"
          data-flash-duration-value="2500"> <%# 2.5秒 %>
       <%= notice %>
@@ -9,7 +9,7 @@
   <% end %>
 
   <% if alert %>
-    <div class="print:hidden alert error flex justify-center items-center text-center p-4 h-16 w-auto bg-success rounded-tr-xl rounded-br-xl text-primary pointer-events-auto shadow-lg"
+    <div class="print:hidden alert error flex justify-center items-center text-center p-4 h-16 w-auto bg-success rounded-e-xl text-primary pointer-events-auto shadow-lg"
          data-controller="flash"
          data-flash-duration-value="4000"> <%# 4.0秒 %>
       <%= alert %>
