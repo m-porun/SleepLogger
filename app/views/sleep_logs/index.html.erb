@@ -4,14 +4,19 @@
     <!-- 印刷時非表示: 年月選択 -->
     <div class="print:hidden">
       <%= form_with(url: sleep_logs_path, method: :get, data: { turbo: true }) do |f| %>
-        <div class="form-group btn bg-primary px-4 py-2 rounded relative overflow-hidden cursor-pointer"
+        <div class="btn flex items-center form-group btn-xs sm:btn-sm md:btn-md bg-primary relative overflow-hidden cursor-pointer text-xs md:text:base text-neutral"
             onclick="document.getElementById('year_month_selector').showPicker();">
+          <span class="material-symbols-outlined text-sm md:text-xl">
+            calendar_month
+          </span>
+          <!-- 年月直接入力をナシに -->
           <span class="pointer-events-none">
             <%= @selected_date.strftime('%Y年%m月') %>
           </span>
+          <!-- 13機関みたいな存在感 -->
           <%= f.month_field :year_month,
                             id: 'year_month_selector',
-                            class: 'absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer',
+                            class: 'absolute top-0 left-0 w-full h-full opacity-0',
                             value: @selected_date.strftime('%Y-%m'),
                             onchange: 'this.form.submit();' %>
         </div>
@@ -30,7 +35,7 @@
 
     <!-- 印刷時非表示: 印刷ボタン -->
     <div class="print:hidden">
-      <button onclick="print(); return false;" id="printButton" class="btn bg-primary rounded text-sm md:text-base">
+      <button onclick="print(); return false;" id="printButton" class="btn bg-primary btn-xs sm:btn-sm md:btn-md rounded text-sm md:text-base text-neutral">
         印刷する
       </button>
     </div>
