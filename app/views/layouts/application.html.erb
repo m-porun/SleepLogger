@@ -38,7 +38,9 @@
       <%= render 'shared/before_login_header' %>
     <% end %>
     <%= render 'shared/flash' %>
-    <%= yield %>
+    <div class="py-20"> <!-- ヘッダーの高さがh-20 -->
+      <%= yield %>
+    </div>
     <%= render 'shared/footer' %>
   </body>
 </html>
