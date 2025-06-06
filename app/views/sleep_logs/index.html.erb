@@ -51,7 +51,7 @@
     <!-- Turbo Frameでモーダルの設定 -->
     <!-- daisyUIのモーダルを採用, submit後にもモーダルを閉じさせるし、どんな閉じ方しても閉じたよ〜ってのを他のactionにも伝える -->
     <dialog id="my_modal_3" class="modal" data-controller="modal" data-modal-target="dialog" data-action="turbo:submit-end->modal#formSubmission modal:close->modal#clearModal">
-      <div class="modal-box h-auto">
+      <div class="modal-box h-auto bg-secondary">
         <!-- エラーメッセージ表示用Turbo Frame -->
         <%= turbo_frame_tag "modal_error_message_frame" %>
 

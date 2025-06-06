@@ -164,6 +164,7 @@ class SleepLogForm
 
   # カスタムバリデータ祭
   def validate_sleep_times_order
+    return if go_to_bed_at.blank? || fell_asleep_at.blank? || woke_up_at.blank? || leave_bed_at.blank?
     # go_to_bed_atがfell_asleep_atより後の日時だった場合
     if go_to_bed_at > fell_asleep_at
       errors.add(:go_to_bed_at, "は昨夜寝た時刻より前の時刻にしてください")
@@ -186,6 +187,7 @@ class SleepLogForm
   end
 
   def validate_sleep_times_range
+    return if go_to_bed_at.blank? || fell_asleep_at.blank? || woke_up_at.blank? || leave_bed_at.blank?
     if go_to_bed_at.present? && ![ sleep_date, sleep_date - 1.day ].include?(go_to_bed_at.to_date)
       errors.add(:go_to_bed_at, "寝すぎです。日付を見直してください")
     end
