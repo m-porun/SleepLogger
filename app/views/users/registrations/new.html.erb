@@ -1,45 +1,45 @@
-<div class="flex justify-center py-16 w-full">
+<div class="flex justify-center py-6 md:py-16 w-full">
   <div class="w-96">
     <%= form_with model: @user, url: user_registration_path, data: { turbo: false } do |f| %>
-      <fieldset class="fieldset bg-secondary border-base-300 rounded-box border p-6">
+      <fieldset class="fieldset bg-secondary border-base-300 rounded-box border p-4 md:p-6">
         <legend class="fieldset-legend text-2xl font-semibold">新規登録</legend>
 
         <%= render "users/shared/error_messages", resource: resource %>
 
-        <div class="form-control space-y-4">
+        <div class="form-control space-y-1 md:space-y-4">
           <div>
-            <%= f.label :name, "お名前", class: "label" %>
+            <%= f.label :name, "お名前", class: "label text-sm md:text-base" %>
             <%= f.text_field :name, autofocus: true, autocomplete: "name", placeholder: "お名前を入力", class: "input input-bordered w-full bg-primary" %>
           </div>
 
           <div>
-            <%= f.label :email, "メールアドレス", class: "label" %>
+            <%= f.label :email, "メールアドレス", class: "label text-sm md:text-base" %>
             <%= f.email_field :email, autocomplete: "email", placeholder: "メールアドレスを入力", class: "input input-bordered w-full bg-primary" %>
           </div>
 
           <div>
             <div class="flex items-center justify-between">
-              <%= f.label :password, "パスワード", class: "label" %>
+              <%= f.label :password, "パスワード", class: "label text-sm md:text-base" %>
               <% if @minimum_password_length %>
-                <span class="label-text-alt text-sm text-gray-500">(<%= @minimum_password_length %>文字以上)</span>
+                <span class="label-text-alt text-xs md:text-sm text-gray-500">(<%= @minimum_password_length %>文字以上)</span>
               <% end %>
             </div>
             <%= f.password_field :password, autocomplete: "new-password", placeholder: "パスワードを入力", class: "input input-bordered w-full bg-primary" %>
           </div>
 
           <div>
-            <%= f.label :password_confirmation, "パスワード確認", class: "label" %>
+            <%= f.label :password_confirmation, "パスワード確認", class: "label text-sm md:text-base" %>
             <%= f.password_field :password_confirmation, autocomplete: "new-password", placeholder: "パスワードを再入力", class: "input input-bordered w-full bg-primary" %>
           </div>
         </div>
 
-        <div class="actions mt-8">
-          <%= f.submit "登録", class: "btn btn-accent w-full" %>
+        <div class="actions mt-6 md:mt-8">
+          <%= f.submit "登録", class: "btn btn-accent w-full text-sm md:text-base" %>
         </div>
       </fieldset>
     <% end %>
 
-    <div class="mt-6 text-center">
+    <div class="mt-4 md:mt-6 text-center">
       <%= render "users/shared/links" %>
     </div>
   </div>
