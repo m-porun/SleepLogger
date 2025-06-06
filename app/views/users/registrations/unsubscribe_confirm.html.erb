@@ -1,21 +1,21 @@
-<div class="relative top-24 flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
-  <div class="sm:mx-auto sm:w-full sm:max-w-sm">
-    <h2 class="mt-10 text-center text-2xl/9 font-bold text-neutral">ユーザー退会</h2>
-  </div>
+<div class="relative flex flex-col items-center py-6 md:py-16 min-h-screen bg-error">
+  <div class="card mt-10 bg-secondary w-96 shadow-sm p-8">
+    <h2 class="text-center text-2xl/9 font-bold">ユーザー退会</h2>
 
-  <div class="sm:mx-auto sm:w-full sm:max-w-sm">
-    <div class="mt-10 text-center text-neutral">
-      <p>退会すると、これまでの保存データが全て消えてしまします。</p>
-      <p>2度と戻りません。</p>
-      <p class="text-warning">本当に退会しますか？</p>
+    <div class="w-full">
+      <div class="mt-8 text-center text-neutral">
+        <p>退会すると、これまでの保存データが<br />全て消えてしまいます。</p>
+        <p>2度と戻りません。</p>
+        <p class="text-warning">本当に退会しますか？</p>
+      </div>
     </div>
-  </div>
 
-  <div class="actions mt-8 flex w-full justify-center rounded-md bg-warning px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-red-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-    <%= button_to "退会する", users_destroy_path, method: :delete %>
-  </div>
+    <div class="actions mt-8 flex w-full justify-center rounded-md bg-warning px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-red-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+      <%= button_to "退会する", users_destroy_path, method: :delete, data: { turbo: false } %>
+    </div>
 
-  <div class="mt-8 text-center">
-    <%= link_to "やっぱりやめる", users_edit_profile_path %>
+    <div class="mt-8 text-center underline underline-offset-2">
+      <%= link_to "やっぱりやめる", users_edit_profile_path %>
+    </div>
   </div>
 </div>

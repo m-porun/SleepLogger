@@ -60,8 +60,9 @@ class Users::RegistrationsController < Devise::RegistrationsController
   # DELETE /resource
   def destroy
     current_user.destroy
-    flash[:notice] = "ユーザーを削除しました"
-    redirect_to :root
+    sign_out current_user
+    flash[:notice] = "すいみんにっしをご利用いただきありがとうございました。"
+    redirect_to new_user_session_path, status: :see_other
   end
 
   # GET /resource/cancel
