@@ -1,12 +1,22 @@
-<div class="my-32 print:my-0">
-  <div class="mb-12 flex justify-center items-center print:m-2">
+<div class="print:my-0 print:space-y-0 my-8 md:my-16 w-full space-y-6 md:space-y-16">
+  <div class="flex justify-center items-center print:m-2">
 
     <!-- 印刷時非表示: 年月選択 -->
     <div class="print:hidden">
       <%= form_with(url: sleep_logs_path, method: :get, data: { turbo: true }) do |f| %>
-        <div class="form-group btn bg-primary text-neutral px-4 py-2 rounded">
+        <div class="btn flex items-center form-group btn-xs sm:btn-sm md:btn-md bg-primary relative overflow-hidden cursor-pointer text-xs md:text-base text-neutral"
+            onclick="document.getElementById('year_month_selector').showPicker();">
+          <span class="material-symbols-outlined text-sm md:text-xl">
+            calendar_month
+          </span>
+          <!-- 年月直接入力をナシに -->
+          <span class="pointer-events-none">
+            <%= @selected_date.strftime('%Y年%m月') %>
+          </span>
+          <!-- 13機関みたいな存在感 -->
           <%= f.month_field :year_month,
-                            class: 'form-control bg-primary',
+                            id: 'year_month_selector',
+                            class: 'absolute top-0 left-0 w-full h-full opacity-0',
                             value: @selected_date.strftime('%Y-%m'),
                             onchange: 'this.form.submit();' %>
         </div>
@@ -19,13 +29,16 @@
     </div>
 
     <!-- タイトル -->
-    <div class="mx-8 text-center font-bold text-lg">
+    <div class="mx-8 text-center font-bold text-base md:text-xl">
       睡眠日誌
     </div>
 
     <!-- 印刷時非表示: 印刷ボタン -->
     <div class="print:hidden">
-      <button onclick="print(); return false;" id="printButton" class="btn bg-primary text-neutral px-4 py-2 rounded">
+      <button onclick="print(); return false;" id="printButton" class="btn bg-primary btn-xs sm:btn-sm md:btn-md text-sm md:text-base text-neutral">
+        <span class="material-symbols-outlined text-sm md:text-xl">
+          print
+        </span>
         印刷する
       </button>
     </div>
@@ -38,7 +51,7 @@
     <!-- Turbo Frameでモーダルの設定 -->
     <!-- daisyUIのモーダルを採用, submit後にもモーダルを閉じさせるし、どんな閉じ方しても閉じたよ〜ってのを他のactionにも伝える -->
     <dialog id="my_modal_3" class="modal" data-controller="modal" data-modal-target="dialog" data-action="turbo:submit-end->modal#formSubmission modal:close->modal#clearModal">
-      <div class="modal-box h-auto">
+      <div class="modal-box h-auto bg-secondary">
         <!-- エラーメッセージ表示用Turbo Frame -->
         <%= turbo_frame_tag "modal_error_message_frame" %>
 
@@ -53,7 +66,7 @@
   </div>
 
   <!-- 睡眠記録テーブル -->
-  <div class="mx-32 flex justify-center">
+  <div class="mx-0 ms:mx-2 md:mx-32 flex justify-center">
         <%= render 'logs_table' %>
   </div>
 </div>

@@ -1,45 +1,46 @@
-<div class="relative top-24 flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
-  <div class="sm:mx-auto sm:w-full sm:max-w-sm">
-    <h2 class="mt-10 text-center text-2xl/9 font-bold text-neutral">ログイン</h2>
-  </div>
+<div class="flex justify-center py-6 md:py-16 w-full">
+  <div class="w-96">
+    <%= form_with model: @user, url: user_session_path, data: { turbo: false } do |f| %> <!-- Userモデルに送る -->
+      <fieldset class="fieldset bg-secondary border-base-300 rounded-box border p-4 md:p-6">
+        <legend class="fieldset-legend text-2xl font-semibold">ログイン</legend>
 
-<%= form_with model: @user, url: user_session_path, data: { turbo: false } do |f| %> <!-- Userモデルに送る -->
-  <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+        <%= render "users/shared/error_messages", resource: resource %>
 
-  <!-- メールアドレス -->
-  <div>
-    <%= f.label :email, "メールアドレス", class: "block text-sm/6 font-medium text-neutral"%>
-    <div class="mt-2">
-      <%= f.email_field :email, autocomplete: "email", class: "block w-full rounded-md bg-primary px-3 py-1.5 text-base text-neutral outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm" %>
-    </div>
-  </div>
+        <div class="form-control space-y-4">
+          <!-- メールアドレス -->
+          <div>
+            <%= f.label :email, "メールアドレス", class: "label" %>
+            <%= f.email_field :email, autocomplete: "email", placeholder: "メールアドレスを入力", class: "input input-bordered w-full bg-primary" %>
+          </div>
 
+          <!-- パスワード -->
+          <div>
+            <div class="flex items-center justify-between">
+              <%= f.label :password, "パスワード", class: "label" %>
+              <% if @minimum_password_length %>
+                <span class="label-text-alt text-sm text-gray-500">(<%= @minimum_password_length %>文字以上)</span>
+              <% end %>
+            </div>
+            <%= f.password_field :password, autocomplete: "current-password", placeholder: "パスワードを入力", class: "input input-bordered w-full bg-primary" %>
+          </div>
 
-  <!-- パスワード -->
-  <div class="flex items-center justify-between">
-    <%= f.label :password, "パスワード", class: "block text-sm/6 font-medium text-neutral"%>
-  </div>
-  <div class="mt-2">
-    <%= f.password_field :password, autocomplete: "current-password", class: "block w-full rounded-md bg-primary px-3 py-1.5 text-base text-neutral  outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm" %>
-  </div>
+          <div class="flex items-center">
+            <% if devise_mapping.rememberable? %>
+              <%= f.check_box :remember_me, class: "h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600" %>
+              <%= f.label :remember_me, "ログイン状態を保持する", class: "ml-2 block text-sm text-neutral" %>
+            <% end %>
+          </div>
 
-  <div class="mt-4 flex items-center">
-    <% if devise_mapping.rememberable? %>
-      <%= f.check_box :remember_me, class: "h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600" %>
-      <%= f.label :remember_me, "ログイン状態を保持する", class: "ml-2 block text-sm text-neutral" %>
+        <div class="actions">
+          <%= f.submit "ログイン", class: "btn btn-accent w-full" %>
+        </div>
+      </fieldset>
     <% end %>
-  </div>
 
-  <div class="actions mt-8 flex w-full justify-center rounded-md bg-accent px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-    <%= f.submit "ログイン" %>
-  </div>
-<% end %>
+    <div class="mt-4 md:mt-6 text-center">
+      <%= render "users/shared/links" %>
+    </div>
 
-  <div class="mt-6 flex justify-center block text-sm/6 font-medium text-neutral underline underline-offset-1">
-    <%= render "users/shared/links" %>
-  </div>
 
-  <div class="mt-6 flex justify-center block text-sm/6 font-medium text-neutral underline underline-offset-1">
-  <%= link_to "パスワードを忘れた場合", new_user_password_path %>
   </div>
 </div>
