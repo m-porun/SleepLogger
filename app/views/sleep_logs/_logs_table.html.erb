@@ -1,71 +1,71 @@
-<div id="sleep-logs-table">
-    <table class="table-fixed w-full text-center text-sm text-neutral print:leading-none print:py-[15px]">
+<div id="sleep-logs-table" class="relative overflow-x-auto overflow-y-auto h-[600px] md:h-auto print:h-auto print:overflow-visible">
+    <table class="table-fixed w-full text-center text-[12px] md:text-base print:text-sm print:leading-none print:py-[15px]">
       <thead>
-        <tr class="print:text-[12px]">
-          <th class="w-8 border border-secondary bg-primary print:w-8">日</th>
-          <th class="w-8 border border-secondary bg-primary print:w-8">曜日</th>
-          <th class="w-16 border border-secondary bg-primary print:w-14">就床時刻</th>
-          <th class="w-16 border border-secondary bg-primary print:w-14">就寝時刻</th>
-          <th class="w-16 border border-secondary bg-primary print:w-14">覚醒時刻</th>
-          <th class="w-16 border border-secondary bg-primary print:w-14">起床時刻</th>
-          <th class="w-24 border border-secondary bg-primary print:w-20">睡眠時間</th>
-          <th class="w-16 border border-secondary bg-primary print:w-8">中途覚醒(回)</th>
-          <th class="w-16 border border-secondary bg-primary print:w-8">昼寝時間(分)</th>
-          <th class="w-1/3 max-w-[33%] border border-secondary bg-primary print:w-56 print:max-w-1/3">備考</th>
+        <tr class="text-[10px] md:text-base print:text-[9px]">
+          <th class="border border-secondary bg-primary sticky top-0 z-10 md:static w-[5%] md:w-8 print:w-8">日</th>
+          <th class="border border-secondary bg-primary sticky top-0 z-10 md:static w-[5%] md:w-8 print:w-8">曜日</th>
+          <th class="border border-secondary bg-primary sticky top-0 z-10 md:static w-[12%] md:w-16 print:w-14">就床時刻</th>
+          <th class="border border-secondary bg-primary sticky top-0 z-10 md:static w-[12%] md:w-16 print:w-14">就寝時刻</th>
+          <th class="border border-secondary bg-primary sticky top-0 z-10 md:static w-[12%] md:w-16 print:w-14">覚醒時刻</th>
+          <th class="border border-secondary bg-primary sticky top-0 z-10 md:static w-[12%] md:w-16 print:w-14">起床時刻</th>
+          <th class="border border-secondary bg-primary sticky top-0 z-10 md:static w-[15%] md:w-24 print:w-20">睡眠時間</th>
+          <th class="border border-secondary bg-primary sticky top-0 z-10 md:static w-[8%] md:w-16 print:w-8 text-[8px] md:text-base print:text-[8px]">中途覚醒(回)</th>
+          <th class="border border-secondary bg-primary sticky top-0 z-10 md:static w-[8%] md:w-16 print:w-8 text-[8px] md:text-base print:text-[8px]">昼寝時間(分)</th>
+          <th class="border border-secondary bg-primary sticky top-0 z-10 md:static w-1/3 max-w-[33%] print:w-56 print:max-w-1/3 hidden md:table-cell">備考</th>
           <!-- 編集ボタンのみプリントしない -->
-          <th class="w-8 print:hidden border border-secondary bg-primary">編集</th>
+          <th class="border border-secondary bg-primary sticky top-0 z-10 md:static w-[9%] md:w-8 print:hidden">編集</th>
         </tr>
       </thead>
 
-  <% @sleep_logs.each do |sleep_log| %> <!-- 月初から月末までの日付を繰り返し表示する -->
-    <tr class="border border-secondary bg-primary">
-      <td class="border border-secondary bg-primary print:py-2"><%= sleep_log.sleep_date.day %></td>
-      <td class="border border-secondary bg-primary"><%= %w[日 月 火 水 木 金 土][sleep_log.sleep_date.wday] %></td>
-      <td class="border border-secondary bg-primary">
-        <%= sleep_log.go_to_bed_at&.strftime('%H:%M') || "--:--" %>
-      </td>
+      <% @sleep_logs.each do |sleep_log| %> <!-- 月初から月末までの日付を繰り返し表示する -->
+        <tr class="border border-secondary bg-primary">
+          <td class="border border-secondary bg-primary py-4 md:py-auto print:py-2"><%= sleep_log.sleep_date.day %></td>
+          <td class="border border-secondary bg-primary"><%= %w[日 月 火 水 木 金 土][sleep_log.sleep_date.wday] %></td>
+          <td class="border border-secondary bg-primary">
+            <%= sleep_log.go_to_bed_at&.strftime('%H:%M') || "--:--" %>
+          </td>
 
-      <td class="border border-secondary bg-primary">
-        <%= sleep_log.fell_asleep_at&.strftime('%H:%M') || "--:--" %>
-      </td>
+          <td class="border border-secondary bg-primary">
+            <%= sleep_log.fell_asleep_at&.strftime('%H:%M') || "--:--" %>
+          </td>
 
-      <td class="border border-secondary bg-primary">
-        <%= sleep_log.woke_up_at&.strftime('%H:%M') || "--:--" %>
-      </td>
+          <td class="border border-secondary bg-primary">
+            <%= sleep_log.woke_up_at&.strftime('%H:%M') || "--:--" %>
+          </td>
 
-      <td class="border border-secondary bg-primary">
-        <%= sleep_log.leave_bed_at&.strftime('%H:%M') || "--:--" %>
-      </td>
+          <td class="border border-secondary bg-primary">
+            <%= sleep_log.leave_bed_at&.strftime('%H:%M') || "--:--" %>
+          </td>
 
-      <td class="border border-secondary bg-primary">
-        <%= calculate_sleep_duration(sleep_log.fell_asleep_at, sleep_log.woke_up_at) || "--:--" %> <!-- 就寝時刻〜覚醒時刻の睡眠時間を計算する -->
-      </td>
+          <td class="border border-secondary bg-primary text-[9px] md:text-base print:text-xs">
+            <%= calculate_sleep_duration(sleep_log.fell_asleep_at, sleep_log.woke_up_at) || "--:--" %> <!-- 就寝時刻〜覚醒時刻の睡眠時間を計算する -->
+          </td>
 
-      <td class="border border-secondary bg-primary">
-        <%= sleep_log.awakening&.awakenings_count || 0 %>
-      </td>
+          <td class="border border-secondary bg-primary">
+            <%= sleep_log.awakening&.awakenings_count || 0 %>
+          </td>
 
-      <td class="border border-secondary bg-primary">
-          <%= sleep_log.napping_time&.napping_time || 0 %>
-      </td>
+          <td class="border border-secondary bg-primary">
+              <%= sleep_log.napping_time&.napping_time || 0 %>
+          </td>
 
-      <td class="p-2 border border-secondary bg-primary print:p-[5px] print:text-[9px]">
-        <%= sleep_log.comment&.comment || '' %>
-      </td>
+          <td class="p-2 border border-secondary bg-primary print:p-[5px] print:text-[9px] hidden md:table-cell">
+            <%= sleep_log.comment&.comment || '' %>
+          </td>
 
-      <td class="print:hidden border border-secondary bg-primary">
-          <% if sleep_log.persisted? %>
-            <button class="btn w-full" onclick="my_modal_3.showModal()">
-              <%= link_to 'edit_square', edit_sleep_log_path(sleep_log), data: { turbo_frame: 'sleep_log_frame'}, class: "material-symbols-outlined inline-flex" %>
-            </button>
-          <% else %>
-            <button class="btn w-full" onclick="my_modal_3.showModal()">
-              <%= link_to 'edit_square', new_sleep_log_path(sleep_date: sleep_log.sleep_date), data: { turbo_frame: 'sleep_log_frame'}, class: "material-symbols-outlined inline-flex" %> <!-- indexで設定した日付一覧から日付を取得 -->
-            </button>
-          <% end %>
-      </td>
-    </tr>
-  <% end %>
+          <td class="print:hidden border border-secondary bg-primary">
+              <% if sleep_log.persisted? %>
+                <button onclick="my_modal_3.showModal()">
+                  <%= link_to 'edit_square', edit_sleep_log_path(sleep_log), data: { turbo_frame: 'sleep_log_frame'}, class: "material-symbols-outlined text-base md:text-2xl hover:text-accent" %>
+                </button>
+              <% else %>
+                <button onclick="my_modal_3.showModal()">
+                  <%= link_to 'edit_square', new_sleep_log_path(sleep_date: sleep_log.sleep_date), data: { turbo_frame: 'sleep_log_frame'}, class: "material-symbols-outlined text-base md:text-2xl hover:text-accent" %> <!-- indexで設定した日付一覧から日付を取得 -->
+                </button>
+              <% end %>
+          </td>
+        </tr>
+      <% end %>
     </tbody>
   </table>
 </div>

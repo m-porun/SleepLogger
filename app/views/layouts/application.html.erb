@@ -17,28 +17,30 @@
     <link rel="icon" type="image/svg+xml" href="/icon.svg">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
     <link rel="manifest" href="/site.webmanifest">
-ß
+
     <!-- GoggleFont -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru&display=swap" rel="stylesheet">
 
     <!-- Icon -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=edit_square" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 
     <!-- Turbo使用時、アセットが更新されたときに再ロードする -->
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
   </head>
 
-  <body class="text-neutral kiwi-maru-regular base-100 w-screen print:flex print:items-center print:justify-center print:min-h-screen print:bg-transparent"> <!-- 印刷時中央寄せ&まじない程度に印刷時背景透明 -->
+  <body class="kiwi-maru-regular overflow-x-hidden w-screen bg-cover text- base-100 print:flex print:items-center print:justify-center print:min-h-screen print:bg-transparent"> <!-- 印刷時中央寄せ&まじない程度に印刷時背景透明 -->
     <% if user_signed_in? %>
       <%= render 'shared/header' %>
     <% else %>
       <%= render 'shared/before_login_header' %>
     <% end %>
     <%= render 'shared/flash' %>
-    <%= yield %>
+    <div class="py-20"> <!-- ヘッダーの高さがh-20 -->
+      <%= yield %>
+    </div>
     <%= render 'shared/footer' %>
   </body>
 </html>

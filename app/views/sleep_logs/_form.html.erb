@@ -1,8 +1,7 @@
 <!-- new, editファイルの中身 -->
-<div class="flex justify-center items-center">
   <!-- new_record?メソッドを使って、newかeditかでURLとmethodを切り替える -->
-  <%= form_with(model: sleep_log_form, url: sleep_log_form.new_record? ? sleep_logs_path : sleep_log_path(sleep_log_form.id), method: sleep_log_form.new_record? ? :post : :patch) do |f| %>
-    <!-- 全体エラーの表示ゾーン -->
+<div class="flex justify-center items-center py-6">
+  <%= form_with(model: sleep_log_form, url: sleep_log_form.new_record? ? sleep_logs_path : sleep_log_path(sleep_log_form.id), method: sleep_log_form.new_record? ? :post : :patch, class: "w-full max-w-lg mx-auto") do |f| %>
     <% if sleep_log_form.errors.any? %>
       <div class="flex justify-center items-center text-center mb-4 text-error font-bold">
         <ul>
@@ -13,74 +12,81 @@
       </div>
     <% end %>
 
-    <!-- フォームの中身 -->
-    <div>
-        <%= f.label :sleep_date, '起きた日付' %>
+    <div class="flex flex-col space-y-4">
+      <div class="mb-4">
+        <%= f.label :sleep_date, '起きた日付', class: "block text-sm font-medium mb-1" %>
         <% display_date = (f.object.sleep_date.presence || params[:sleep_date]) %>
-        <% display_date = display_date.to_date if display_date.is_a?(String) %> <!-- paramsのパラメーターをString型に変換 -->
-        <p><%= display_date.strftime('%Y年%-m月%-d日') if display_date.present? %></p>
-        <!-- 絶対に入力させたくないマン -->
-        <%= f.hidden_field :sleep_date, value: f.object.sleep_date.presence || params[:sleep_date], readonly: true, class: "input input-ghost" %> <!-- f.objectに値があれば日付を、なければ探す -->
+        <% display_date = display_date.to_date if display_date.is_a?(String) %>
+        <p class="text-base font-semibold "><%= display_date.strftime('%Y年%-m月%-d日') if display_date.present? %></p>
+        <%= f.hidden_field :sleep_date, value: f.object.sleep_date.presence || params[:sleep_date], readonly: true, class: "input input-ghost" %>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 md:gap-x-8 md:gap-y-4">
+        <div>
+          <%= f.label :go_to_bed_at, "昨夜布団に入った時刻", class: "block text-sm font-medium mb-1" %>
+          <%= f.time_field :go_to_bed_at, class: "input input-bordered w-full bg-primary" %>
+          <% if f.object.errors[:go_to_bed_at].any? %>
+            <p class="text-error text-xs mt-1"><%= f.object.errors[:go_to_bed_at].join(", ") %></p>
+          <% end %>
+        </div>
+
+        <div>
+          <%= f.label :fell_asleep_at, "昨夜寝た時刻", class: "block text-sm font-medium mb-1" %>
+          <%= f.time_field :fell_asleep_at, class: "input input-bordered w-full bg-primary" %>
+          <% if f.object.errors[:fell_asleep_at].any? %>
+            <p class="text-error text-xs mt-1"><%= f.object.errors[:fell_asleep_at].join(", ") %></p>
+          <% end %>
+        </div>
+
+        <div>
+          <%= f.label :woke_up_at, "今朝目覚めた時刻", class: "block text-sm font-medium mb-1" %>
+          <%= f.time_field :woke_up_at, class: "input input-bordered w-full bg-primary " %>
+          <% if f.object.errors[:woke_up_at].any? %>
+            <p class="text-error text-xs mt-1"><%= f.object.errors[:woke_up_at].join(", ") %></p>
+          <% end %>
+        </div>
+
+        <div>
+          <%= f.label :leave_bed_at, "今朝布団から出た時刻", class: "block text-sm font-medium mb-1" %>
+          <%= f.time_field :leave_bed_at, class: "input input-bordered w-full bg-primary" %>
+          <% if f.object.errors[:leave_bed_at].any? %>
+            <p class="text-error text-xs mt-1"><%= f.object.errors[:leave_bed_at].join(", ") %></p>
+          <% end %>
+        </div>
+      </div>
+
+      <div>
+        <%= f.label :awakenings_count, "中途覚醒（回数）", class: "block text-sm font-medium mb-1" %>
+        <%= f.number_field :awakenings_count, min: 0, class: "input input-bordered w-full bg-primary" %>
+        <% if f.object.errors[:awakenings_count].any? %>
+          <p class="text-error text-xs mt-1"><%= f.object.errors[:awakenings_count].join(", ") %></p>
+        <% end %>
+      </div>
+
+      <div>
+        <%= f.label :napping_time, "昼寝時間（分）", class: "block text-sm font-medium mb-1" %>
+        <%= f.number_field :napping_time, min: 0, class: "input input-bordered w-full bg-primary " %>
+        <% if f.object.errors[:napping_time].any? %>
+          <p class="text-error text-xs mt-1"><%= f.object.errors[:napping_time].join(", ") %></p>
+        <% end %>
+      </div>
+
+      <div>
+        <%= f.label :comment, "備考(42文字まで)", class: "block text-sm font-medium mb-1" %>
+        <%= f.text_area :comment, max: 42,
+                          class: "textarea textarea-bordered w-full bg-primary indent-1 text-sm resize-y",
+                          placeholder:"昨夜はよく眠れましたか？　薬は飲みましたか？",
+                          data: { controller: "textarea-autoresize", action: "input->textarea-autoresize#resize" } %>
+        <% if f.object.errors[:comment].any? %>
+          <p class="text-error text-xs mt-1"><%= f.object.errors[:comment].join(", ") %></p>
+        <% end %>
+      </div>
+
+      <div>
+        <%= f.submit sleep_log_form.new_record? ? "登録" : "更新", class: "flex w-full rounded rounded-md bg-accent hover:bg-blue-600 text-primary font-bold py-2 px-4"%>
+      </div>
     </div>
 
-    <div>
-      <%= f.label :go_to_bed_at, "昨夜布団に入った時刻" %>
-      <%= f.datetime_field :go_to_bed_at, class: "input input-bordered bg-primary" %>
-      <% if f.object.errors[:go_to_bed_at].any? %>
-        <p class="text-error text-xs mt-1"><%= f.object.errors[:go_to_bed_at].join(", ") %></p>
-      <% end %>
-    </div>
 
-    <div>
-      <%= f.label :fell_asleep_at, "昨夜寝た時刻" %>
-      <%= f.datetime_field :fell_asleep_at, class: "input input-bordered bg-primary" %>
-      <% if f.object.errors[:fell_asleep_at].any? %>
-        <p class="text-error text-xs mt-1"><%= f.object.errors[:fell_asleep_at].join(", ") %></p>
-      <% end %>
-    </div>
-
-    <div>
-      <%= f.label :woke_up_at, "今朝目覚めた時刻" %>
-      <%= f.datetime_field :woke_up_at, class: "input input-bordered bg-primary" %>
-      <% if f.object.errors[:woke_up_at].any? %>
-        <p class="text-error text-xs mt-1"><%= f.object.errors[:woke_up_at].join(", ") %></p>
-      <% end %>
-    </div>
-
-    <div>
-      <%= f.label :leave_bed_at, "今朝布団から出た時刻" %>
-      <%= f.datetime_field :leave_bed_at, class: "input input-bordered bg-primary" %>
-      <% if f.object.errors[:leave_bed_at].any? %>
-        <p class="text-error text-xs mt-1"><%= f.object.errors[:leave_bed_at].join(", ") %></p>
-      <% end %>
-    </div>
-
-    <div>
-      <%= f.label :awakenings_count, "中途覚醒（回数）" %>
-      <%= f.number_field :awakenings_count, min: 0 %> <!-- デフォルトで0が入力されている -->
-      <% if f.object.errors[:awakenings_count].any? %>
-        <p class="text-error text-xs mt-1"><%= f.object.errors[:awakenings_count].join(", ") %></p>
-      <% end %>
-    </div>
-
-    <div>
-      <%= f.label :napping_time, "昼寝時間（分）" %>
-      <%= f.number_field :napping_time, min: 0 %> <!-- デフォルトで0が入力されている -->
-      <% if f.object.errors[:napping_time].any? %>
-        <p class="text-error text-xs mt-1"><%= f.object.errors[:napping_time].join(", ") %></p>
-      <% end %>
-    </div>
-
-    <div>
-      <%= f.label :comment, "備考(42文字まで)" %>
-      <%= f.text_area :comment, max: 42 %>
-      <% if f.object.errors[:comment].any? %>
-        <p class="text-error text-xs mt-1"><%= f.object.errors[:comment].join(", ") %></p>
-      <% end %>
-    </div>
-
-    <div class="flex justify-end">
-      <%= f.submit sleep_log_form.new_record? ? "登録" : "更新", class: "bg-accent hover:bg-blue-600 text-primary font-bold py-2 px-4 rounded"%>
-    </div>
   <% end %>
 </div>
