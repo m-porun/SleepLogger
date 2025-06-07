@@ -37,7 +37,7 @@ class SleepLogForm
 
   # 純粋なバリデーション祭の直後にカスタムバリデート祭開催
   validate :validate_sleep_times_order # 日時の論理性
-  #validate :validate_sleep_times_range # 日付の論理性
+  # validate :validate_sleep_times_range # 日付の論理性
 
   # initializeをオーバーライドできない fetch_valueとは:Rubyのメソッド→initializeオーバーライドしてはいかん→fetchにattributes
   def initialize(attributes = nil, sleep_log: SleepLog.new)
