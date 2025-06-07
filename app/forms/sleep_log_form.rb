@@ -59,7 +59,8 @@ class SleepLogForm
     # Time型をDateTime型に変換
     %i[go_to_bed_at fell_asleep_at woke_up_at leave_bed_at].each do |column|
       time_value = attributes[column.to_s] # Formオブジェクトで同じカラム名がついているattributesさんを呼び出し
-      sleep_log[column] = convert_to_datetime(sleep_date, time_value) if time_value.present?
+      # もしTime入力があればDateTime型に変換、未入力であれば明示的にnilを代入することで、edit画面で未入力した際にバリデーションエラーを発生させる
+      sleep_log[column] = time_value.present? ? convert_to_datetime(sleep_date, time_value) : nil
     end
 
     # 起床日が就床・就寝時刻よりも前にならないように変換
@@ -99,6 +100,7 @@ class SleepLogForm
   # 覚醒時刻が就床時刻・入眠時刻よりも後にならないよう修正
   def adjust_datetime_order(sleep_log)
     pp "日時修正"
+    # ここガチガチに固めておかないと、カスタムバリデータまで貫通してしまう
     return unless sleep_log.go_to_bed_at.present? &&
                 sleep_log.fell_asleep_at.present? &&
                 sleep_log.woke_up_at.present? &&
@@ -109,6 +111,7 @@ class SleepLogForm
       end
     end
 
+    # DateTime型に加工した際に2000-01-01になっているので、改めて教え込ませる
     self.go_to_bed_at = sleep_log.go_to_bed_at
     self.fell_asleep_at = sleep_log.fell_asleep_at
     self.woke_up_at = sleep_log.woke_up_at
