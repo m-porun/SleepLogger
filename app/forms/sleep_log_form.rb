@@ -2,7 +2,7 @@ class SleepLogForm
   # ActiveModelを使ってフォームバリデーション
   include ActiveModel::Model # 通常のモデルと同じくバリデーションを使えるように
   include ActiveModel::Attributes # attr_accessorと同じように属性が使える
-  include ActiveModel::Validations::Callbacks # before_validation用
+  # include ActiveModel::Validations::Callbacks # before_validation用
 
   # パラメータの読み書きを許可する。指定の属性に変換してくれる。デフォルト値も設定可能。各モデルで扱いたいカラム名をインスタンス変数名としている。
   attribute :user_id, :integer
@@ -69,8 +69,6 @@ class SleepLogForm
     # sleep_log の値を使って self に代入（formオブジェクトの属性を更新）
 
     # バリデーションに引っかかる場合は以降の処理にせずfalseをコントローラーに返す
-    #binding.pry
-    # binding.pry
     return false unless valid? # 上記のvalidatesをチェック
 
     # Formオブジェクトの値をビルドしたsleep_logの子モデルにセット
@@ -101,7 +99,10 @@ class SleepLogForm
   # 覚醒時刻が就床時刻・入眠時刻よりも後にならないよう修正
   def adjust_datetime_order(sleep_log)
     pp "日時修正"
-    return unless sleep_log.woke_up_at
+    return unless sleep_log.go_to_bed_at.present? &&
+                sleep_log.fell_asleep_at.present? &&
+                sleep_log.woke_up_at.present? &&
+                sleep_log.leave_bed_at.present?
     %i[go_to_bed_at fell_asleep_at].each do |fix_date|
       if sleep_log[fix_date] > sleep_log.woke_up_at
         sleep_log[fix_date] -= 1.day # 前夜就寝とする
@@ -150,44 +151,38 @@ class SleepLogForm
   # カスタムバリデータ祭
   def validate_sleep_times_order
     return false if go_to_bed_at.blank? || fell_asleep_at.blank? || woke_up_at.blank? || leave_bed_at.blank?
-
-
-    Rails.logger.debug("バリデーション前 fell_asleep_at: #{fell_asleep_at}, woke_up_at: #{woke_up_at}")
     # go_to_bed_atがfell_asleep_atより後の日時だった場合
     if go_to_bed_at > fell_asleep_at
       errors.add(:go_to_bed_at, "は昨夜寝た時刻より前の時刻にしてください")
     end
-
     # fell_asleep_atがwoke_up_atより後の日時だった場合
     if fell_asleep_at > woke_up_at
       errors.add(:fell_asleep_at, "は今朝目覚めた時刻より前の時刻にしてください")
     end
-
     # fell_asleep_atがleave_bed_atより後の日時だった場合
     if fell_asleep_at > leave_bed_at
       errors.add(:fell_asleep_at, "は今朝布団から出た時刻より前の時刻にしてください")
     end
-
     # woke_up_atがleave_bed_atより後の日時だった場合
     if woke_up_at > leave_bed_at
       errors.add(:woke_up_at, "は今朝布団から出た時刻より前の時刻にしてください")
     end
   end
 
-  def validate_sleep_times_range
-    return if go_to_bed_at.blank? || fell_asleep_at.blank? || woke_up_at.blank? || leave_bed_at.blank?
-    if go_to_bed_at.present? && ![ sleep_date, sleep_date - 1.day ].include?(go_to_bed_at.to_date)
-      errors.add(:go_to_bed_at, "寝すぎです。日付を見直してください")
-    end
-    if fell_asleep_at.present? && ![ sleep_date, sleep_date - 1.day ].include?(fell_asleep_at.to_date)
-      errors.add(:fell_asleep_at, "寝すぎです。日付を見直してください")
-    end
+  # def validate_sleep_times_range
+  #   return if go_to_bed_at.blank? || fell_asleep_at.blank? || woke_up_at.blank? || leave_bed_at.blank?
+  #   if go_to_bed_at.present? && ![ sleep_date, sleep_date - 1.day ].include?(go_to_bed_at.to_date)
+  #     errors.add(:go_to_bed_at, "寝すぎです。日付を見直してください")
+  #   end
+  #   if fell_asleep_at.present? && ![ sleep_date, sleep_date - 1.day ].include?(fell_asleep_at.to_date)
+  #     errors.add(:fell_asleep_at, "寝すぎです。日付を見直してください")
+  #   end
 
-    if woke_up_at.present? && woke_up_at.to_date > sleep_date
-      errors.add(:woke_up_at, "こんにちは未来人。起きた日付よりも後の日付にできません")
-    end
-    if leave_bed_at.present? && leave_bed_at.to_date > sleep_date
-      errors.add(:leave_bed_at, "こんにちは未来人。起きた日付よりも後の日付にできません")
-    end
-  end
+  #   if woke_up_at.present? && woke_up_at.to_date > sleep_date
+  #     errors.add(:woke_up_at, "こんにちは未来人。起きた日付よりも後の日付にできません")
+  #   end
+  #   if leave_bed_at.present? && leave_bed_at.to_date > sleep_date
+  #     errors.add(:leave_bed_at, "こんにちは未来人。起きた日付よりも後の日付にできません")
+  #   end
+  # end
 end
