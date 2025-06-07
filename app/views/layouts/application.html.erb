@@ -31,7 +31,7 @@
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
   </head>
 
-  <body class="kiwi-maru-regular overflow-x-hidden w-screen bg-cover text-neutral base-100 print:flex print:items-center print:justify-center print:min-h-screen print:bg-transparent"> <!-- 印刷時中央寄せ&まじない程度に印刷時背景透明 -->
+  <body class="kiwi-maru-regular overflow-x-hidden w-screen bg-cover text- base-100 print:flex print:items-center print:justify-center print:min-h-screen print:bg-transparent"> <!-- 印刷時中央寄せ&まじない程度に印刷時背景透明 -->
     <% if user_signed_in? %>
       <%= render 'shared/header' %>
     <% else %>
