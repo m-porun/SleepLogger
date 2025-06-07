@@ -33,10 +33,10 @@ class SleepLogForm
   validates :comment, length: { maximum: 42 }
 
   # バリデーション前に時刻の論理的な日付調整を行う
-  #before_validation :adjust_datetimes_for_sleep_cycle
+  # after_validation :validate_sleep_times_order
 
   # 純粋なバリデーション祭の直後にカスタムバリデート祭開催
-  #validate :validate_sleep_times_order # 日時の論理性
+  validate :validate_sleep_times_order # 日時の論理性
   #validate :validate_sleep_times_range # 日付の論理性
 
   # initializeをオーバーライドできない fetch_valueとは:Rubyのメソッド→initializeオーバーライドしてはいかん→fetchにattributes
@@ -52,7 +52,7 @@ class SleepLogForm
 
   def save
     pp "saveメソッド"
-    return false unless valid? # 上記のvalidatesをチェック
+    # binding.pry
     # 結局saveは一度しかしてないのでいらないのではActiveRecord::Base.transaction do
     # 新規セーブまたは更新セーブを開始する(ユーザーidと睡眠日から検索する)
     sleep_log = SleepLog.find_or_initialize_by(user_id: user_id, sleep_date: sleep_date)
@@ -64,15 +64,14 @@ class SleepLogForm
 
     # 起床日が就床・就寝時刻よりも前にならないように変換
     adjust_datetime_order(sleep_log)
+
+
+    # sleep_log の値を使って self に代入（formオブジェクトの属性を更新）
+
     # バリデーションに引っかかる場合は以降の処理にせずfalseをコントローラーに返す
-
-
-
-    # # 親モデルカラムにフォームの値をセット
-    # sleep_log.go_to_bed_at = go_to_bed_at
-    # sleep_log.fell_asleep_at = fell_asleep_at
-    # sleep_log.woke_up_at = woke_up_at
-    # sleep_log.leave_bed_at = leave_bed_at
+    #binding.pry
+    # binding.pry
+    return false unless valid? # 上記のvalidatesをチェック
 
     # Formオブジェクトの値をビルドしたsleep_logの子モデルにセット
     set_child_models(sleep_log)
@@ -94,19 +93,25 @@ class SleepLogForm
   private
 
   def convert_to_datetime(sleep_date, time_value)
-    return if time_value.blank? # もし時間入力がなければ返す
+    pp "DateTime型に加工"
+    return nil if time_value.blank? # もし時間入力がなければ返す
     "#{sleep_date} #{time_value}".in_time_zone # "YYYY-MM-DD + time_value: HH:MM" をローカル時間で保存
   end
 
   # 覚醒時刻が就床時刻・入眠時刻よりも後にならないよう修正
   def adjust_datetime_order(sleep_log)
-    if sleep_log.woke_up_at.present?
-      %i[go_to_bed_at fell_asleep_at].each do |fix_date|
-        if sleep_log[fix_date] > sleep_log.woke_up_at
-          sleep_log[fix_date] -= 1.day # 前夜就寝とする
-        end
+    pp "日時修正"
+    return unless sleep_log.woke_up_at
+    %i[go_to_bed_at fell_asleep_at].each do |fix_date|
+      if sleep_log[fix_date] > sleep_log.woke_up_at
+        sleep_log[fix_date] -= 1.day # 前夜就寝とする
       end
     end
+
+    self.go_to_bed_at = sleep_log.go_to_bed_at
+    self.fell_asleep_at = sleep_log.fell_asleep_at
+    self.woke_up_at = sleep_log.woke_up_at
+    self.leave_bed_at = sleep_log.leave_bed_at
   end
 
   # 子モデルの設定
@@ -145,6 +150,9 @@ class SleepLogForm
   # カスタムバリデータ祭
   def validate_sleep_times_order
     return false if go_to_bed_at.blank? || fell_asleep_at.blank? || woke_up_at.blank? || leave_bed_at.blank?
+
+
+    Rails.logger.debug("バリデーション前 fell_asleep_at: #{fell_asleep_at}, woke_up_at: #{woke_up_at}")
     # go_to_bed_atがfell_asleep_atより後の日時だった場合
     if go_to_bed_at > fell_asleep_at
       errors.add(:go_to_bed_at, "は昨夜寝た時刻より前の時刻にしてください")
