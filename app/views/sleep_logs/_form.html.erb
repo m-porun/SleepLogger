@@ -71,17 +71,19 @@
         <% end %>
       </div>
 
+      <!-- 最大文字数取得 -->
+      <% max_length = SleepLogForm.validators_on(:comment).find { |v| v.kind == :length }.options[:maximum] %>
       <div data-controller="character-counter">
-        <%= f.label :comment, "備考(42文字まで)", class: "block text-sm font-medium mb-1" %>
+        <%= f.label :comment, "備考", class: "block text-sm font-medium mb-1" %>
 
-        <%= f.text_area :comment, maxlength: 42,
+        <%= f.text_area :comment, maxlength: max_length,
           class: "textarea textarea-bordered w-full bg-primary indent-1 text-sm resize-y",
           placeholder: "昨夜はよく眠れましたか？　薬は飲みましたか？",
           data: {
             "character-counter-target": "input"
           } %>
         <p class="text-end text-sm">
-          <strong data-character-counter-target="counter"></strong>/42文字
+          <strong data-character-counter-target="counter"></strong>/<%= max_length %>文字
         </p>
 
 
