@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  get "/headers/how_to_use", to: "headers#how_to_use"
   get "footers/terms_of_service"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
