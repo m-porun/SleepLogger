@@ -29,6 +29,9 @@
     <!-- Turbo使用時、アセットが更新されたときに再ロードする -->
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
+
+    <!-- OGP画像 -->
+    <%= display_meta_tags(default_meta_tags) %>
   </head>
 
   <body class="kiwi-maru-regular overflow-x-hidden w-screen bg-cover text- base-100 print:flex print:items-center print:justify-center print:min-h-screen print:bg-transparent"> <!-- 印刷時中央寄せ&まじない程度に印刷時背景透明 -->
