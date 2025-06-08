@@ -25,14 +25,10 @@ RUN rm -rf /var/lib/apt/lists /var/cache/apt/archives
 ENV RAILS_ENV="production" \
     BUNDLE_DEPLOYMENT="1" \
     BUNDLE_PATH="/usr/local/bundle" \
-    BUNDLE_WITHOUT="development" \
-    TZ=UTC
+    BUNDLE_WITHOUT="development"
 
 # Throw-away build stage to reduce size of final image
 FROM base AS build
-
-# 祈りのUTCタイムゾーン
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Install packages needed to build gems and node modules ファイナルステージ！
 RUN apt-get update -qq && \
