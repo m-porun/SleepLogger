@@ -32,6 +32,16 @@
 
     <!-- OGP画像 -->
     <%= display_meta_tags(default_meta_tags) %>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GJDR2NW3K9"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-GJDR2NW3K9');
+    </script>
   </head>
 
   <body class="kiwi-maru-regular overflow-x-hidden w-screen bg-cover text- base-100 print:flex print:items-center print:justify-center print:min-h-screen print:bg-transparent"> <!-- 印刷時中央寄せ&まじない程度に印刷時背景透明 -->
