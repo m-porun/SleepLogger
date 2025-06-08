@@ -71,15 +71,20 @@
         <% end %>
       </div>
 
-      <div>
+      <div data-controller="character-counter">
         <%= f.label :comment, "備考(42文字まで)", class: "block text-sm font-medium mb-1" %>
-        <%= f.text_area :comment, max: 42,
-                          class: "textarea textarea-bordered w-full bg-primary indent-1 text-sm resize-y",
-                          placeholder:"昨夜はよく眠れましたか？　薬は飲みましたか？",
-                          data: { controller: "textarea-autoresize", action: "input->textarea-autoresize#resize" } %>
-        <% if f.object.errors[:comment].any? %>
-          <p class="text-error text-xs mt-1"><%= f.object.errors[:comment].join(", ") %></p>
-        <% end %>
+
+        <%= f.text_area :comment, maxlength: 42,
+          class: "textarea textarea-bordered w-full bg-primary indent-1 text-sm resize-y",
+          placeholder: "昨夜はよく眠れましたか？　薬は飲みましたか？",
+          data: {
+            "character-counter-target": "input"
+          } %>
+        <p class="text-end text-sm">
+          <strong data-character-counter-target="counter"></strong>/42文字
+        </p>
+
+
       </div>
 
       <div>
