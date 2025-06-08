@@ -31,6 +31,9 @@ ENV RAILS_ENV="production" \
 # Throw-away build stage to reduce size of final image
 FROM base AS build
 
+# 祈りのUTCタイムゾーン
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 # Install packages needed to build gems and node modules ファイナルステージ！
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y \
