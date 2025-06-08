@@ -67,5 +67,5 @@ Rails.application.configure do
 
   # 日本時間をテスト環境にも適用
   config.time_zone = "Asia/Tokyo"
-  config.active_record.default_timezone = :utc
+  config.active_record.default_timezone = :local
 end
