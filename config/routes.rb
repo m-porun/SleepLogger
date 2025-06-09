@@ -45,6 +45,6 @@ Rails.application.routes.draw do
     get "users/unsubscribe_confirm", to: "users/registrations#unsubscribe_confirm"
     delete "users/destroy", to: "users/registrations#destroy"
     # Defines the root path route ('/') トップページ
-    root to: "sleep_logs#index"
+    root to: "headers#how_to_use"
   end
 end
