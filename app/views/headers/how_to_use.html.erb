@@ -1,31 +1,31 @@
-<div class="relative flex flex-col justify-center items-center mx-4 md:mx-16 py-6 md:py-16 flex min-h-full">
+<div class="relative flex flex-col justify-center items-center mx-4 md:mx-16 lg:mx-48 py-6 md:py-16 flex min-h-full">
   <div class="card bg-secondary w-full shadow-sm p-8 md:p-16">
-    <div class="mx-0 lg:mx-32 space-y-8 md:space-y-16">
+    <div class="space-y-8 md:space-y-16 lg:space-y-12">
 
-      <div>
-        <%= image_tag("how_to_use/ogp_original.png", class: "rounded-xl w-full h-full object-cover") %>
+      <div class="flex justify-center">
+        <%= image_tag("how_to_use/ogp_original.png", class: "rounded-xl w-full lg:w-1/2 h-full object-cover") %>
       </div>
 
-      <div class="card bg-base-100 w-full shadow-sm p-8 space-y-8 border border-base-300">
-        <div class="font-semibold">すいみんにっしへようこそ</div>
-        <div class="text-sm">
+      <div class="card bg-base-100 w-full p-8 lg:p-16 space-y-8 border border-base-300">
+        <div class="text-base lg:text-2xl font-semibold text-center">すいみんにっしへようこそ</div>
+        <div class="text-sm lg:text-xl">
           このアプリケーションは、睡眠外来で提出しなければならない睡眠日誌を、フォームに入力するだけでPDFデータに出力できるツールサービスです。</br>
           スマートフォンの睡眠アプリなどで記録した睡眠時間を入力・保存することで、毎日の睡眠状況を把握できます。
         </div>
       </div>
 
       <div>
-        <h2 class="text-center text-2xl/9 font-bold">使い方</h2>
+        <h2 class="text-center text-xl font-bold">使い方</h2>
       </div>
 
       <div class="collapse collapse-plus bg-base-100 border border-base-300">
         <input type="checkbox" name="my-accordion-3" />
-        <div class="collapse-title font-semibold">まずはログインします</div>
-          <div class="collapse-content flex flex-col-reverse md:flex-row justify-center items-center gap-6">
-            <div class="w-full md:w-1/2">
+        <div class="collapse-title text-base lg:text-2xl font-semibold text-center">まずはログインします</div>
+          <div class="collapse-content flex flex-col-reverse md:flex-row justify-center items-center gap-8 md:gap-12 lg:gap20 mx-4 md:mx-10 lg:max-mx-20">
+            <div class="w-full md:w-1/2 lg:my-6">
               <%= image_tag("how_to_use/01_logs_table.png", class: "rounded-xl w-full h-auto object-cover") %>
             </div>
-            <div class="w-full md:w-1/2 text-sm">
+            <div class="w-full md:w-1/2 lg:my-6 text-sm lg:text-xl lg:my-6">
               <%= link_to "新規登録", new_user_registration_path, class: "underline underline-accent text-accent" %>、または
               <%= link_to "ログイン", new_user_session_path, class: "underline underline-accent text-accent" %>します。<br>
               ログイン後、今月の睡眠記録一覧を見ることができます。
@@ -35,12 +35,12 @@
 
       <div class="collapse collapse-plus bg-base-100 border border-base-300">
         <input type="checkbox" name="my-accordion-3" />
-        <div class="collapse-title font-semibold">年月選択</div>
-          <div class="collapse-content flex flex-col-reverse md:flex-row justify-center items-center gap-6">
-            <div class="w-full md:w-1/2">
+        <div class="collapse-title text-base lg:text-2xl font-semibold text-center">年月選択</div>
+          <div class="collapse-content flex flex-col-reverse md:flex-row justify-center items-center gap-8 md:gap-12 lg:gap20 mx-4 md:mx-10 lg:max-mx-20">
+            <div class="w-full md:w-1/2 lg:my-6 text-sm lg:text-xl lg:my-6">
               <%= image_tag("how_to_use/02_choice_month.jpg", class: "rounded-xl w-fit h-auto object-cover") %>
             </div>
-            <div class="w-full md:w-1/2 text-sm">
+            <div class="w-full md:w-1/2 lg:my-6 text-sm lg:text-xl lg:my-6">
               年月選択ボタンを押すと、記録したい月を選択できます。
             </div>
           </div>
@@ -48,12 +48,12 @@
 
       <div class="collapse collapse-plus bg-base-100 border border-base-300">
         <input type="checkbox" name="my-accordion-3" />
-        <div class="collapse-title font-semibold">睡眠を記録する</div>
-          <div class="collapse-content flex flex-col-reverse md:flex-row justify-center items-center gap-6">
-            <div class="w-full md:w-1/2">
+        <div class="collapse-title text-base lg:text-2xl font-semibold text-center">睡眠を記録する</div>
+          <div class="collapse-content flex flex-col-reverse md:flex-row justify-center items-center gap-8 md:gap-12 lg:gap20 mx-4 md:mx-10 lg:max-mx-20">
+            <div class="w-full md:w-1/2 lg:my-6">
               <%= image_tag("how_to_use/03_record_a_sleep_log.jpg", class: "rounded-xl w-full h-auto object-cover") %>
             </div>
-            <div class="w-full md:w-1/2 text-sm">
+            <div class="w-full md:w-1/2 lg:my-6 text-sm lg:text-xl lg:my-6">
               <p>編集ボタンを押すことで、日々の記録を入力できます。</p>
               <ul class="list-disc ml-4">
                 <li>中途覚醒：寝てる途中で目覚めた回数を入力してください。</li>
@@ -66,12 +66,12 @@
 
       <div class="collapse collapse-plus bg-base-100 border border-base-300">
         <input type="checkbox" name="my-accordion-3" />
-        <div class="collapse-title font-semibold">記録後、即座に反映されます</div>
-          <div class="collapse-content flex flex-col-reverse md:flex-row justify-center items-center gap-6">
-            <div class="w-full md:w-1/2">
+        <div class="collapse-title text-base lg:text-2xl font-semibold text-center">記録後、即座に反映されます</div>
+          <div class="collapse-content flex flex-col-reverse md:flex-row justify-center items-center gap-8 md:gap-12 lg:gap20 mx-4 md:mx-10 lg:max-mx-20">
+            <div class="w-full md:w-1/2 lg:my-6">
               <%= image_tag("how_to_use/04_recorded.jpg", class: "rounded-xl w-fit h-auto object-cover") %>
             </div>
-            <div class="w-full md:w-1/2 text-sm">
+            <div class="w-full md:w-1/2 lg:my-6 text-sm lg:text-xl">
               登録が完了すると、入力した内容が一覧表に反映されます。
             </div>
           </div>
@@ -80,12 +80,12 @@
 
       <div class="collapse collapse-plus bg-base-100 border border-base-300">
         <input type="checkbox" name="my-accordion-3" />
-        <div class="collapse-title font-semibold">記録を印刷する</div>
-          <div class="collapse-content flex flex-col-reverse md:flex-row justify-center items-center gap-6">
-            <div class="w-full md:w-1/2">
+        <div class="collapse-title text-base lg:text-2xl font-semibold text-center">記録を印刷する</div>
+          <div class="collapse-content flex flex-col-reverse md:flex-row justify-center items-center gap-8 md:gap-12 lg:gap20 mx-4 md:mx-10 lg:max-mx-20">
+            <div class="w-full md:w-1/2 lg:my-6">
               <%= image_tag("how_to_use/05_print_button.jpg", class: "rounded-xl w-fit h-auto object-cover") %>
             </div>
-            <div class="w-full md:w-1/2 text-sm">
+            <div class="w-full md:w-1/2 lg:my-6 text-sm lg:text-xl">
               その月の睡眠記録を、印刷することができます。
             </div>
           </div>
@@ -93,12 +93,12 @@
 
       <div class="collapse collapse-plus bg-base-100 border border-base-300">
         <input type="checkbox" name="my-accordion-3" />
-        <div class="collapse-title font-semibold">印刷ボタンを押すと、印刷ダイアログが表示されます。</div>
-          <div class="collapse-content flex flex-col-reverse md:flex-row justify-center items-center gap-6">
-            <div class="w-full md:w-1/2">
+        <div class="collapse-title text-base lg:text-2xl font-semibold text-center">印刷ボタンを押すと、印刷ダイアログが表示されます。</div>
+          <div class="collapse-content flex flex-col-reverse md:flex-row justify-center items-center gap-8 md:gap-12 lg:gap20 mx-4 md:mx-10 lg:max-mx-20">
+            <div class="w-full md:w-1/2 lg:my-6">
               <%= image_tag("how_to_use/06_print_dialog.jpg", class: "rounded-xl w-fit h-auto object-cover") %>
             </div>
-            <div class="w-full md:w-1/2 text-sm">
+            <div class="w-full md:w-1/2 lg:my-6 text-sm lg:text-xl">
               なるべくA4用紙1枚に収まるようにしていますが、もし2枚以上になってしまう場合はご一報ください。
             </div>
           </div>
@@ -106,12 +106,12 @@
 
       <div class="collapse collapse-plus bg-base-100 border border-base-300">
         <input type="checkbox" name="my-accordion-3" />
-        <div class="collapse-title font-semibold">このまま睡眠日誌として提出できるぜ！</div>
-          <div class="collapse-content flex flex-col-reverse md:flex-row justify-center items-center gap-6">
-            <div class="w-full md:w-1/2">
+        <div class="collapse-title text-base lg:text-2xl font-semibold text-center">このまま睡眠日誌として提出できるぜ！</div>
+          <div class="collapse-content flex flex-col-reverse md:flex-row justify-center items-center gap-8 md:gap-12 lg:gap20 mx-4 md:mx-10 lg:max-mx-20">
+            <div class="w-full md:w-1/2 lg:my-6">
               <%= image_tag("how_to_use/07_printed.jpg", class: "rounded-xl w-fit h-auto object-cover") %>
             </div>
-            <div class="w-full md:w-1/2 text-sm">
+            <div class="w-full md:w-1/2 lg:my-6 text-sm lg:text-xl">
               もう手書きとはおさらばだ！</br>
               ※睡眠クリニック指定の睡眠日誌フォーマットがない場合
             </div>
