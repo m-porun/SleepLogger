@@ -2,7 +2,7 @@ class SleepLogForm
   # ActiveModelを使ってフォームバリデーション
   include ActiveModel::Model # 通常のモデルと同じくバリデーションを使えるように
   include ActiveModel::Attributes # attr_accessorと同じように属性が使える
-  #include ActiveModel::Validations::Callbacks # before_validation用
+  # include ActiveModel::Validations::Callbacks # before_validation用
 
   # パラメータの読み書きを許可する。指定の属性に変換してくれる。デフォルト値も設定可能。各モデルで扱いたいカラム名をインスタンス変数名としている。
   attribute :user_id, :integer
