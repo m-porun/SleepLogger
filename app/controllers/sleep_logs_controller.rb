@@ -141,13 +141,17 @@ class SleepLogsController < ApplicationController
     end
     @start_date = @selected_date.beginning_of_month # 1日or本日の日付の月初を設定
     @end_date = @selected_date.end_of_month # 1日or本日の月末を設定
-    sleep_logs = current_user.sleep_logs.where(sleep_date: @start_date..@end_date).includes(:awakening, :napping_time, :comment) # 子クラスを含むsleep_logモデルを月初〜月末分取得する
+    sleep_logs = current_user.sleep_logs # 現ユーザーの睡眠記録の中から
+                             .where(sleep_date: @start_date..@end_date) # その月の月初から月末までの日付のみ
+                             .includes(:awakening, :napping_time, :comment) # 子クラスを含むsleep_logモデルを月初〜月末分取得する
+                             .index_by(&:sleep_date) # sleep_dateをキー・日付をバリューとしてハッシュ変換
 
     all_dates = (@start_date..@end_date).to_a # 月初から月末までの範囲オブジェクトを配列にする
 
     # データが存在しない日は日付で埋める
     @sleep_logs = all_dates.map do |sleep_date|
-      sleep_logs.find { |sleep_log| sleep_log.sleep_date == sleep_date } || current_user.sleep_logs.build(sleep_date: sleep_date)
+      # sleep_dateキーから値を探す
+      sleep_logs[sleep_date] || current_user.sleep_logs.build(sleep_date: sleep_date)
     end
   end
 end
