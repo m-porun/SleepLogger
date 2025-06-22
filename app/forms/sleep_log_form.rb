@@ -33,7 +33,7 @@ class SleepLogForm
   validates :comment, length: { maximum: 42 }
 
   # バリデーション前に時刻の論理的な日付調整を行う
-  # after_validation :validate_sleep_times_order
+  # after_validation :validated_flash
 
   # 純粋なバリデーション祭の直後にカスタムバリデート祭開催
   validate :validate_sleep_times_order # 日時の論理性
@@ -70,6 +70,7 @@ class SleepLogForm
     # sleep_log の値を使って self に代入（formオブジェクトの属性を更新）
 
     # バリデーションに引っかかる場合は以降の処理にせずfalseをコントローラーに返す
+    pp "バリデーションはつどう"
     return false unless valid? # 上記のvalidatesをチェック
 
     # Formオブジェクトの値をビルドしたsleep_logの子モデルにセット
