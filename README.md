@@ -1,3 +1,5 @@
+[![CI](https://github.com/m-porun/SleepLogger/actions/workflows/ci.yml/badge.svg)](https://github.com/m-porun/SleepLogger/actions/workflows/ci.yml)
+
 # 🛌すいみんにっし✍️
 <br>
 
