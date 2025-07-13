@@ -1,0 +1,37 @@
+ja:
+  activerecord:
+    models:
+      user: ユーザー
+      sns_credential: SNSクレデンシャル
+      sleep_log: 睡眠記録
+      awakening: 中途覚醒
+      napping_time: 昼寝
+      comment: コメント
+    attributes:
+      user:
+        name: お名前
+        email: メールアドレス
+        encrypted_password: パスワード
+        reset_password_token: リセットパスワードトークン
+        reset_password_sent_at: リセットパスワード送信タイミング
+        remember_created_at: パスワードの記憶
+      sns_credential: {}
+      sleep_log:
+        go_to_bed_at: 昨夜布団に入った時刻
+        fell_asleep_at: 昨夜寝た時刻
+        woke_up_at: 今朝目覚めた時刻
+        leave_bed_at: 今朝布団から出た時刻
+        sleep_date: 起きた日付
+      awakening: 
+        awakenings_count: 中途覚醒回数
+      napping_time:
+        napping_time: 昼寝時間
+      comment:
+        comment: 備考
+
+      created_at: 作成日
+      updated_at: 更新日
+      provider: プロバイダ
+      uid: UID
+      user_id: ユーザID
+      sleep_log_id: 睡眠記録ID
