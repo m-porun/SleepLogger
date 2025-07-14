@@ -13,14 +13,14 @@ ja:
         awakenings_count: 中途覚醒回数
         napping_time: 昼寝時間
         comment: 備考
-  errors:
-    models:
-      sleep_log_form:
-        attributes:
-          go_to_bed_at:
-            go_to_bed_at_before_fell_asleep_at: "は昨夜寝た時刻より前の時刻にしてください"
-          fell_asleep_at:
-            fell_asleep_at_before_woke_up_at: "は今朝目覚めた時刻より前の時刻にしてください"
-            fell_asleep_at_before_leave_bed_at: "は今朝布団から出た時刻より前の時刻にしてください"
-          woke_up_at:
-            woke_up_at_before_leave_bed_at: "は今朝布団から出た時刻より前の時刻にしてください"
+    errors:
+      models:
+        sleep_log_form:
+          attributes:
+            go_to_bed_at:
+              go_to_bed_at_before_fell_asleep_at: "は昨夜寝た時刻より前の時刻にしてください"
+            fell_asleep_at:
+              fell_asleep_at_before_woke_up_at: "は今朝目覚めた時刻より前の時刻にしてください"
+              fell_asleep_at_before_leave_bed_at: "は今朝布団から出た時刻より前の時刻にしてください"
+            woke_up_at:
+              woke_up_at_before_leave_bed_at: "は今朝布団から出た時刻より前の時刻にしてください"
