@@ -26,17 +26,17 @@
       </div>
 
         <div class="actions mt-10 flex w-full justify-center rounded-md bg-accent px-3 py-1.5 font-semibold text-primary shadow-sm">
-          <%= f.submit "更新"%>
+          <%= f.submit t("helpers.submit.create") %>
         </div>
     <% end %>
 
     <div class="mt-10 text-center">
       <div>
-        <%= link_to "パスワード変更", :users_edit_password %>
+        <%= link_to t("views.links.change_password"), :users_edit_password %>
       </div>
 
       <div class="mt-4 text-warning">
-        <%= link_to "退会はこちら", :users_unsubscribe_confirm %>
+        <%= link_to t("views.links.unsubscribe"), :users_unsubscribe_confirm %>
       </div>
     </div>
   </div>

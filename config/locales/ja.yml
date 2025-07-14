@@ -1,0 +1,9 @@
+ja:
+  views:
+    links:
+      change_password: パスワード変更
+      unsubscribe: 退会はこちら
+  helpers:
+    submit:
+      create: 登録
+      update: 更新
