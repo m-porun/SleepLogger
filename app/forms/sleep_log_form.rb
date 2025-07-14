@@ -133,19 +133,19 @@ class SleepLogForm
     return false if go_to_bed_at.blank? || fell_asleep_at.blank? || woke_up_at.blank? || leave_bed_at.blank?
     # go_to_bed_atがfell_asleep_atより後の日時だった場合
     if go_to_bed_at > fell_asleep_at
-      errors.add(:go_to_bed_at, go_to_bed_at_before_fell_asleep_at)
+      errors.add(:go_to_bed_at, :go_to_bed_at_before_fell_asleep_at)
     end
     # fell_asleep_atがwoke_up_atより後の日時だった場合
     if fell_asleep_at > woke_up_at
-      errors.add(:fell_asleep_at, fell_asleep_at_before_woke_up_at)
+      errors.add(:fell_asleep_at, :fell_asleep_at_before_woke_up_at)
     end
     # fell_asleep_atがleave_bed_atより後の日時だった場合
     if fell_asleep_at > leave_bed_at
-      errors.add(:fell_asleep_at, fell_asleep_at_before_leave_bed_at)
+      errors.add(:fell_asleep_at, :fell_asleep_at_before_leave_bed_at)
     end
     # woke_up_atがleave_bed_atより後の日時だった場合
     if woke_up_at > leave_bed_at
-      errors.add(:woke_up_at, woke_up_at_before_leave_bed_at)
+      errors.add(:woke_up_at, :woke_up_at_before_leave_bed_at)
     end
   end
 end
