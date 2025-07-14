@@ -15,6 +15,7 @@ ja:
         reset_password_token: リセットパスワードトークン
         reset_password_sent_at: リセットパスワード送信タイミング
         remember_created_at: パスワードの記憶
+        remember_me: ログイン状態を保持する
         current_password: 今のパスワード
         password: 新しいパスワード
         password_confirmation: 新しいパスワード確認
