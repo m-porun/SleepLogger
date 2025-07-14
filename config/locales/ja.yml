@@ -1,0 +1,12 @@
+ja:
+  views:
+    submits:
+      login: ログイン
+    links:
+      change_password: パスワード変更
+      unsubscribe: 退会はこちら
+      back_to_user_edit: ユーザー設定に戻る
+  helpers:
+    submit:
+      create: 登録
+      update: 更新

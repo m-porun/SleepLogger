@@ -13,10 +13,10 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   def update_profile
     if current_user.update(account_update_params)
-      flash[:notice] = "ユーザー設定を更新しました"
+      flash[:notice] = t("flash.users.registrations.update_profile.success")
       redirect_to users_edit_profile_path
     else
-      flash.now[:alert] ="なんかユーザー設定にやらかしがあります"
+      flash.now[:alert] = t("flash.users.registrations.update_profile.failure")
       render :edit_profile
     end
   end
@@ -29,12 +29,20 @@ class Users::RegistrationsController < Devise::RegistrationsController
     if current_user.update_with_password(password_update_params)
       # 自動ログアウトさせないように再ログイン
       bypass_sign_in(current_user)
-      flash[:notice] = "パスワードを更新しました"
+      flash[:notice] = t("flash.users.registrations.update_password.success")
       redirect_to root_path
     else
-      flash.now[:alert] ="なんかパスワードにやらかしがあります"
+      flash.now[:alert] = t("flash.users.registrations.update_password.failure")
       render :edit_password
     end
+  end
+
+  # DELETE /resource
+  def destroy
+    current_user.destroy
+    sign_out current_user
+    flash[:notice] = t("flash.users.registrations.destroy.success")
+    redirect_to new_user_session_path, status: :see_other
   end
 
   # GET /resource/sign_up
@@ -56,16 +64,8 @@ class Users::RegistrationsController < Devise::RegistrationsController
   # def update
   #   super
   # end
-
-  # DELETE /resource
-  def destroy
-    current_user.destroy
-    sign_out current_user
-    flash[:notice] = "すいみんにっしをご利用いただきありがとうございました。"
-    redirect_to new_user_session_path, status: :see_other
-  end
-
   # GET /resource/cancel
+
   # Forces the session data which is usually expired after sign
   # in to be expired now. This is useful if the user wants to
   # cancel oauth signing in/up in the middle of the process,
