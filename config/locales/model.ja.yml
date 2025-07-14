@@ -12,6 +12,7 @@ ja:
         name: お名前
         email: メールアドレス
         encrypted_password: パスワード
+        encrypted_password_confirmation: パスワード確認
         reset_password_token: リセットパスワードトークン
         reset_password_sent_at: リセットパスワード送信タイミング
         remember_created_at: パスワードの記憶
