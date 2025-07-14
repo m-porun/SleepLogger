@@ -9,14 +9,14 @@
         <div class="form-control space-y-4">
           <!-- メールアドレス -->
           <div>
-            <%= f.label :email, "メールアドレス", class: "label" %>
+            <%= f.label :email, t("activerecord.attributes.user.email"), class: "label" %>
             <%= f.email_field :email, autocomplete: "email", placeholder: "メールアドレスを入力", class: "input input-bordered w-full bg-primary" %>
           </div>
 
           <!-- パスワード -->
           <div>
             <div class="flex items-center justify-between">
-              <%= f.label :password, "パスワード", class: "label" %>
+              <%= f.label :password, t("activerecord.attributes.user.encrypted_password"), class: "label" %>
               <% if @minimum_password_length %>
                 <span class="label-text-alt text-sm text-gray-500">(<%= @minimum_password_length %>文字以上)</span>
               <% end %>
@@ -27,12 +27,12 @@
           <div class="flex items-center">
             <% if devise_mapping.rememberable? %>
               <%= f.check_box :remember_me, class: "h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600" %>
-              <%= f.label :remember_me, "ログイン状態を保持する", class: "ml-2 block text-sm text-neutral" %>
+              <%= f.label :remember_me, t("activerecord.attributes.user.remember_me"), class: "ml-2 block text-sm text-neutral" %>
             <% end %>
           </div>
 
         <div class="actions">
-          <%= f.submit "ログイン", class: "btn btn-accent w-full" %>
+          <%= f.submit t("views.submits.login"), class: "btn btn-accent w-full" %>
         </div>
       </fieldset>
     <% end %>

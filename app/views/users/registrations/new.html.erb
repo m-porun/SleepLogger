@@ -8,18 +8,18 @@
 
         <div class="form-control space-y-1 md:space-y-4">
           <div>
-            <%= f.label :name, "お名前", class: "label text-sm md:text-base" %>
+            <%= f.label :name, t("activerecord.attributes.user.name"), class: "label text-sm md:text-base" %>
             <%= f.text_field :name, autofocus: true, autocomplete: "name", placeholder: "お名前を入力", class: "input input-bordered w-full bg-primary" %>
           </div>
 
           <div>
-            <%= f.label :email, "メールアドレス", class: "label text-sm md:text-base" %>
+            <%= f.label :email, t("activerecord.attributes.user.email"), class: "label text-sm md:text-base" %>
             <%= f.email_field :email, autocomplete: "email", placeholder: "メールアドレスを入力", class: "input input-bordered w-full bg-primary" %>
           </div>
 
           <div>
             <div class="flex items-center justify-between">
-              <%= f.label :password, "パスワード", class: "label text-sm md:text-base" %>
+              <%= f.label :password, t("activerecord.attributes.user.encrypted_password"), class: "label text-sm md:text-base" %>
               <% if @minimum_password_length %>
                 <span class="label-text-alt text-xs md:text-sm text-gray-500">(<%= @minimum_password_length %>文字以上)</span>
               <% end %>
@@ -28,13 +28,13 @@
           </div>
 
           <div>
-            <%= f.label :password_confirmation, "パスワード確認", class: "label text-sm md:text-base" %>
+            <%= f.label :password_confirmation, t("activerecord.attributes.user.encrypted_password_confirmation"), class: "label text-sm md:text-base" %>
             <%= f.password_field :password_confirmation, autocomplete: "new-password", placeholder: "パスワードを再入力", class: "input input-bordered w-full bg-primary" %>
           </div>
         </div>
 
         <div class="actions mt-6 md:mt-8">
-          <%= f.submit "登録", class: "btn btn-accent w-full text-sm md:text-base" %>
+          <%= f.submit t("helpers.submit.create"), class: "btn btn-accent w-full text-sm md:text-base" %>
         </div>
       </fieldset>
     <% end %>

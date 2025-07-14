@@ -1,0 +1,13 @@
+ja:
+  flash:
+    users:
+      registrations:
+        update_profile:
+          success: "ユーザー設定を更新しました"
+          failure: "なんかユーザー設定にやらかしがあります"
+        update_password:
+          success: "パスワードを更新しました"
+          failure: "なんかパスワードにやらかしがあります"
+        destroy:
+          success: "すいみんにっしをご利用いただきありがとうございました。"
+
