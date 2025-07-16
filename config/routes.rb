@@ -3,17 +3,17 @@ Rails.application.routes.draw do
   root to: "headers#how_to_use"
 
   # ヘッダー
-  get "/headers/how_to_use", to: "headers#how_to_use"
+  get "how_to_use", to: "headers#how_to_use"
 
   # フッター
   scope :footers do
     # おといあわせ
-    get "/footers/contact_form", to: "footers#contact_form"
-    post "/footers/contact_form", to: "footers#create"
+    get "contact_form", to: "footers#contact_form"
+    post "contact_form", to: "footers#create"
     # 利用規約
-    get "/footers/terms_of_service", to: "footers#terms_of_service"
+    get "terms_of_service", to: "footers#terms_of_service"
     # プライバシーポリシー
-    get "/footers/privacy_policy", to: "footers#privacy_policy"
+    get "privacy_policy", to: "footers#privacy_policy"
   end
 
   # Devise(ユーザー認証)
