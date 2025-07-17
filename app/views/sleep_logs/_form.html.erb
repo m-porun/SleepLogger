@@ -3,8 +3,8 @@
 <div class="flex justify-center items-center py-6">
   <%= form_with(model: sleep_log_form, url: sleep_log_form.new_record? ? sleep_logs_path : sleep_log_path(sleep_log_form.id), method: sleep_log_form.new_record? ? :post : :patch, class: "w-full max-w-lg mx-auto") do |f| %>
     <% if sleep_log_form.errors.any? %>
-      <div class="flex justify-center items-center text-center mb-4 text-error font-bold">
-        <ul>
+      <div class="flex justify-center items-center text-left ml-4 mb-4 text-error font-bold">
+        <ul class="list-disc">
           <% sleep_log_form.errors.full_messages.each do |message| %>
             <li><%= message %></li>
           <% end %>
@@ -21,7 +21,7 @@
         <%= f.hidden_field :sleep_date, value: f.object.sleep_date.presence || params[:sleep_date], readonly: true, class: "input input-ghost" %>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 md:gap-x-8 md:gap-y-4">
+      <div class="grid grid-cols-1  md:gap-x-8 md:gap-y-4">
         <div>
           <%= f.label :go_to_bed_at, class: "block text-sm font-medium mb-1" %>
           <%= f.time_field :go_to_bed_at, class: "input w-full bg-primary #{f.object.errors[:go_to_bed_at].any? ? 'border-2 border-warning input-warning' : 'border-none input-accent'}" %>
