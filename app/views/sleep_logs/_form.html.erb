@@ -14,7 +14,12 @@
 
     <div class="flex flex-col space-y-4">
       <div class="mb-4">
-        <%= f.label :sleep_date, class: "block text-sm font-medium mb-1" %>
+        <div class="flex justify-left items-center">
+          <span class="material-symbols-outlined text-sm md:text-xl">
+            today
+          </span>
+          <%= f.label :sleep_date, class: "block text-sm font-medium mb-1" %>
+        </div>
         <% display_date = (f.object.sleep_date.presence || params[:sleep_date]) %>
         <% display_date = display_date.to_date if display_date.is_a?(String) %>
         <p class="text-base font-semibold "><%= display_date.strftime('%Y年%-m月%-d日') if display_date.present? %></p>
@@ -23,7 +28,12 @@
 
       <div class="grid grid-cols-1  md:gap-x-8 md:gap-y-4">
         <div>
-          <%= f.label :go_to_bed_at, class: "block text-sm font-medium mb-1" %>
+          <div class="flex justify-left items-center">
+            <span class="material-symbols-outlined text-sm md:text-xl">
+              airline_seat_flat
+            </span>
+            <%= f.label :go_to_bed_at, class: "block text-sm font-medium mb-1" %>
+          </div>
           <%= f.time_field :go_to_bed_at, class: "input w-full bg-primary #{f.object.errors[:go_to_bed_at].any? ? 'border-2 border-warning input-warning' : 'border-none input-accent'}" %>
           <% if f.object.errors[:go_to_bed_at].any? %>
             <p class="text-error text-xs mt-1"><%= f.object.errors[:go_to_bed_at].join(", ") %></p>
@@ -31,7 +41,12 @@
         </div>
 
         <div>
-          <%= f.label :fell_asleep_at, class: "block text-sm font-medium mb-1" %>
+          <div class="flex justify-left items-center">
+            <span class="material-symbols-outlined text-sm md:text-xl">
+              bedtime
+            </span>
+            <%= f.label :fell_asleep_at, class: "block text-sm font-medium mb-1" %>
+          </div>
           <%= f.time_field :fell_asleep_at, class: "input w-full bg-primary #{f.object.errors[:fell_asleep_at].any? ? 'border-2 border-warning input-warning' : 'border-none input-accent'}" %>
           <% if f.object.errors[:fell_asleep_at].any? %>
             <p class="text-error text-xs mt-1"><%= f.object.errors[:fell_asleep_at].join(", ") %></p>
@@ -39,7 +54,12 @@
         </div>
 
         <div>
-          <%= f.label :woke_up_at, class: "block text-sm font-medium mb-1" %>
+          <div class="flex justify-left items-center">
+            <span class="material-symbols-outlined text-sm md:text-xl">
+              sunny
+            </span>
+            <%= f.label :woke_up_at, class: "block text-sm font-medium mb-1" %>
+          </div>
           <%= f.time_field :woke_up_at, class: "input w-full bg-primary #{f.object.errors[:woke_up_at].any? ? 'border-2 border-warning input-warning' : 'border-none input-accent'}" %>
           <% if f.object.errors[:woke_up_at].any? %>
             <p class="text-error text-xs mt-1"><%= f.object.errors[:woke_up_at].join(", ") %></p>
@@ -47,7 +67,12 @@
         </div>
 
         <div>
-          <%= f.label :leave_bed_at, class: "block text-sm font-medium mb-1" %>
+          <div class="flex justify-left items-center">
+            <span class="material-symbols-outlined text-sm md:text-xl">
+              emoji_people
+            </span>
+            <%= f.label :leave_bed_at, class: "block text-sm font-medium mb-1" %>
+          </div>
           <%= f.time_field :leave_bed_at, class: "input w-full bg-primary #{f.object.errors[:leave_bed_at].any? ? 'border-2 border-warning input-warning' : 'border-none input-accent'}" %>
           <% if f.object.errors[:leave_bed_at].any? %>
             <p class="text-error text-xs mt-1"><%= f.object.errors[:leave_bed_at].join(", ") %></p>
@@ -56,7 +81,12 @@
       </div>
 
       <div>
-        <%= f.label :awakenings_count, class: "block text-sm font-medium mb-1" %>
+        <div class="flex justify-left items-center">
+          <span class="material-symbols-outlined text-sm md:text-xl">
+            sentiment_neutral
+          </span>
+          <%= f.label :awakenings_count, class: "block text-sm font-medium mb-1" %>
+        </div>
         <%= f.number_field :awakenings_count, min: 0, class: "input w-full bg-primary #{f.object.errors[:awakenings_count].any? ? 'border-2 border-warning input-warning' : 'border-none input-accent'}" %>
         <% if f.object.errors[:awakenings_count].any? %>
           <p class="text-error text-xs mt-1"><%= f.object.errors[:awakenings_count].join(", ") %></p>
@@ -64,7 +94,12 @@
       </div>
 
       <div>
-        <%= f.label :napping_time, class: "block text-sm font-medium mb-1" %>
+        <div class="flex justify-left items-center">
+          <span class="material-symbols-outlined text-sm md:text-xl">
+            airline_seat_recline_extra
+          </span>
+          <%= f.label :napping_time, class: "block text-sm font-medium mb-1" %>
+        </div>
         <%= f.number_field :napping_time, min: 0, class: "input w-full bg-primary #{f.object.errors[:napping_time].any? ? 'border-2 border-warning input-warning' : 'border-none input-accent'}" %>
         <% if f.object.errors[:napping_time].any? %>
           <p class="text-error text-xs mt-1"><%= f.object.errors[:napping_time].join(", ") %></p>
@@ -74,8 +109,12 @@
       <!-- 最大文字数取得 -->
       <% max_length = SleepLogForm.validators_on(:comment).find { |v| v.kind == :length }.options[:maximum] %>
       <div data-controller="character-counter">
-        <%= f.label :comment, class: "block text-sm font-medium mb-1" %>
-
+        <div class="flex justify-left items-center">
+          <span class="material-symbols-outlined text-sm md:text-xl">
+            comment
+          </span>
+          <%= f.label :comment, class: "block text-sm font-medium mb-1" %>
+        </div>
         <%= f.text_area :comment, maxlength: max_length,
           class: "textarea w-full bg-primary indent-1 text-sm resize-y #{f.object.errors[:comment].any? ? 'border-2 border-warning textarea-warning' : 'border-none textarea-accent'}",
           placeholder: "昨夜はよく眠れましたか？　薬は飲みましたか？",
