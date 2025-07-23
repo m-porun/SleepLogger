@@ -108,11 +108,12 @@ class SleepLogsController < ApplicationController
     redirect_to sleep_logs_path, notice: "睡眠記録を削除しました"
   end
 
-  # ヘルスケアのzipデータを受け取る
+  # ヘルスケアのzipデータを受け取るリクエストフォーム
   def import
     @healthcare_import_form = HealthcareImportForm.new
   end
 
+  # ヘルスケアのzipデータを受け取った後、zip->xmlにして加工する
   def import_healthcare_data
     @healthcare_import_form = HealthcareImportForm.new(healthcare_import_params)
     

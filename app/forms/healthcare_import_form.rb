@@ -13,11 +13,17 @@ class HealthcareImportForm
   attr_accessor :user
   # 解凍したXMLファイルを扱う
   attr_accessor :xml_content
+  # フィルタリングしたレコードを扱う
+  attr_accessor :filtered_sleep_records
 
   # ファイルは選択されているか？
   validates :zip_file, presence: true
   # ZIPファイル形式のバリデーション集
   validate :validate_zip_file
+
+  # SleepAnalusisシリーズの中から、AsleepOnspecifiedだけ除外する用の定数
+  # さらに、freezeで定数をこれ以上変更できないようにする
+  EXCLUDE_FROM_EXTRACT = %w[HKCategoryValueSleepAnalysisAsleepUnspecified].freeze
 
   # 引数には、キー名がzip_fileとuserのハッシュが渡されてくる
   def initialize(attributes = {}) # もし引数にattributesが渡されなかったら、空のハッシュを入れる
@@ -26,6 +32,9 @@ class HealthcareImportForm
     @user = attributes.delete(:user)
     # zip_fileをattributesに渡す
     super(attributes)
+    # 空っぽを作るシリーズ
+    @xml_content = nil
+    @filtered_sleep_records = []
   end
 
   def process_file
@@ -36,6 +45,10 @@ class HealthcareImportForm
     # zipからXML内容を抽出するメソッドの呼び出し
     begin
       if extract_xml_content
+        # 抽出したxmlファイルの文字列をNokogiriでオブジェクト化->構文解析する
+        parsed_content = Nokogiri::XML(@xml_content)
+        # フィルター用メソッド呼び出し
+        @filtered_sleep_records = extract_and_filter_records(parsed_content)
         true
       else
         false
@@ -82,4 +95,12 @@ class HealthcareImportForm
     end
   end
 
+  # レコードのフィルタリングメソッド
+  def extract_and_filter_records(parsed_content)
+    # xmlオブジェクトの中から、階層問わず@typeに当てはまるレコードをまるっと抽出
+    parsed_content.xpath('//Record[@type="HKCategoryTypeIdentifierSleepAnalysis"]').select do |record|
+      # 定数HKCategoryValueSleepAnalysisAsleepUnspecifiedを除外
+      !EXCLUDE_FROM_EXTRACT.include?(record['value'])
+    end
+  end
 end

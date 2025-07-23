@@ -15,7 +15,7 @@
     <% end %>
 
     <!-- multipart許可をしていることにより、ZIPファイルぅｐ可能 -->
-    <%= form_with model: @healthcare_import_form, url: import_healthcare_data_sleep_logs_path, local: true, multipart: true, data: { turbo: false } do |form| %>
+    <%= form_with model: @healthcare_import_form, url: import_healthcare_data_sleep_logs_path, method: :post, local: true, multipart: true, data: { turbo: false } do |form| %>
       <%= form.label :zip_file, "ZIPファイル" %>
       <%= form.file_field :zip_file, accept: ".zip" %>
       <% if @healthcare_import_form.errors[:zip_file].any? %>
@@ -29,6 +29,36 @@
     <h2>xmlデータの最初1000文字を出すところ</h2>
     <% if @healthcare_import_form.xml_content.present? %>
       <pre class="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm"><code><%= CGI.escapeHTML(@healthcare_import_form.xml_content.first(1000)) %>...</code></pre>
+    <% end %>
+
+    <h2>フィルタリングされた睡眠レコードを２０件出すところ</h2>
+    <% if @healthcare_import_form.filtered_sleep_records.present? %>
+      <p><%= @healthcare_import_form.filtered_sleep_records.count %>件のレコードを抽出しますた。</p>
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-white border border-gray-200">
+          <thead>
+            <tr>
+              <th class="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700">開始時刻</th>
+              <th class="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700">終了時刻</th>
+              <th class="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700">タイプ</th>
+              <th class="py-2 px-4 border-b text-right text-sm font-semibold text-gray-700">期間 (分)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @healthcare_import_form.filtered_sleep_records.first(20).each do |record| %>
+              <% start_time = Time.parse(record['startDate']) rescue nil %>
+              <% end_time = Time.parse(record['endDate']) rescue nil %>
+              <% duration_minutes = (end_time && start_time) ? ((end_time - start_time) / 60).to_i : 'N/A' %>
+              <tr>
+                <td class="py-2 px-4 border-b text-sm"><%= start_time&.strftime('%Y-%m-%d %H:%M:%S %Z') || 'N/A' %></td>
+                <td class="py-2 px-4 border-b text-sm"><%= end_time&.strftime('%Y-%m-%d %H:%M:%S %Z') || 'N/A' %></td>
+                <td class="py-2 px-4 border-b text-sm"><%= record['value'] %></td>
+                <td class="py-2 px-4 border-b text-right text-sm"><%= duration_minutes %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
     <% end %>
   </div>
 </div>
