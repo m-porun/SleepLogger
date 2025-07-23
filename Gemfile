@@ -58,6 +58,12 @@ gem "omniauth-rails_csrf_protection"
 # 静的OGP
 gem "meta-tags"
 
+# zipファイル処理用
+gem 'rubyzip'
+
+# XMLデータをパースする
+gem 'nokogiri'
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
@@ -75,8 +81,6 @@ end
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
-  # I18n確認用
-  gem "i18n-tasks"
 end
 
 group :test do
