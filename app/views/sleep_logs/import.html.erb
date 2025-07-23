@@ -25,6 +25,11 @@
       <%= form.submit "インポート" %>
 
     <% end %>
+
+    <h2>xmlデータの最初1000文字を出すところ</h2>
+    <% if @healthcare_import_form.xml_content.present? %>
+      <pre class="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm"><code><%= CGI.escapeHTML(@healthcare_import_form.xml_content.first(1000)) %>...</code></pre>
+    <% end %>
   </div>
 </div>
 

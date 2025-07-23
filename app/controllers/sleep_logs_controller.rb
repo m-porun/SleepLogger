@@ -116,9 +116,10 @@ class SleepLogsController < ApplicationController
   def import_healthcare_data
     @healthcare_import_form = HealthcareImportForm.new(healthcare_import_params)
     
-    if @healthcare_import_form.valid?
+    # もしインポートできてxmlファイルに加工でたら
+    if @healthcare_import_form.valid? && @healthcare_import_form.process_file
       flash.now[:notice] =  "インポートできますた"
-      redirect_to sleep_logs_path
+      render :import
     else
       flash.now[:alert] = @healthcare_import_form.errors.full_messages.join(", ")
       render :import, status: :unprocessable_entity # ステータスコード指定
