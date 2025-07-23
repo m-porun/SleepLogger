@@ -1,0 +1,30 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
+    <h2 class="text-2xl font-bold mb-6 text-center">ヘルスケアデータインポート</h2>
+    
+    <!-- flashメッセージ表示用。変更要! -->
+    <% if flash[:notice] %>
+      <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+        <span class="block sm:inline"><%= flash[:notice] %></span>
+      </div>
+    <% end %>
+    <% if flash[:alert] %>
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+        <span class="block sm:inline"><%= flash[:alert] %></span>
+      </div>
+    <% end %>
+
+    <!-- multipart許可をしていることにより、ZIPファイルぅｐ可能 -->
+    <%= form_with model: @healthcare_import_form, url: import_healthcare_data_sleep_logs_path, local: true, multipart: true, data: { turbo: false } do |form| %>
+      <%= form.label :zip_file, "ZIPファイル" %>
+      <%= form.file_field :zip_file, accept: ".zip" %>
+      <% if @healthcare_import_form.errors[:zip_file].any? %>
+        <%= @healthcare_import_form.errors[:zip_file].first %>
+      <% end %>
+
+      <%= form.submit "インポート" %>
+
+    <% end %>
+  </div>
+</div>
+

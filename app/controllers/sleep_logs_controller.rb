@@ -110,14 +110,15 @@ class SleepLogsController < ApplicationController
 
   # ヘルスケアのzipデータを受け取る
   def import
-    @healthcare_import_form = HealthcareImport_form.new
+    @healthcare_import_form = HealthcareImportForm.new
   end
 
   def import_healthcare_data
     @healthcare_import_form = HealthcareImportForm.new(healthcare_import_params)
     
-    if @healthcare_import_form.valid? && @healthcare_import_form.process_file
-      redirect_to sleep_logs_path, notice: "#{@healthcare_import_form.imported_count}件分のヘルスケアデータをインポートしました。"
+    if @healthcare_import_form.valid?
+      flash.now[:notice] =  "インポートできますた"
+      redirect_to sleep_logs_path
     else
       flash.now[:alert] = @healthcare_import_form.errors.full_messages.join(", ")
       render :import, status: :unprocessable_entity # ステータスコード指定
