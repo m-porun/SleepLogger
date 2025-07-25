@@ -83,6 +83,8 @@ class HealthcareImportForm
   attr_accessor :in_bed_records
   # それ以外の睡眠タイプを保存して扱う
   attr_accessor :asleep_records
+  # ひとかたまりの睡眠データを扱う
+  attr_accessor :sleep_blocks
 
   # ファイルは選択されているか？
   validates :zip_file, presence: true
@@ -101,6 +103,7 @@ class HealthcareImportForm
     @filtered_sleep_records = []
     @in_bed_records = []
     @asleep_records = []
+    @sleep_blocks = []
   end
 
   def process_file
@@ -124,6 +127,9 @@ class HealthcareImportForm
         @filtered_sleep_records = sax_handler.filtered_sleep_records 
         @in_bed_records = sax_handler.in_bed_records
         @asleep_records = sax_handler.asleep_records
+
+        # Asleepレコードを日別でグループ化
+        group_sleep_records
         
         true
       else
@@ -169,5 +175,42 @@ class HealthcareImportForm
       @xml_content = export_entry.get_input_stream.read
       true
     end
+  end
+
+  # Asleepレコードを日別でグループ化
+  def group_sleep_records
+    return if @asleep_records.empty?
+    
+    current_block = nil
+
+    @asleep_records.each do |record|
+      # ヘルスケアのレコードにおいて、1回睡眠に含まれる複数のレコードはそれぞれ前のendDateと次のstartDateが合致する特徴がある
+      record_start = Time.parse(record['startDate']) rescue nil
+      record_end = Time.parse(record['endDate']) rescue nil
+
+      next unless record_start && record_end # 時刻を読み取れなければスキップ
+
+      if current_block.nil? # 最初のブロック
+        current_block = {
+          start_date: record_start,
+          end_date: record_end,
+          duration_minutes: (record_end - record_start) / 60 # 小数点の扱いが難しいので分変換で計算
+        }
+      elsif record_start == current_block[:end_date] # 前のレコードendと今回のレコードstartが連続している場合
+        # 今回のレコードendを現在のブロックendに代入
+        current_block[:end_date] = record_end
+        # 今回のレコード始まりから終わりまでの時間を累計時間に足す
+        current_block[:duration_minutes] += (record_end - record_start) / 60
+      else # 連続が途切れた場合、現在のブロックを保存して新しいブロックを開始
+        @sleep_blocks << current_block
+        current_block = {
+          start_date: record_start,
+          end_date: record_end,
+          duration_minutes: (record_end - record_start) / 60
+        }
+      end
+    end
+    # 連続が途切れたら、ひとかたまり分の睡眠データを配列に入れる
+    @sleep_blocks << current_block if current_block
   end
 end

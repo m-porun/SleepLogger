@@ -67,77 +67,30 @@
         </table>
       </div>
       <p class="text-sm text-gray-600 mt-2">（すべてのレコードを表示すると長くなるため、最初の20件のみ表示しています）</p>
-    <% end %><% if @healthcare_import_form.filtered_sleep_records.present? %>
-      <h3 class="text-lg font-semibold mt-8 mb-4">フィルタリングされた睡眠レコードサマリー（最新<%= HealthcareImportSaxHandler::DAYS_TO_KEEP %>日間）</h3>
-      <ul class="list-disc pl-5 mb-4 text-sm text-gray-700">
-        <li>全抽出レコード数: **<%= @healthcare_import_form.filtered_sleep_records.count %>** 件</li>
-        <li>InBedレコード数: **<%= @healthcare_import_form.in_bed_records.count %>** 件</li>
-        <li>Asleep系レコード数: **<%= @healthcare_import_form.asleep_records.count %>** 件</li>
-      </ul>
-
-      <h3 class="text-lg font-semibold mt-8 mb-4">フィルタリングされた睡眠レコード（最初の20件）</h3>
-      <div class="overflow-x-auto">
-        <table class="min-w-full bg-white border border-gray-200">
-          <thead>
-            <tr>
-              <th class="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700">開始時刻</th>
-              <th class="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700">終了時刻</th>
-              <th class="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700">タイプ</th>
-              <th class="py-2 px-4 border-b text-right text-sm font-semibold text-gray-700">期間 (分)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @healthcare_import_form.filtered_sleep_records.first(20).each do |record| %>
-              <% start_time = Time.parse(record['startDate']) rescue nil %>
-              <% end_time = Time.parse(record['endDate']) rescue nil %>
-              <% duration_minutes = (end_time && start_time) ? ((end_time - start_time) / 60).to_i : 'N/A' %>
-              <tr>
-                <td class="py-2 px-4 border-b text-sm"><%= start_time&.strftime('%Y-%m-%d %H:%M:%S %Z') || 'N/A' %></td>
-                <td class="py-2 px-4 border-b text-sm"><%= end_time&.strftime('%Y-%m-%d %H:%M:%S %Z') || 'N/A' %></td>
-                <td class="py-2 px-4 border-b text-sm"><%= record['value'] %></td>
-                <td class="py-2 px-4 border-b text-right text-sm"><%= duration_minutes %></td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      </div>
-      <p class="text-sm text-gray-600 mt-2">（すべてのレコードを表示すると長くなるため、最初の20件のみ表示しています）</p>
     <% end %>
-    <% if @healthcare_import_form.filtered_sleep_records.present? %>
-      <h3 class="text-lg font-semibold mt-8 mb-4">フィルタリングされた睡眠レコードサマリー（最新<%= HealthcareImportSaxHandler::DAYS_TO_KEEP %>日間）</h3>
-      <ul class="list-disc pl-5 mb-4 text-sm text-gray-700">
-        <li>全抽出レコード数: **<%= @healthcare_import_form.filtered_sleep_records.count %>** 件</li>
-        <li>InBedレコード数: **<%= @healthcare_import_form.in_bed_records.count %>** 件</li>
-        <li>Asleep系レコード数: **<%= @healthcare_import_form.asleep_records.count %>** 件</li>
-      </ul>
 
-      <h3 class="text-lg font-semibold mt-8 mb-4">フィルタリングされた睡眠レコード（最初の20件）</h3>
+    <% if @healthcare_import_form.sleep_blocks.present? %>
+      <h3 class="text-lg font-semibold mt-8 mb-4">「一塊の睡眠」検出結果（<%= @healthcare_import_form.sleep_blocks.count %>件）</h3>
       <div class="overflow-x-auto">
         <table class="min-w-full bg-white border border-gray-200">
           <thead>
             <tr>
               <th class="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700">開始時刻</th>
               <th class="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700">終了時刻</th>
-              <th class="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700">タイプ</th>
               <th class="py-2 px-4 border-b text-right text-sm font-semibold text-gray-700">期間 (分)</th>
             </tr>
           </thead>
           <tbody>
-            <% @healthcare_import_form.filtered_sleep_records.first(20).each do |record| %>
-              <% start_time = Time.parse(record['startDate']) rescue nil %>
-              <% end_time = Time.parse(record['endDate']) rescue nil %>
-              <% duration_minutes = (end_time && start_time) ? ((end_time - start_time) / 60).to_i : 'N/A' %>
+            <% @healthcare_import_form.sleep_blocks.each do |block| %>
               <tr>
-                <td class="py-2 px-4 border-b text-sm"><%= start_time&.strftime('%Y-%m-%d %H:%M:%S %Z') || 'N/A' %></td>
-                <td class="py-2 px-4 border-b text-sm"><%= end_time&.strftime('%Y-%m-%d %H:%M:%S %Z') || 'N/A' %></td>
-              <td class="py-2 px-4 border-b text-sm"><%= record['value'] %></td>
-              <td class="py-2 px-4 border-b text-right text-sm"><%= duration_minutes %></td>
+                <td class="py-2 px-4 border-b text-sm"><%= block[:start_date]&.strftime('%Y-%m-%d %H:%M:%S %Z') || 'N/A' %></td>
+                <td class="py-2 px-4 border-b text-sm"><%= block[:end_date]&.strftime('%Y-%m-%d %H:%M:%S %Z') || 'N/A' %></td>
+                <td class="py-2 px-4 border-b text-right text-sm"><%= block[:duration_minutes].to_i %></td>
               </tr>
             <% end %>
           </tbody>
         </table>
       </div>
-      <p class="text-sm text-gray-600 mt-2">（すべてのレコードを表示すると長くなるため、最初の20件のみ表示しています）</p>
     <% end %>
   </div>
 </div>
