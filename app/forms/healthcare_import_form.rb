@@ -3,6 +3,70 @@
 require 'zip' # zipファイル解凍用
 require 'nokogiri' # パース用
 
+# XMLをSAX方式で解析するためのハンドラクラス。イベントに対してどう処理するか
+# 解析処理を軽くするため、XMLの要素から必要なデータだけを抽出する
+class HealthcareImportSaxHandler < Nokogiri::XML::SAX::Document
+  attr_reader :filtered_sleep_records, :in_bed_records, :asleep_records
+
+  # SleepAnalusisシリーズの中から、AsleepOnspecifiedだけ除外する用の定数
+  # さらに、freezeで定数をこれ以上変更できないようにする
+  EXCLUDE_FROM_EXTRACT = %w[HKCategoryValueSleepAnalysisAsleepUnspecified].freeze
+
+  # 4つの睡眠パターンを丸っと管理する定数。ただしAwake(中途覚醒)は除く
+  ASLEEP_VALUES = %w[
+    HKCategoryValueSleepAnalysisAsleep
+    HKCategoryValueSleepAnalysisAsleepCore
+    HKCategoryValueSleepAnalysisAsleepDeep
+    HKCategoryValueSleepAnalysisAsleepREM
+  ].freeze
+
+  # 取り扱う日数の定数
+  DAYS_TO_KEEP = 62
+
+  # 必要なデータを抽出して入れておく配列たち
+  def initialize
+    @filtered_sleep_records = []
+    @in_bed_records = []
+    @asleep_records = []
+    @cutoff_date = (Time.current - DAYS_TO_KEEP.days).beginning_of_day
+  end
+
+  # XML要素の中で、開始タグを見つけたら以下を発動
+  def start_element(name, attrs = [])
+    # タグの冒頭がRecordで始まらないものは除外
+    return unless name == 'Record'
+
+    # Recordの中にはstartDate="2025-07-17 02:08:43 +0900"などが空白区切りで入っている
+    # SAXパーサがそれらを読み込んでattrsに[["type", "HKQuantityTypeIdentifierPhysicalEffort"],["key", "value"],...]を渡す
+    # その配列をさらにハッシュへ変換
+    attrs_hash = Hash[attrs]
+
+    # typeの値が睡眠タイプHKCategoryTypeIdentifierSleepAnalysis出ない場合は除外
+    return unless attrs_hash['type'] == 'HKCategoryTypeIdentifierSleepAnalysis'
+
+    # 仕分け用の前準備(InBed対策、62日分のレコード対策)
+    record_value = attrs_hash['value']
+    record_start_date = Time.parse(attrs_hash['startDate']) rescue nil # ないならnil
+
+    # フィルタリング発動
+    if record_start_date.present? &&
+       record_start_date >= @cutoff_date &&
+       !EXCLUDE_FROM_EXTRACT.include?(record_value)
+
+      # フィルターを通過したレコードを保持(InBed含む全てのレコード)
+      @filtered_sleep_records << attrs_hash
+
+      # InBed(ベッドに入った時間)があるかないかで仕分け
+      if record_value == 'HKCategoryValueSleepAnalysisInBed'
+        @in_bed_records << attrs_hash
+      elsif ASLEEP_VALUES.include?(record_value)
+        @asleep_records << attrs_hash
+      end
+    end
+  end
+end
+
+# こっからフォームオブジェクト！
 class HealthcareImportForm
   include ActiveModel::Model
   include ActiveModel::Attributes
@@ -15,15 +79,15 @@ class HealthcareImportForm
   attr_accessor :xml_content
   # フィルタリングしたレコードを扱う
   attr_accessor :filtered_sleep_records
+  # InBed(ベッドに入ってから出るまでの期間)があれば、別途保存して扱う
+  attr_accessor :in_bed_records
+  # それ以外の睡眠タイプを保存して扱う
+  attr_accessor :asleep_records
 
   # ファイルは選択されているか？
   validates :zip_file, presence: true
   # ZIPファイル形式のバリデーション集
   validate :validate_zip_file
-
-  # SleepAnalusisシリーズの中から、AsleepOnspecifiedだけ除外する用の定数
-  # さらに、freezeで定数をこれ以上変更できないようにする
-  EXCLUDE_FROM_EXTRACT = %w[HKCategoryValueSleepAnalysisAsleepUnspecified].freeze
 
   # 引数には、キー名がzip_fileとuserのハッシュが渡されてくる
   def initialize(attributes = {}) # もし引数にattributesが渡されなかったら、空のハッシュを入れる
@@ -35,6 +99,8 @@ class HealthcareImportForm
     # 空っぽを作るシリーズ
     @xml_content = nil
     @filtered_sleep_records = []
+    @in_bed_records = []
+    @asleep_records = []
   end
 
   def process_file
@@ -43,12 +109,22 @@ class HealthcareImportForm
     return false unless valid?
 
     # zipからXML内容を抽出するメソッドの呼び出し
+    # 抽出したxmlファイルの文字列をNokogiriでオブジェクト化->構文解析する
+    # DOM形式ではなく、SAXパーサーで一行ずつ読み込む
     begin
       if extract_xml_content
-        # 抽出したxmlファイルの文字列をNokogiriでオブジェクト化->構文解析する
-        parsed_content = Nokogiri::XML(@xml_content)
-        # フィルター用メソッド呼び出し
-        @filtered_sleep_records = extract_and_filter_records(parsed_content)
+        # SAXハンドラーの処理を記した自作クラスのインスタンスを作成
+        sax_handler = HealthcareImportSaxHandler.new
+        # 構文解析本体のインスタンスを生成
+        parser_content = Nokogiri::XML::SAX::Parser.new(sax_handler)
+        # XML文字列をSAXパーサーで解析
+        parser_content.parse(@xml_content)
+
+        # フィルタリング完了したものをインスタンス変数に格納
+        @filtered_sleep_records = sax_handler.filtered_sleep_records 
+        @in_bed_records = sax_handler.in_bed_records
+        @asleep_records = sax_handler.asleep_records
+        
         true
       else
         false
@@ -92,15 +168,6 @@ class HealthcareImportForm
       # zipファイルを読み取って、xmlのデータとしてインスタンス変数に代入
       @xml_content = export_entry.get_input_stream.read
       true
-    end
-  end
-
-  # レコードのフィルタリングメソッド
-  def extract_and_filter_records(parsed_content)
-    # xmlオブジェクトの中から、階層問わず@typeに当てはまるレコードをまるっと抽出
-    parsed_content.xpath('//Record[@type="HKCategoryTypeIdentifierSleepAnalysis"]').select do |record|
-      # 定数HKCategoryValueSleepAnalysisAsleepUnspecifiedを除外
-      !EXCLUDE_FROM_EXTRACT.include?(record['value'])
     end
   end
 end
