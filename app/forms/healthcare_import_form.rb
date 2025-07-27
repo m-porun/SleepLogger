@@ -18,6 +18,7 @@ class HealthcareImportSaxHandler < Nokogiri::XML::SAX::Document
     HKCategoryValueSleepAnalysisAsleepCore
     HKCategoryValueSleepAnalysisAsleepDeep
     HKCategoryValueSleepAnalysisAsleepREM
+    HKCategoryValueSleepAnalysisAwake
   ].freeze
 
   # 取り扱う日数の定数
@@ -36,13 +37,19 @@ class HealthcareImportSaxHandler < Nokogiri::XML::SAX::Document
     # タグの冒頭がRecordで始まらないものは除外
     return unless name == 'Record'
 
+    # assocメソッドを使って、type属性のキーバリューペアを返す
+    type_pair = attrs.assoc('type')
+
+    # typeの値が睡眠タイプHKCategoryTypeIdentifierSleepAnalysis出ない場合は除外
+    return unless type_pair && type_pair[1] == 'HKCategoryTypeIdentifierSleepAnalysis' 
+
     # Recordの中にはstartDate="2025-07-17 02:08:43 +0900"などが空白区切りで入っている
     # SAXパーサがそれらを読み込んでattrsに[["type", "HKQuantityTypeIdentifierPhysicalEffort"],["key", "value"],...]を渡す
     # その配列をさらにハッシュへ変換
     attrs_hash = Hash[attrs]
 
     # typeの値が睡眠タイプHKCategoryTypeIdentifierSleepAnalysis出ない場合は除外
-    return unless attrs_hash['type'] == 'HKCategoryTypeIdentifierSleepAnalysis'
+    # return unless attrs_hash['type'] == 'HKCategoryTypeIdentifierSleepAnalysis'
 
     # 仕分け用の前準備(InBed対策、62日分のレコード対策)
     record_value = attrs_hash['value']
@@ -91,6 +98,9 @@ class HealthcareImportForm
   # ZIPファイル形式のバリデーション集
   validate :validate_zip_file
 
+  # 日付の変わり目を決める定数(午前4時)
+  DAILY_CUT_OFF_HOUR= 4
+
   # 引数には、キー名がzip_fileとuserのハッシュが渡されてくる
   def initialize(attributes = {}) # もし引数にattributesが渡されなかったら、空のハッシュを入れる
     pp 'importフォームのinitializeメソッドです'
@@ -127,6 +137,12 @@ class HealthcareImportForm
         @filtered_sleep_records = sax_handler.filtered_sleep_records 
         @in_bed_records = sax_handler.in_bed_records
         @asleep_records = sax_handler.asleep_records
+
+        # InBedレコードにsleep_dateというキーを作成、ベットから出た日付を追加
+        @in_bed_records.each do |record|
+          record_end_time = Time.parse(record['endDate']) rescue nil
+          record['sleep_date'] = calculate_sleep_date(record_end_time) if record_end_time
+        end
 
         # Asleepレコードを日別でグループ化
         group_sleep_records
@@ -185,6 +201,7 @@ class HealthcareImportForm
 
     @asleep_records.each do |record|
       # ヘルスケアのレコードにおいて、1回睡眠に含まれる複数のレコードはそれぞれ前のendDateと次のstartDateが合致する特徴がある
+      # 時刻だけを抽出して、比較する
       record_start = Time.parse(record['startDate']) rescue nil
       record_end = Time.parse(record['endDate']) rescue nil
 
@@ -202,6 +219,8 @@ class HealthcareImportForm
         # 今回のレコード始まりから終わりまでの時間を累計時間に足す
         current_block[:duration_minutes] += (record_end - record_start) / 60
       else # 連続が途切れた場合、現在のブロックを保存して新しいブロックを開始
+        # 睡眠日を決定
+        current_block[:sleep_date] = calculate_sleep_date(current_block[:end_date])
         @sleep_blocks << current_block
         current_block = {
           start_date: record_start,
@@ -211,6 +230,21 @@ class HealthcareImportForm
       end
     end
     # 連続が途切れたら、ひとかたまり分の睡眠データを配列に入れる
-    @sleep_blocks << current_block if current_block
+    if current_block
+      current_block[:sleep_date] = calculate_sleep_date(current_block[:end_date])
+      @sleep_blocks << current_block
+    end
+  end
+
+  # 睡眠日の決定：今朝起きた日を決める
+  def calculate_sleep_date(end_time)
+    return nil unless end_time.is_a?(Time)
+
+    # 終了時刻が日付切り替え時刻の午前4時より前かどうかで日付を決める
+    if end_time.hour < DAILY_CUT_OFF_HOUR
+      end_time.prev_day.to_date # 前日にする
+    else
+      end_time.to_date
+    end
   end
 end

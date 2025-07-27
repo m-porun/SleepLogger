@@ -78,6 +78,7 @@
               <th class="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700">開始時刻</th>
               <th class="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700">終了時刻</th>
               <th class="py-2 px-4 border-b text-right text-sm font-semibold text-gray-700">期間 (分)</th>
+              <th class="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700">睡眠日</th>
             </tr>
           </thead>
           <tbody>
@@ -86,6 +87,7 @@
                 <td class="py-2 px-4 border-b text-sm"><%= block[:start_date]&.strftime('%Y-%m-%d %H:%M:%S %Z') || 'N/A' %></td>
                 <td class="py-2 px-4 border-b text-sm"><%= block[:end_date]&.strftime('%Y-%m-%d %H:%M:%S %Z') || 'N/A' %></td>
                 <td class="py-2 px-4 border-b text-right text-sm"><%= block[:duration_minutes].to_i %></td>
+                <td class="py-2 px-4 border-b text-sm"><%= block[:sleep_date]&.strftime('%Y-%m-%d') || 'N/A' %></td>
               </tr>
             <% end %>
           </tbody>
