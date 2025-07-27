@@ -59,10 +59,10 @@ gem "omniauth-rails_csrf_protection"
 gem "meta-tags"
 
 # zipファイル処理用
-gem 'rubyzip'
+gem "rubyzip"
 
 # XMLデータをパースする
-gem 'nokogiri'
+gem "nokogiri"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem

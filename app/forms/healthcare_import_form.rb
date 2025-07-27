@@ -1,7 +1,7 @@
 # ヘルスケアデータインポート用のフォームオブジェクトさん
 # Gemfileから使いたいライブラリを呼び出す
-require 'zip' # zipファイル解凍用
-require 'nokogiri' # パース用
+require "zip" # zipファイル解凍用
+require "nokogiri" # パース用
 
 # XMLをSAX方式で解析するためのハンドラクラス。イベントに対してどう処理するか
 # 解析処理を軽くするため、XMLの要素から必要なデータだけを抽出する
@@ -35,13 +35,13 @@ class HealthcareImportSaxHandler < Nokogiri::XML::SAX::Document
   # XML要素の中で、開始タグを見つけたら以下を発動
   def start_element(name, attrs = [])
     # タグの冒頭がRecordで始まらないものは除外
-    return unless name == 'Record'
+    return unless name == "Record"
 
     # assocメソッドを使って、type属性のキーバリューペアを返す
-    type_pair = attrs.assoc('type')
+    type_pair = attrs.assoc("type")
 
     # typeの値が睡眠タイプHKCategoryTypeIdentifierSleepAnalysis出ない場合は除外
-    return unless type_pair && type_pair[1] == 'HKCategoryTypeIdentifierSleepAnalysis' 
+    return unless type_pair && type_pair[1] == "HKCategoryTypeIdentifierSleepAnalysis"
 
     # Recordの中にはstartDate="2025-07-17 02:08:43 +0900"などが空白区切りで入っている
     # SAXパーサがそれらを読み込んでattrsに[["type", "HKQuantityTypeIdentifierPhysicalEffort"],["key", "value"],...]を渡す
@@ -49,8 +49,8 @@ class HealthcareImportSaxHandler < Nokogiri::XML::SAX::Document
     attrs_hash = Hash[attrs]
 
     # 仕分け用の前準備(InBed対策、62日分のレコード対策)
-    record_value = attrs_hash['value']
-    record_start_date = Time.parse(attrs_hash['startDate']) rescue nil # ないならnil
+    record_value = attrs_hash["value"]
+    record_start_date = Time.parse(attrs_hash["startDate"]) rescue nil # ないならnil
 
     # フィルタリング発動
     if record_start_date.present? &&
@@ -61,7 +61,7 @@ class HealthcareImportSaxHandler < Nokogiri::XML::SAX::Document
       @filtered_sleep_records << attrs_hash
 
       # InBed(ベッドに入った時間)があるかないかで仕分け
-      if record_value == 'HKCategoryValueSleepAnalysisInBed'
+      if record_value == "HKCategoryValueSleepAnalysisInBed"
         @in_bed_records << attrs_hash
       elsif ASLEEP_VALUES.include?(record_value)
         @asleep_records << attrs_hash
@@ -104,7 +104,7 @@ class HealthcareImportForm
 
   # 引数には、キー名がzip_fileとuserのハッシュが渡されてくる
   def initialize(attributes = {}) # もし引数にattributesが渡されなかったら、空のハッシュを入れる
-    pp 'importフォームのinitializeメソッドです'
+    pp "importフォームのinitializeメソッドです"
     # zip_fileのみを加工できるように、Userモデルのインスタンスを切り出してインスタンス変数に入れておく
     @user = attributes.delete(:user)
     # zip_fileをattributesに渡す
@@ -120,7 +120,7 @@ class HealthcareImportForm
   end
 
   def process_file
-    pp 'process_fileです'
+    pp "process_fileです"
     # zipファイルかどうかのバリデーションチェック
     return false unless valid?
 
@@ -137,14 +137,14 @@ class HealthcareImportForm
         parser_content.parse(@xml_content)
 
         # フィルタリング完了したものをインスタンス変数に格納
-        @filtered_sleep_records = sax_handler.filtered_sleep_records 
+        @filtered_sleep_records = sax_handler.filtered_sleep_records
         @in_bed_records = sax_handler.in_bed_records
         @asleep_records = sax_handler.asleep_records
 
         # InBedレコードにsleep_dateというキーを作成、ベットから出た日付を追加
         @in_bed_records.each do |record|
-          record_end_time = Time.parse(record['endDate']) rescue nil
-          record['sleep_date'] = calculate_sleep_date(record_end_time) if record_end_time
+          record_end_time = Time.parse(record["endDate"]) rescue nil
+          record["sleep_date"] = calculate_sleep_date(record_end_time) if record_end_time
         end
 
         # Asleepレコードを日別でグループ化
@@ -152,7 +152,7 @@ class HealthcareImportForm
 
         # 日別集計
         summarize_daily_sleep_data
-        
+
         # 各睡眠日ごとに睡眠データを処理し保存させる
         @daily_sleep_summaries.each do |sleep_date, summary_data|
           process_daily_sleep_data(sleep_date, summary_data)
@@ -174,10 +174,10 @@ class HealthcareImportForm
   # ZIPファイルのみを受け付けるバリデーション
   def validate_zip_file
     return unless zip_file.present?
-    
+
     # インポートしたデータのMIMEタイプが'application/zip'かどうかチェック
-    unless zip_file.content_type == 'application/zip'
-      errors.add(:zip_file, 'ZIPファイルを選択してください')
+    unless zip_file.content_type == "application/zip"
+      errors.add(:zip_file, "ZIPファイルを選択してください")
     end
   end
 
@@ -186,17 +186,17 @@ class HealthcareImportForm
     # Tempfileライブラリを利用して、一時ファイルに保存されたTemplateオブジェクトのフルパスを返す
     Zip::File.open(zip_file.tempfile.path) do |zip_file_obj|
       # 頑張ってexport.xmlファイルを探し出せ！
-      export_entry = zip_file_obj.glob('**/apple_health_export/export.xml').first
+      export_entry = zip_file_obj.glob("**/apple_health_export/export.xml").first
       # それでも見つからなかったら、ルート直下で探せ！
       unless export_entry
-        export_entry = zip_file_obj.find_entry('export.xml')
+        export_entry = zip_file_obj.find_entry("export.xml")
         unless export_entry
           # 属性には基づかないファイル全体のエラーに:base
-          errors.add(:base, 'export.xmlファイルが見つからないです')
+          errors.add(:base, "export.xmlファイルが見つからないです")
           return false
         end
       end
-      
+
       # zipファイルを読み取って、xmlのデータとしてインスタンス変数に代入
       @xml_content = export_entry.get_input_stream.read
       true
@@ -206,14 +206,14 @@ class HealthcareImportForm
   # Asleepレコードを日別でグループ化
   def group_sleep_records
     return if @asleep_records.empty?
-    
+
     current_block = nil
 
     @asleep_records.each do |record|
       # ヘルスケアのレコードにおいて、1回睡眠に含まれる複数のレコードはそれぞれ前のendDateと次のstartDateが合致する特徴がある
       # 時刻だけを抽出して、比較する
-      record_start = Time.parse(record['startDate']) rescue nil
-      record_end = Time.parse(record['endDate']) rescue nil
+      record_start = Time.parse(record["startDate"]) rescue nil
+      record_end = Time.parse(record["endDate"]) rescue nil
 
       next unless record_start && record_end # 時刻を読み取れなければスキップ
 
@@ -222,7 +222,7 @@ class HealthcareImportForm
           start_date: record_start,
           end_date: record_end,
           duration_minutes: (record_end - record_start) / 60, # 小数点の扱いが難しいので分変換で計算
-          records: [record] # その日の睡眠レコードたちを丸ごと管理
+          records: [ record ] # その日の睡眠レコードたちを丸ごと管理
         }
       elsif record_start == current_block[:end_date] # 前のレコードendと今回のレコードstartが連続している場合
         # 今回のレコードendを現在のブロックendに代入
@@ -239,7 +239,7 @@ class HealthcareImportForm
           start_date: record_start,
           end_date: record_end,
           duration_minutes: (record_end - record_start) / 60,
-          records: [record]
+          records: [ record ]
         }
       end
     end
@@ -285,15 +285,15 @@ class HealthcareImportForm
 
     # InBedレコードの集計
     @in_bed_records.each do |record|
-      sleep_date = record['sleep_date']
+      sleep_date = record["sleep_date"]
 
-      record_start = Time.parse(record['startDate']) rescue nil
-      record_end = Time.parse(record['endDate']) rescue nil
-      
+      record_start = Time.parse(record["startDate"]) rescue nil
+      record_end = Time.parse(record["endDate"]) rescue nil
+
       if record_start && record_end
         @daily_sleep_summaries[sleep_date][:in_bed_duration_minutes] += ((record_end - record_start) / 60).to_i
       end
-      
+
       # InBedレコードの詳細も入れとく
       @daily_sleep_summaries[sleep_date][:in_bed_record_details] << record
     end
@@ -313,9 +313,9 @@ class HealthcareImportForm
     # 例えInBedレコードが2つあっても1つとして扱います！
     main_in_bed_record = in_bed_record_details.first
     # SleepLogモデルのベットに入った時刻カラムに入れる準備
-    go_to_bed_at = Time.parse(main_in_bed_record['startDate']) rescue nil
+    go_to_bed_at = Time.parse(main_in_bed_record["startDate"]) rescue nil
     # SleepLogモデルのベットから出た時刻カラムに入れる準備
-    leave_bed_at = Time.parse(main_in_bed_record['endDate']) rescue nil
+    leave_bed_at = Time.parse(main_in_bed_record["endDate"]) rescue nil
 
     main_sleep_chunks = [] # InBed範囲内の睡眠ブロック
     nap_chunks = [] # InBed範囲外の睡眠ブロック=昼寝時間
@@ -339,7 +339,7 @@ class HealthcareImportForm
 
     # Awakeningモデルの覚醒回数を計算
     awakenings_count = main_sleep_chunks.sum do |block|
-      block[:records].count { |r| r['value'] == 'HKCategoryValueSleepAnalysisAwake' }
+      block[:records].count { |r| r["value"] == "HKCategoryValueSleepAnalysisAwake" }
     end
 
     # Nappingモデルの昼寝時間を計算
@@ -362,16 +362,16 @@ class HealthcareImportForm
   def process_without_in_bed_data(sleep_date, asleep_block_details)
     # 最も長い睡眠チャンクを主な睡眠と捉える
     longest_chunk = asleep_block_details.max_by { |block| block[:duration_minutes] }
-    other_chunk = asleep_block_details - [longest_chunk] # それ以外を昼寝と判定
+    other_chunk = asleep_block_details - [ longest_chunk ] # それ以外を昼寝と判定
 
     # 主要な睡眠の時刻をSleepLogモデル用のカラムにセット
     go_to_bed_at = longest_chunk[:start_date]
     fell_asleep_at = longest_chunk[:start_date] # InBedが存在しないので、go_to_bed_atと同値になる
     woke_up_at = longest_chunk[:end_date]
     leave_bed_at = longest_chunk[:end_date]
-    
+
     # 中途覚醒のレコードがあった数をカウント
-    awakenings_count = longest_chunk[:records].count { |r| r['value'] == 'HKCategoryValueSleepAnalysisAwake' }
+    awakenings_count = longest_chunk[:records].count { |r| r["value"] == "HKCategoryValueSleepAnalysisAwake" }
 
     # 昼寝時間
     napping_time = calculate_total_duration_minutes(other_chunk)
@@ -424,7 +424,7 @@ class HealthcareImportForm
     # Comment
     comment_record = sleep_log.comment || sleep_log.build_comment
     if comment_record.comment.blank?
-      comment_record.comment = attributes[:comment] || "" 
+      comment_record.comment = attributes[:comment] || ""
     end
 
     SleepLog.transaction do

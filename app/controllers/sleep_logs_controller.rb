@@ -116,7 +116,7 @@ class SleepLogsController < ApplicationController
   # ヘルスケアのzipデータを受け取った後、zip->xmlにして加工する
   def import_healthcare_data
     @healthcare_import_form = HealthcareImportForm.new(healthcare_import_params)
-    
+
     # もしインポートできてxmlファイルに加工でたら
     if @healthcare_import_form.valid? && @healthcare_import_form.process_file
       flash.now[:notice] =  "インポートできますた"

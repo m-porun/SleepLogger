@@ -40,7 +40,7 @@ Rails.application.routes.draw do
   # リソースルート
   resources :sleep_logs, only: [ :index, :new, :edit, :update, :create, :destroy ] do
     collection do
-      get :import 
+      get :import
       post :import_healthcare_data
     end
   end
