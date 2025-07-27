@@ -1,5 +1,5 @@
 <div id="sleep-logs-table" class="relative overflow-x-auto overflow-y-auto h-[600px] md:h-auto print:h-auto print:overflow-visible">
-    <table class="table-fixed w-full text-center text-[12px] md:text-base print:text-sm print:leading-none print:py-[15px]">
+    <table class="table-fixed w-full text-center text-[12px] md:text-base print:text-sm print:leading-none print:py-[14px]">
       <thead>
         <tr class="text-[10px] md:text-base print:text-[9px]">
           <th class="border border-secondary bg-primary sticky top-0 z-10 md:static w-[5%] md:w-8 print:w-8">日</th>
@@ -19,7 +19,7 @@
 
       <% @sleep_logs.each do |sleep_log| %> <!-- 月初から月末までの日付を繰り返し表示する -->
         <tr class="border border-secondary bg-primary">
-          <td class="border border-secondary bg-primary py-4 md:py-auto print:py-2"><%= sleep_log.sleep_date.day %></td>
+          <td class="border border-secondary bg-primary py-4 md:py-auto print:py-[7px]"><%= sleep_log.sleep_date.day %></td>
           <td class="border border-secondary bg-primary"><%= %w[日 月 火 水 木 金 土][sleep_log.sleep_date.wday] %></td>
           <td class="border border-secondary bg-primary">
             <%= sleep_log.go_to_bed_at&.strftime('%H:%M') || "--:--" %>
