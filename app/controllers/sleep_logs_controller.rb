@@ -119,8 +119,7 @@ class SleepLogsController < ApplicationController
 
     # もしインポートできてxmlファイルに加工でたら
     if @healthcare_import_form.valid? && @healthcare_import_form.process_file
-      flash.now[:notice] =  "インポートできますた"
-      render :import
+      redirect_to sleep_logs_path, notice: "インポートできますた"
     else
       flash.now[:alert] = @healthcare_import_form.errors.full_messages.join(", ")
       render :import, status: :unprocessable_entity # ステータスコード指定
