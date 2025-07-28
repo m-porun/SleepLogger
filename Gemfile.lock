@@ -417,6 +417,7 @@ DEPENDENCIES
   jbuilder
   jsbundling-rails
   meta-tags
+  nokogiri
   omniauth-google-oauth2
   omniauth-rails_csrf_protection
   pg (~> 1.1)
@@ -427,6 +428,7 @@ DEPENDENCIES
   rails-i18n
   rubocop
   rubocop-rails-omakase
+  rubyzip
   selenium-webdriver
   sprockets-rails
   stimulus-rails
