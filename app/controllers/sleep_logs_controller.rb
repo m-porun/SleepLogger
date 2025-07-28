@@ -108,6 +108,25 @@ class SleepLogsController < ApplicationController
     redirect_to sleep_logs_path, notice: "睡眠記録を削除しました"
   end
 
+  # ヘルスケアのzipデータを受け取るリクエストフォーム
+  def import
+    @healthcare_import_form = HealthcareImportForm.new
+  end
+
+  # ヘルスケアのzipデータを受け取った後、zip->xmlにして加工する
+  def import_healthcare_data
+    @healthcare_import_form = HealthcareImportForm.new(healthcare_import_params)
+
+    # もしインポートできてxmlファイルに加工でたら
+    if @healthcare_import_form.valid? && @healthcare_import_form.process_file
+      flash.now[:notice] =  "インポートできますた"
+      render :import
+    else
+      flash.now[:alert] = @healthcare_import_form.errors.full_messages.join(", ")
+      render :import, status: :unprocessable_entity # ステータスコード指定
+    end
+  end
+
   private
 
   def set_user
@@ -154,4 +173,10 @@ class SleepLogsController < ApplicationController
       sleep_logs[sleep_date] || current_user.sleep_logs.build(sleep_date: sleep_date)
     end
   end
+
+  # zipファイルのみを受け付けるついでに、ユーザーデータくっつける
+  def healthcare_import_params
+    params.require(:healthcare_import_form).permit(:zip_file).merge(user: current_user)
+  end
 end
+
