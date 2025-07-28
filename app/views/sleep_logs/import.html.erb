@@ -1,101 +1,109 @@
-<div class="container mx-auto px-4 py-8">
-  <div class="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
-    <h2 class="text-2xl font-bold mb-6 text-center">ヘルスケアデータインポート</h2>
-    
-    <!-- flashメッセージ表示用。変更要! -->
-    <% if flash[:notice] %>
-      <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
-        <span class="block sm:inline"><%= flash[:notice] %></span>
+<div class="relative flex flex-col justify-center items-center mx-4 md:mx-16 lg:mx-48 py-6 md:py-16 flex min-h-full">
+  <div class="card bg-secondary w-full shadow-sm p-8 md:p-16">
+    <div class="space-y-8 md:space-y-16 lg:space-y-12">
+      <div>
+        <h2 class="mt-10 text-center text-2xl/9 font-bold">ヘルスケアインポート</h2>
       </div>
-    <% end %>
-    <% if flash[:alert] %>
-      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-        <span class="block sm:inline"><%= flash[:alert] %></span>
-      </div>
-    <% end %>
 
-    <!-- multipart許可をしていることにより、ZIPファイルぅｐ可能 -->
-    <%= form_with model: @healthcare_import_form, url: import_healthcare_data_sleep_logs_path, method: :post, local: true, multipart: true, data: { turbo: false } do |form| %>
-      <%= form.label :zip_file, "ZIPファイル" %>
-      <%= form.file_field :zip_file, accept: ".zip" %>
-      <% if @healthcare_import_form.errors[:zip_file].any? %>
-        <%= @healthcare_import_form.errors[:zip_file].first %>
-      <% end %>
+      <div class="card bg-base-100 w-full p-8 lg:p-16 space-y-8 border border-base-300">
+        <div class="text-sm lg:text-xl">
+          iPhone, AppleWatchで記録したヘルスケアデータを睡眠記録に反映します！
+        </div>
 
-      <%= form.submit "インポート" %>
-
-    <% end %>
-
-    <h2>xmlデータの最初1000文字を出すところ</h2>
-    <% if @healthcare_import_form.xml_content.present? %>
-      <pre class="bg-gray-100 p-4 rounded-md overflow-x-auto text-sm"><code><%= CGI.escapeHTML(@healthcare_import_form.xml_content.first(1000)) %>...</code></pre>
-    <% end %>
-
-    <h2>フィルタリングされた睡眠レコードを２０件出すところ</h2>
-      <% if @healthcare_import_form.filtered_sleep_records.present? %>
-      <h3 class="text-lg font-semibold mt-8 mb-4">フィルタリングされた睡眠レコードサマリー（最新<%= HealthcareImportSaxHandler::DAYS_TO_KEEP %>日間）</h3>
-      <ul class="list-disc pl-5 mb-4 text-sm text-gray-700">
-        <li>全抽出レコード数: **<%= @healthcare_import_form.filtered_sleep_records.count %>** 件</li>
-        <li>InBedレコード数: **<%= @healthcare_import_form.in_bed_records.count %>** 件</li>
-        <li>Asleep系レコード数: **<%= @healthcare_import_form.asleep_records.count %>** 件</li>
-      </ul>
-
-      <h3 class="text-lg font-semibold mt-8 mb-4">フィルタリングされた睡眠レコード（最初の20件）</h3>
-      <div class="overflow-x-auto">
-        <table class="min-w-full bg-white border border-gray-200">
-          <thead>
-            <tr>
-              <th class="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700">開始時刻</th>
-              <th class="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700">終了時刻</th>
-              <th class="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700">タイプ</th>
-              <th class="py-2 px-4 border-b text-right text-sm font-semibold text-gray-700">期間 (分)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @healthcare_import_form.filtered_sleep_records.first(20).each do |record| %>
-              <% start_time = Time.parse(record['startDate']) rescue nil %>
-              <% end_time = Time.parse(record['endDate']) rescue nil %>
-              <% duration_minutes = (end_time && start_time) ? ((end_time - start_time) / 60).to_i : 'N/A' %>
-              <tr>
-                <td class="py-2 px-4 border-b text-sm"><%= start_time&.strftime('%Y-%m-%d %H:%M:%S %Z') || 'N/A' %></td>
-                <td class="py-2 px-4 border-b text-sm"><%= end_time&.strftime('%Y-%m-%d %H:%M:%S %Z') || 'N/A' %></td>
-                <td class="py-2 px-4 border-b text-sm"><%= record['value'] %></td>
-                <td class="py-2 px-4 border-b text-right text-sm"><%= duration_minutes %></td>
-              </tr>
+        <%= form_with model: @healthcare_import_form, url: import_healthcare_data_sleep_logs_path, method: :post, local: true, multipart: true, data: { turbo: false } do |form| %>
+          <div class="space-y-4 w-full">
+            <% if @healthcare_import_form.errors.any? %>
+              <div class="text-sm text-error">
+                <%= @healthcare_import_form.errors.full_messages.first %>
+              </div>
             <% end %>
-          </tbody>
-        </table>
-      </div>
-      <p class="text-sm text-gray-600 mt-2">（すべてのレコードを表示すると長くなるため、最初の20件のみ表示しています）</p>
-    <% end %>
 
-    <% if @healthcare_import_form.sleep_blocks.present? %>
-      <h3 class="text-lg font-semibold mt-8 mb-4">「一塊の睡眠」検出結果（<%= @healthcare_import_form.sleep_blocks.count %>件）</h3>
-      <div class="overflow-x-auto">
-        <table class="min-w-full bg-white border border-gray-200">
-          <thead>
-            <tr>
-              <th class="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700">開始時刻</th>
-              <th class="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700">終了時刻</th>
-              <th class="py-2 px-4 border-b text-right text-sm font-semibold text-gray-700">期間 (分)</th>
-              <th class="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700">睡眠日</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @healthcare_import_form.sleep_blocks.each do |block| %>
-              <tr>
-                <td class="py-2 px-4 border-b text-sm"><%= block[:start_date]&.strftime('%Y-%m-%d %H:%M:%S %Z') || 'N/A' %></td>
-                <td class="py-2 px-4 border-b text-sm"><%= block[:end_date]&.strftime('%Y-%m-%d %H:%M:%S %Z') || 'N/A' %></td>
-                <td class="py-2 px-4 border-b text-right text-sm"><%= block[:duration_minutes].to_i %></td>
-                <td class="py-2 px-4 border-b text-sm"><%= block[:sleep_date]&.strftime('%Y-%m-%d') || 'N/A' %></td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
+            <!-- ZIPファイル -->
+            <div>
+              <%= form.label :zip_file, "ZIPファイル", class: "block text-sm/6 font-medium" %>
+              <div class="mt-2">
+                <%= form.file_field :zip_file, accept: ".zip", class: "file-input file-input-sm w-full bg-primary text-sm px-3 py-1.5 rounded-md outline outline-1 -outline-offset-1 outline-secondary" %>
+              </div>
+            </div>
+          </div>
+
+          <div class="actions mt-10 flex w-full justify-center rounded-md bg-accent px-3 py-1.5 font-semibold text-primary shadow-sm">
+            <%= form.submit "インポート" %>
+          </div>
+        <% end %>
       </div>
-    <% end %>
+
+      <div class="collapse collapse-plus bg-base-100 border border-base-300">
+        <input type="checkbox" name="my-accordion-3" />
+        <div class="collapse-title text-base lg:text-2xl font-semibold text-center">使い方</div>
+
+        <div class="collapse-content">
+          <div class="flex flex-col-reverse md:flex-row justify-center items-center gap-8 md:gap-12 lg:gap-20 mx-4 md:mx-10 mb-12">
+            <div class="w-full md:w-1/2 text-sm lg:text-xl">
+              <%= image_tag("how_to_import/01_pokesleep.jpg", class: "rounded-xl w-fit h-auto object-cover") %>
+            </div>
+            <div class="w-full md:w-1/2 text-sm lg:text-xl">
+              まずはヘルスケアとデータ連携できるような睡眠計測アプリや、AppleWatchを使って寝てください。</br>
+              <%= link_to "ポケスリはイイゾ", "https://www.pokemonsleep.net/devices/ios/", class: "underline underline-accent text-accent" %>
+            </div>
+          </div>
+
+          <div class="flex flex-col-reverse md:flex-row justify-center items-center gap-8 md:gap-12 lg:gap-20 mx-4 md:mx-10 mb-12">
+            <div class="w-full md:w-1/2 text-sm lg:text-xl">
+              <%= image_tag("how_to_import/02_open_healthcare.png", class: "rounded-xl w-fit h-auto object-cover") %>
+            </div>
+            <div class="w-full md:w-1/2 text-sm lg:text-xl">
+              iPhoneのヘルスケアアプリを開き、右上のアイコンを押してください。
+            </div>
+          </div>
+
+          <div class="flex flex-col-reverse md:flex-row justify-center items-center gap-8 md:gap-12 lg:gap-20 mx-4 md:mx-10 mb-12">
+            <div class="w-full md:w-1/2 text-sm lg:text-xl">
+              <%= image_tag("how_to_import/03_export_healthcare.png", class: "rounded-xl w-fit h-auto object-cover") %>
+            </div>
+            <div class="w-full md:w-1/2 text-sm lg:text-xl">
+              下の方にある「すべてのヘルスケアデータを書き出す」を押して、お好みのフォルダに保存してください。</br>
+              (データ量によっては数分かかります。)
+            </div>
+          </div>
+
+          <div class="flex flex-col-reverse md:flex-row justify-center items-center gap-8 md:gap-12 lg:gap-20 mx-4 md:mx-10 mb-12">
+            <div class="w-full md:w-1/2 text-sm lg:text-xl">
+              <%= image_tag("how_to_import/04_import_pgae.png", class: "rounded-xl w-fit h-auto object-cover") %>
+            </div>
+            <div class="w-full md:w-1/2 text-sm lg:text-xl">
+              こちらのページを開き、ファイルを選択で先ほどダウンロードしたZIPデータを選択してください。</br>
+              (ファイル名は変えないでくださいませ！)
+            </div>
+          </div>
+
+          <div class="flex flex-col-reverse md:flex-row justify-center items-center gap-8 md:gap-12 lg:gap-20 mx-4 md:mx-10 mb-12">
+            <div class="w-full md:w-1/2 text-sm lg:text-xl">
+              <%= image_tag("how_to_import/05_imported.png", class: "rounded-xl w-fit h-auto object-cover") %>
+            </div>
+            <div class="w-full md:w-1/2 text-sm lg:text-xl">
+              インポートボタンを押したら、コーヒーでも淹れてください☕️</br>
+              戻ってきたらきっとあなたの記録が反映されているハズ。</br>
+              (※コメントは上書きしません。)
+            </div>
+          </div>
+
+          <div class="flex flex-col-reverse md:flex-row justify-center items-center gap-8 md:gap-12 lg:gap-20 mx-4 md:mx-10 mb-12">
+            <ul class="list-disc ml-4">
+              <li>インポートに数分かかります。</li>
+              <li>処理の都合上、過去62日間分しか保存できません。</li>
+              <li>独特な計算方法で睡眠記録を算出しているので、お使いのスマホアプリと異なる表示になる場合があります。</li>
+              <li>めっちゃ細かい話しますと、中途覚醒時間込みの睡眠時間で今のところ算出しているので、眠れぬ夜でも睡眠時間が長い場合があります。</li>
+              <li>午前4時区切りで日付判断しています。ポケスリと一緒です。</li>
+              <li>1日に何度も寝てる場合は、一番長く寝たものを睡眠と捉え、それ以外を昼寝と判定しています。</li>
+              <li>スマホアプリで計測している場合はベットに入った時刻もちゃんと計測してくれているハズなので、それを睡眠時間として判定しています。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
   </div>
 </div>
-
-
 
