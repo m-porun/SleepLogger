@@ -1,7 +1,7 @@
 class SleepLogsController < ApplicationController
   # ログインしていない場合はログイン画面にリダイレクト
-  before_action :authenticate_user!, only: [ :index, :new, :edit, :destroy ]
-  before_action :set_user, only: [ :index, :new, :create, :edit, :update, :destroy ] # user情報を取得
+  before_action :authenticate_user!, only: [ :index, :new, :create, :edit, :update, :destroy, :import, :import_healthcare_data ]
+  before_action :set_user, only: [ :index, :new, :create, :edit, :update, :destroy, :import, :import_healthcare_data ] # user情報を取得
   before_action :set_sleep_log, only: [ :edit, :update, :destroy ] # ユーザーの睡眠記録を取得
 
   def index
@@ -108,6 +108,24 @@ class SleepLogsController < ApplicationController
     redirect_to sleep_logs_path, notice: "睡眠記録を削除しました"
   end
 
+  # ヘルスケアのzipデータを受け取るリクエストフォーム
+  def import
+    @healthcare_import_form = HealthcareImportForm.new(user: @user)
+  end
+
+  # ヘルスケアのzipデータを受け取った後、zip->xmlにして加工する
+  def import_healthcare_data
+    @healthcare_import_form = HealthcareImportForm.new(healthcare_import_params.merge(user: @user))
+
+    # もしインポートできてxmlファイルに加工でたら
+    if @healthcare_import_form.valid? && @healthcare_import_form.process_file
+      redirect_to sleep_logs_path, notice: "インポートできますた"
+    else
+      flash.now[:alert] = @healthcare_import_form.errors.full_messages.join(", ")
+      render :import, status: :unprocessable_entity # ステータスコード指定
+    end
+  end
+
   private
 
   def set_user
@@ -153,5 +171,10 @@ class SleepLogsController < ApplicationController
       # sleep_dateキーから値を探す
       sleep_logs[sleep_date] || current_user.sleep_logs.build(sleep_date: sleep_date)
     end
+  end
+
+  # zipファイルのみを受け付ける
+  def healthcare_import_params
+    params.require(:healthcare_import_form).permit(:zip_file)
   end
 end

@@ -38,7 +38,12 @@ Rails.application.routes.draw do
   end
 
   # リソースルート
-  resources :sleep_logs, only: [ :index, :new, :edit, :update, :create, :destroy ]
+  resources :sleep_logs, only: [ :index, :new, :edit, :update, :create, :destroy ] do
+    collection do
+      get :import
+      post :import_healthcare_data
+    end
+  end
 
   # ヘルスチェック用のルート 正常に稼働しているか外部から監視
   get "up", to: "rails/health#show", as: :rails_health_check
