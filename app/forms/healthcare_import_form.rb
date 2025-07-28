@@ -435,4 +435,3 @@ class HealthcareImportForm
     end
   end
 end
-

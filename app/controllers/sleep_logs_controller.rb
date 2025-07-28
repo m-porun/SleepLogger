@@ -178,4 +178,3 @@ class SleepLogsController < ApplicationController
     params.require(:healthcare_import_form).permit(:zip_file)
   end
 end
-
