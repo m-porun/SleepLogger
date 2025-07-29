@@ -64,7 +64,7 @@ class HealthcareImportSaxHandler < Nokogiri::XML::SAX::Document
       break if type_val && start_date_str && end_date_str && value_str
     end
 
-    # typeの値が睡眠タイプHKCategoryTypeIdentifierSleepAnalysis出ない場合は除外 
+    # typeの値が睡眠タイプHKCategoryTypeIdentifierSleepAnalysis出ない場合は除外
     return unless type_val == "HKCategoryTypeIdentifierSleepAnalysis"
 
     # Recordの中にはstartDate="2025-07-17 02:08:43 +0900"などが空白区切りで入っている
@@ -81,7 +81,7 @@ class HealthcareImportSaxHandler < Nokogiri::XML::SAX::Document
 
     # 睡眠日を決める
     current_sleep_date = calculate_sleep_date(record_end_time)
-    
+
     # 新しい日付に更新されたら、それまでメモリに覚えさせていた日別のサマリーを処理する
     if @last_processed_date && @last_processed_date != current_sleep_date
       # 完全に集計が終わった日付のデータをプロセッサに渡す
@@ -91,7 +91,7 @@ class HealthcareImportSaxHandler < Nokogiri::XML::SAX::Document
     end
 
     @last_processed_date = current_sleep_date # 現在処理中の日付を更新
-  
+
     # 現在の睡眠日のサマリーを初期化（存在しない場合）
     @daily_summaries[current_sleep_date] ||= {
       in_bed_records: [],
