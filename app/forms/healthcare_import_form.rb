@@ -156,7 +156,7 @@ class HealthcareImportForm
   # ファイルは選択されているか？
   validates :zip_file, presence: true
   # ZIPファイル形式のバリデーション集
-  # validate :validate_zip_file
+  validate :validate_zip_file
 
   # 引数には、キー名がzip_fileとuserのハッシュが渡されてくる
   def initialize(attributes = {}) # もし引数にattributesが渡されなかったら、空のハッシュを入れる
@@ -209,30 +209,30 @@ class HealthcareImportForm
   private
 
   # ZIPファイルのみを受け付けるバリデーション
-#  def validate_zip_file
-#    return unless zip_file.present?
-#
-#    unless zip_file.content_type == "application/zip"
-#      errors.add(:zip_file, "ZIPファイルを選択してください")
-#    end
-#  end
+  def validate_zip_file
+    return unless zip_file.present?
+
+    unless zip_file.content_type == "application/zip"
+      errors.add(:zip_file, "ZIPファイルを選択してください")
+    end
+  end
 
   # XML抽出メソッド
-#  def extract_xml_content
-#    pp "extract_xml_content"
-#    Zip::File.open(zip_file.tempfile.path) do |zip_file_obj|
-#      export_entry = zip_file_obj.glob("**/apple_health_export/export.xml").first
-#      unless export_entry
-#        export_entry = zip_file_obj.find_entry("export.xml")
-#        unless export_entry
-#          errors.add(:base, "export.xmlファイルが見つからないです")
-#          return false
-#        end
-#      end
-#
-#      @xml_content = export_entry.get_input_stream.read
-#      true
-#    end
+  def extract_xml_content
+    pp "extract_xml_content"
+    Zip::File.open(zip_file.tempfile.path) do |zip_file_obj|
+      export_entry = zip_file_obj.glob("**/apple_health_export/export.xml").first
+      unless export_entry
+        export_entry = zip_file_obj.find_entry("export.xml")
+        unless export_entry
+          errors.add(:base, "export.xmlファイルが見つからないです")
+          return false
+        end
+      end
+
+      @xml_content = export_entry.get_input_stream.read
+      true
+    end
   end
 
   # 日別データを受け取り、睡眠ブロックのグループ化とデータベース保存を実行する
