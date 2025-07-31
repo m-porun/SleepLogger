@@ -219,22 +219,22 @@ class HealthcareImportForm
   end
 
   # XML抽出メソッド
-#  def extract_xml_content
-#    pp "extract_xml_content"
-#    Zip::File.open(zip_file.tempfile.path) do |zip_file_obj|
-#      export_entry = zip_file_obj.glob("**/apple_health_export/export.xml").first
-#      unless export_entry
-#        export_entry = zip_file_obj.find_entry("export.xml")
-#        unless export_entry
-#          errors.add(:base, "export.xmlファイルが見つからないです")
-#          return false
-#        end
-#      end
-#
-#      @xml_content = export_entry.get_input_stream.read
-#      true
-#    end
-#  end
+  #  def extract_xml_content
+  #    pp "extract_xml_content"
+  #    Zip::File.open(zip_file.tempfile.path) do |zip_file_obj|
+  #      export_entry = zip_file_obj.glob("**/apple_health_export/export.xml").first
+  #      unless export_entry
+  #        export_entry = zip_file_obj.find_entry("export.xml")
+  #        unless export_entry
+  #          errors.add(:base, "export.xmlファイルが見つからないです")
+  #          return false
+  #        end
+  #      end
+  #
+  #      @xml_content = export_entry.get_input_stream.read
+  #      true
+  #    end
+  #  end
 
   # 日別データを受け取り、睡眠ブロックのグループ化とデータベース保存を実行する
   def process_daily_sleep_data(sleep_date, summary_data)
