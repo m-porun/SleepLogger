@@ -110,11 +110,13 @@ class SleepLogsController < ApplicationController
 
   # ヘルスケアのzipデータを受け取るリクエストフォーム
   def import
+    pp "import request"
     @healthcare_import_form = HealthcareImportForm.new(user: @user)
   end
 
   # ヘルスケアのzipデータを受け取った後、zip->xmlにして加工する
   def import_healthcare_data
+    pp "import healthcare data"
     @healthcare_import_form = HealthcareImportForm.new(healthcare_import_params.merge(user: @user))
 
     # もしインポートできてxmlファイルに加工でたら
