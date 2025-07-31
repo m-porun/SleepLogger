@@ -160,7 +160,6 @@ class HealthcareImportForm
 
   # 引数には、キー名がzip_fileとuserのハッシュが渡されてくる
   def initialize(attributes = {}) # もし引数にattributesが渡されなかったら、空のハッシュを入れる
-    pp "ImportForm initialize"
     # zip_fileのみを加工できるように、Userモデルのインスタンスを切り出してインスタンス変数に入れておく
     @user = attributes.delete(:user)
     # zip_fileをattributesに渡す
@@ -192,6 +191,7 @@ class HealthcareImportForm
         record_processor: daily_summary_processor,
         daily_summaries: daily_summaries_in_progress
       )
+      pp "これからSAXパース開始"
       Nokogiri::XML::SAX::Parser.new(sax_handler).parse(@xml_content)
 
       true
