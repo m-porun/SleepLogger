@@ -278,7 +278,7 @@ class HealthcareImportForm
           duration_minutes: (record_end - record_start) / 60,
           records: [ record ]
         }
-      elsif ( record_start - current_block[:end_date] ).abs < 10 * 60 # 前のレコードendと今回のレコードstartが10分未満の間に連続している場合
+      elsif (record_start - current_block[:end_date]).abs < 10 * 60 # 前のレコードendと今回のレコードstartが10分未満の間に連続している場合
         current_block[:end_date] = record_end
         current_block[:duration_minutes] += (record_end - record_start) / 60
         current_block[:records] << record
