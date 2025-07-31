@@ -156,7 +156,7 @@ class HealthcareImportForm
   # ファイルは選択されているか？
   validates :zip_file, presence: true
   # ZIPファイル形式のバリデーション集
-  validate :validate_zip_file
+  # validate :validate_zip_file
 
   # 引数には、キー名がzip_fileとuserのハッシュが渡されてくる
   def initialize(attributes = {}) # もし引数にattributesが渡されなかったら、空のハッシュを入れる
@@ -209,13 +209,13 @@ class HealthcareImportForm
   private
 
   # ZIPファイルのみを受け付けるバリデーション
-  def validate_zip_file
-    return unless zip_file.present?
-
-    unless zip_file.content_type == "application/zip"
-      errors.add(:zip_file, "ZIPファイルを選択してください")
-    end
-  end
+#  def validate_zip_file
+#    return unless zip_file.present?
+#
+#    unless zip_file.content_type == "application/zip"
+#      errors.add(:zip_file, "ZIPファイルを選択してください")
+#    end
+#  end
 
   # XML抽出メソッド
 #  def extract_xml_content
