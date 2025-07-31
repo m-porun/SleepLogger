@@ -2,7 +2,6 @@
 # Gemfileから使いたいライブラリを呼び出す
 require "zip" # zipファイル解凍用
 require "nokogiri" # パース用
-require "benchmark" # <--- ベンチマーク用のライブラリを追加
 
 # XMLをSAX方式で解析するためのハンドラクラス。イベントに対してどう処理するか
 # 解析処理を軽くするため、XMLの要素から必要なデータだけを抽出する
@@ -31,6 +30,7 @@ class HealthcareImportSaxHandler < Nokogiri::XML::SAX::Document
   # 必要なデータを抽出して入れておく配列たち
   # SAXハンドラー内で一時的に日別集計を保持
   def initialize(record_processor:, daily_summaries:)
+    pp "initialize"
     @record_processor = record_processor # 日別集計が確定した際に呼び出すコールバック
     @daily_summaries = daily_summaries # フォームオブジェクトに共有する日別集計ハッシュ
     @cutoff_date = (Time.current - DAYS_TO_KEEP.days).beginning_of_day
@@ -160,6 +160,7 @@ class HealthcareImportForm
 
   # 引数には、キー名がzip_fileとuserのハッシュが渡されてくる
   def initialize(attributes = {}) # もし引数にattributesが渡されなかったら、空のハッシュを入れる
+    pp "ImportForm initialize"
     # zip_fileのみを加工できるように、Userモデルのインスタンスを切り出してインスタンス変数に入れておく
     @user = attributes.delete(:user)
     # zip_fileをattributesに渡す
@@ -172,41 +173,35 @@ class HealthcareImportForm
   def process_file
     return false unless valid?
 
-    result = Benchmark.measure("Total process_file") do
-      xml_extract_success = false
-      Benchmark.measure("Extract XML Content") do
-        xml_extract_success = extract_xml_content
-      end.tap { |t| Rails.logger.info "Benchmark: Extract XML Content: #{t.real.round(4)}s" }
+    xml_extract_success = false
+    xml_extract_success = extract_xml_content
 
-      if xml_extract_success
-        # 日ごとのサマリーをSAXハンドラーと共有するためのハッシュ
-        # SAXハンドラーはこのハッシュにデータを蓄積し、日付が変わるとdaily_summary_processorに渡す
-        daily_summaries_in_progress = {}
+    if xml_extract_success
+      # 日ごとのサマリーをSAXハンドラーと共有するためのハッシュ
+      # SAXハンドラーはこのハッシュにデータを蓄積し、日付が変わるとdaily_summary_processorに渡す
+      daily_summaries_in_progress = {}
 
-        # SAXハンドラーから日別データが確定した際に呼び出されるコールバック
-        daily_summary_processor = Proc.new do |sleep_date, summary_data|
-          # ここで、SAXハンドラーから渡された日別データを元に、SleepLogを保存する
-          process_daily_sleep_data(sleep_date, summary_data)
-        end
-
-        # SAXハンドラーのインスタンス化とパース
-        Benchmark.measure("SAX Parse and Daily Processing") do
-          sax_handler = HealthcareImportSaxHandler.new(
-            record_processor: daily_summary_processor,
-            daily_summaries: daily_summaries_in_progress
-          )
-          Nokogiri::XML::SAX::Parser.new(sax_handler).parse(@xml_content)
-        end.tap { |t| Rails.logger.info "Benchmark: SAX Parse and Daily Processing: #{t.real.round(4)}s" }
-
-        true
-      else
-        false
+      # SAXハンドラーから日別データが確定した際に呼び出されるコールバック
+      daily_summary_processor = Proc.new do |sleep_date, summary_data|
+        # ここで、SAXハンドラーから渡された日別データを元に、SleepLogを保存する
+        process_daily_sleep_data(sleep_date, summary_data)
       end
-    rescue => e
-      Rails.logger.error "ファイル処理中にエラーが発生しました: #{e.message}\n#{e.backtrace.join("\n")}"
-      errors.add(:base, "ファイル処理中にエラーが発生しました: #{e.message}")
+
+      # SAXハンドラーのインスタンス化とパース
+      sax_handler = HealthcareImportSaxHandler.new(
+        record_processor: daily_summary_processor,
+        daily_summaries: daily_summaries_in_progress
+      )
+      Nokogiri::XML::SAX::Parser.new(sax_handler).parse(@xml_content)
+
+      true
+    else
       false
-    end.tap { |t| Rails.logger.info "Benchmark: Total process_file: #{t.real.round(4)}s" }
+    end
+  rescue => e
+    Rails.logger.error "ファイル処理中にエラーが発生しました: #{e.message}\n#{e.backtrace.join("\n")}"
+    errors.add(:base, "ファイル処理中にエラーが発生しました: #{e.message}")
+    false
   end
 
   private
@@ -222,6 +217,7 @@ class HealthcareImportForm
 
   # XML抽出メソッド
   def extract_xml_content
+    pp "extract_xml_content"
     Zip::File.open(zip_file.tempfile.path) do |zip_file_obj|
       export_entry = zip_file_obj.glob("**/apple_health_export/export.xml").first
       unless export_entry
@@ -239,6 +235,7 @@ class HealthcareImportForm
 
   # 日別データを受け取り、睡眠ブロックのグループ化とデータベース保存を実行する
   def process_daily_sleep_data(sleep_date, summary_data)
+    pp "process_daily_sleep_data"
     in_bed_records = summary_data[:in_bed_records]
     asleep_records_raw = summary_data[:asleep_records] # 生のAsleepレコード
 
@@ -383,6 +380,7 @@ class HealthcareImportForm
 
   # saveをするメソッド
   def save_sleep_log(attributes)
+    pp "save_sleep_log"
     # ユーザーと睡眠日に基づく睡眠記録を探し、なければ新規作成
     sleep_log = @user.sleep_logs.find_or_initialize_by(sleep_date: attributes[:sleep_date])
 
