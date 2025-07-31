@@ -172,36 +172,38 @@ class HealthcareImportForm
   def process_file
     return false unless valid?
 
-    xml_extract_success = false
-    xml_extract_success = extract_xml_content
+    begin
+      Zip::File.open(zip_file.tempfile.path) do |zip_file_obj|
+        export_entry = zip_file_obj.glob("**/apple_health_export/export.xml").first
+        unless export_entry
+          export_entry = zip_file_obj.find_entry("export.xml")
+          unless export_entry
+            errors.add(:base, "export.xmlファイルが見つからないです")
+            return false
+          end
+        end
 
-    if xml_extract_success
-      # 日ごとのサマリーをSAXハンドラーと共有するためのハッシュ
-      # SAXハンドラーはこのハッシュにデータを蓄積し、日付が変わるとdaily_summary_processorに渡す
-      daily_summaries_in_progress = {}
+        # XMLコンテンツ全体をメモリに読み込まず、ストリームをSAXパーサーに直接渡す
+        export_entry.get_input_stream do |xml_stream| # ストリームを開く
+          daily_summaries_in_progress = {}
 
-      # SAXハンドラーから日別データが確定した際に呼び出されるコールバック
-      daily_summary_processor = Proc.new do |sleep_date, summary_data|
-        # ここで、SAXハンドラーから渡された日別データを元に、SleepLogを保存する
-        process_daily_sleep_data(sleep_date, summary_data)
+          daily_summary_processor = Proc.new do |sleep_date, summary_data|
+            process_daily_sleep_data(sleep_date, summary_data)
+          end
+
+          sax_handler = HealthcareImportSaxHandler.new(
+            record_processor: daily_summary_processor,
+            daily_summaries: daily_summaries_in_progress
+          )
+          pp "これからSAXパース開始"
+          Nokogiri::XML::SAX::Parser.new(sax_handler).parse(xml_stream) # ストリームを直接パース
+        end
       end
-
-      # SAXハンドラーのインスタンス化とパース
-      sax_handler = HealthcareImportSaxHandler.new(
-        record_processor: daily_summary_processor,
-        daily_summaries: daily_summaries_in_progress
-      )
-      pp "これからSAXパース開始"
-      Nokogiri::XML::SAX::Parser.new(sax_handler).parse(@xml_content)
-
-      true
-    else
+      true # すべての処理が成功したらtrueを返す
+    rescue => e
+      Rails.logger.error "ファイル処理中にエラーが発生しました: #{e.message}\n#{e.backtrace.join("\n")}"
+      errors.add(:base, "ファイル処理中にエラーが発生しました: #{e.message}")
       false
-    end
-  rescue => e
-    Rails.logger.error "ファイル処理中にエラーが発生しました: #{e.message}\n#{e.backtrace.join("\n")}"
-    errors.add(:base, "ファイル処理中にエラーが発生しました: #{e.message}")
-    false
   end
 
   private
@@ -216,21 +218,21 @@ class HealthcareImportForm
   end
 
   # XML抽出メソッド
-  def extract_xml_content
-    pp "extract_xml_content"
-    Zip::File.open(zip_file.tempfile.path) do |zip_file_obj|
-      export_entry = zip_file_obj.glob("**/apple_health_export/export.xml").first
-      unless export_entry
-        export_entry = zip_file_obj.find_entry("export.xml")
-        unless export_entry
-          errors.add(:base, "export.xmlファイルが見つからないです")
-          return false
-        end
-      end
-
-      @xml_content = export_entry.get_input_stream.read
-      true
-    end
+#  def extract_xml_content
+#    pp "extract_xml_content"
+#    Zip::File.open(zip_file.tempfile.path) do |zip_file_obj|
+#      export_entry = zip_file_obj.glob("**/apple_health_export/export.xml").first
+#      unless export_entry
+#        export_entry = zip_file_obj.find_entry("export.xml")
+#        unless export_entry
+#          errors.add(:base, "export.xmlファイルが見つからないです")
+#          return false
+#        end
+#      end
+#
+#      @xml_content = export_entry.get_input_stream.read
+#      true
+#    end
   end
 
   # 日別データを受け取り、睡眠ブロックのグループ化とデータベース保存を実行する
