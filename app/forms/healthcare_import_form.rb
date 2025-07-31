@@ -24,8 +24,8 @@ class HealthcareImportSaxHandler < Nokogiri::XML::SAX::Document
   # 取り扱う日数の定数
   DAYS_TO_KEEP = 31
 
-  # 日付の変わり目を決める定数(午前4時)
-  DAILY_CUT_OFF_HOUR= 4
+  # 日付の変わり目を決める定数(午後4時)
+  DAILY_CUT_OFF_HOUR= 16
 
   # 必要なデータを抽出して入れておく配列たち
   # SAXハンドラー内で一時的に日別集計を保持
@@ -278,7 +278,7 @@ class HealthcareImportForm
           duration_minutes: (record_end - record_start) / 60,
           records: [ record ]
         }
-      elsif record_start == current_block[:end_date] # 前のレコードendと今回のレコードstartが連続している場合
+      elsif ( record_start - current_block[:end_date] ).abs < 10 * 60 # 前のレコードendと今回のレコードstartが10分未満の間に連続している場合
         current_block[:end_date] = record_end
         current_block[:duration_minutes] += (record_end - record_start) / 60
         current_block[:records] << record
